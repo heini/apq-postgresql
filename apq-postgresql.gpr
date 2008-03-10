@@ -1,0 +1,42 @@
+-- Build file for Aw_Lib.
+--
+-- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
+--
+-- Repository information:
+-- $Date: 2008-02-25 19:47:48 -0300 (Seg, 25 Fev 2008) $
+-- $Revision: 234 $
+-- $Author: ogro $
+
+
+with "apq.gpr";
+
+project APQ.PostgreSQL is
+
+	version := "2.3.0";
+	
+	
+	type Supported_OS is ("WIN32", "GNU/Linux");
+	
+	target: Supported_OS := external("TARGET", "GNU/Linux");
+	
+	
+	
+	for Source_Dirs use ( "src" );
+	for Object_Dir use "obj";
+	
+	-- LIBRARY
+	for Library_Dir use "lib";
+	for Library_Name use "apq-postgresql";
+	for Library_Kind use "dynamic";
+	for Library_Version use "libapq-postgresql.so." & Version;
+	
+	
+	package Compiler is
+		for Default_Switches ("ada") use ("-O2", "-gnat05");
+	end Compiler;
+
+
+	package Linker renames APQ.Linker;
+
+end APQ.PostgreSQL;
+
