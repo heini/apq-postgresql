@@ -19,9 +19,11 @@ project APQ.PostgreSQL is
 	
 	target: Supported_OS := external("TARGET", "GNU/Linux");
 	
-	
+
+	for Languages use ( "Ada", "C" );
 	
 	for Source_Dirs use ( "src" );
+	
 	for Object_Dir use "obj";
 	
 	-- LIBRARY
@@ -36,7 +38,14 @@ project APQ.PostgreSQL is
 	end Compiler;
 
 
-	package Linker renames APQ.Linker;
+
+	package Linker is
+		for Default_Switches ("Ada") use
+			APQ.Linker'Default_Switches("Ada") &
+			"-lpq" &
+			"-lapq-postgresqlhelp";
+		--for Default_Switches ("ada") use ("-ldl", "-lpq");
+	end Linker;
 
 end APQ.PostgreSQL;
 

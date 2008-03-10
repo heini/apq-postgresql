@@ -7,14 +7,23 @@ ADA_PROJECT_PATH=.:../awlib:../apq
 projectFile="apq-postgresql.gpr"
 
 
-libs:
+libs: c_libs
 	ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatmake -P ${projectFile}
+
+
+
+c_libs: c_objs
+	cd lib && gcc -shared ../obj-c/{numeric,notices}.o -o libapq-postgresqlhelp.so -lpq
+
+c_objs:
+	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
 
 all: libs
 
 
 clean:
 	@ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatclean -P ${projectFile}
+	@rm -f obj-c/* lib/*
 	@echo "All clean"
 
 docs:
