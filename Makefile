@@ -16,7 +16,7 @@ c_libs: c_objs
 	cd lib && gcc -shared ../obj-c/{numeric,notices}.o -o libapq-postgresqlhelp.so -lpq
 
 c_objs:
-	cd obj-c && gcc -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -I../src-c ../src-c/notices.c -c -o notices.o
+	cd obj-c && gcc -fPIC -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -fPIC -I../src-c ../src-c/notices.c -c -o notices.o
 
 all: libs
 
