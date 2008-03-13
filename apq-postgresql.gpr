@@ -12,7 +12,7 @@ with "apq.gpr";
 
 project APQ.PostgreSQL is
 
-	version := "2.3.0";
+	version := APQ.version;
 	
 	
 	type Supported_OS is ("WIN32", "GNU/Linux");
