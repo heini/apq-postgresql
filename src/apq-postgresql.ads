@@ -38,63 +38,63 @@
 
 package APQ.PostgreSQL is
 
-	pragma Linker_Options("-lpq");
-	
-	type Result_Type is (
-		Empty_Query,
-		Command_OK,
-		Tuples_OK,
-		Copy_Out,
-		Copy_In,
-		Bad_Response,
-		Nonfatal_Error,
-		Fatal_Error
-		);
-	
-	for Result_Type use (
-		Empty_Query		=> 0,
-		Command_OK		=> 1,
-		Tuples_OK		=> 2,
-		Copy_Out			=> 3,
-		Copy_In			=> 4,
-		Bad_Response	=> 5,
-		Nonfatal_Error	=> 6,
-		Fatal_Error		=> 7 
-		);
-	
-	
-	subtype PG_Smallint is APQ_Smallint;				-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Integer is APQ_Integer;					-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Bigint is APQ_Bigint;						-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Real is APQ_Real;							-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Double is APQ_Double;						-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Serial is APQ_Serial;						-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Bigserial is APQ_Bigserial;				-- For compatibility only (use APQ.Row_ID_Type instead)
-	
-	subtype PG_Oid is APQ.Row_ID_Type;					-- For compatibility only (use APQ.Row_ID_Type instead)
-	subtype PG_Boolean is Boolean;						-- For compatibility only (use APQ_Boolean or Boolean instead)
-	subtype PG_Date is APQ_Date;							-- For compatibility only (use APQ_Date instead)
-	subtype PG_Time is APQ_Time;							-- For compatibility only (use APQ_Time instead)
-	subtype PG_Timestamp is APQ_Timestamp;				-- For compatibility only (use APQ_Timestamp instead)
-	subtype PG_Timezone is APQ_Timezone;				-- For compatibility only (use APQ_Timestamp instead)
-	subtype PG_Bitstring is APQ_Bitstring;				-- For compatibility only (use APQ_Timestamp instead)
-	
-	type Mode_Type is (
-		Write,
-		Read,
-		Read_Write
-		);
-	for Mode_Type use (
-		Write			=> 16#00020000#,		-- Write access
-		Read			=> 16#00040000#,		-- Read access
-		Read_Write	=> 16#00060000#		-- Read/Write access
-		);
-	for Mode_Type'Size use 32;
-	
+   pragma Linker_Options("-lpq");
+   
+   type Result_Type is (
+      Empty_Query,
+      Command_OK,
+      Tuples_OK,
+      Copy_Out,
+      Copy_In,
+      Bad_Response,
+      Nonfatal_Error,
+      Fatal_Error
+      );
+   
+   for Result_Type use (
+      Empty_Query    => 0,
+      Command_OK     => 1,
+      Tuples_OK      => 2,
+      Copy_Out       => 3,
+      Copy_In        => 4,
+      Bad_Response   => 5,
+      Nonfatal_Error => 6,
+      Fatal_Error    => 7 
+      );
+   
+   
+   subtype PG_Smallint is APQ_Smallint;            -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Integer is APQ_Integer;              -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Bigint is APQ_Bigint;                -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Real is APQ_Real;                    -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Double is APQ_Double;                -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Serial is APQ_Serial;                -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Bigserial is APQ_Bigserial;          -- For compatibility only (use APQ.Row_ID_Type instead)
+   
+   subtype PG_Oid is APQ.Row_ID_Type;              -- For compatibility only (use APQ.Row_ID_Type instead)
+   subtype PG_Boolean is Boolean;                  -- For compatibility only (use APQ_Boolean or Boolean instead)
+   subtype PG_Date is APQ_Date;                    -- For compatibility only (use APQ_Date instead)
+   subtype PG_Time is APQ_Time;                    -- For compatibility only (use APQ_Time instead)
+   subtype PG_Timestamp is APQ_Timestamp;          -- For compatibility only (use APQ_Timestamp instead)
+   subtype PG_Timezone is APQ_Timezone;            -- For compatibility only (use APQ_Timestamp instead)
+   subtype PG_Bitstring is APQ_Bitstring;          -- For compatibility only (use APQ_Timestamp instead)
+   
+   type Mode_Type is (
+      Write,
+      Read,
+      Read_Write
+      );
+   for Mode_Type use (
+      Write       => 16#00020000#,     -- Write access
+      Read        => 16#00040000#,     -- Read access
+      Read_Write  => 16#00060000#      -- Read/Write access
+      );
+   for Mode_Type'Size use 32;
+   
 private
 
-	type PQOid_Type is mod 2 ** 32;		-- Currently PostgreSQL uses unsigned int for Oid
-	
-	Null_Row_ID : constant Row_ID_Type := 0;  -- Value representing no OID
+   type PQOid_Type is mod 2 ** 32;           -- Currently PostgreSQL uses unsigned int for Oid
+   
+   Null_Row_ID : constant Row_ID_Type := 0;  -- Value representing no OID
 
 end APQ.PostgreSQL;
