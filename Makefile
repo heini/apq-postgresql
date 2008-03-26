@@ -2,13 +2,12 @@
 #
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
-ADA_PROJECT_PATH=.:../awlib:../apq
 
 projectFile="apq-postgresql.gpr"
 
 
 libs: c_libs
-	ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatmake -P ${projectFile}
+	gnatmake -P ${projectFile}
 
 
 
@@ -22,7 +21,7 @@ all: libs
 
 
 clean:
-	@ADA_PROJECT_PATH=${ADA_PROJECT_PATH} gnatclean -P ${projectFile}
+	gnatclean -P ${projectFile}
 	@rm -f obj-c/* lib/*
 	@echo "All clean"
 
