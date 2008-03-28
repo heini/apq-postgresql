@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --         Copyright (C) 2002-2007, Warren W. Gay VE3WWG                    --
---         Copyright (C) 2007-2008, Marcelo C. de Freitas (OgRo)            --
+--         Copyright (C) 2007-2008, Ydea Desenv. de Softwares Ltda          --
 --                                                                          --
 --                                                                          --
 -- APQ is free software;  you can  redistribute it  and/or modify it under  --
@@ -37,9 +37,9 @@
 -------------------------------------------------------------------------------
 
 package APQ.PostgreSQL is
-
-	pragma Linker_Options("-lpq");
 	
+	pragma Linker_Options("-lpq");
+
 	type Result_Type is (
 		Empty_Query,
 		Command_OK,
@@ -61,8 +61,8 @@ package APQ.PostgreSQL is
 		Nonfatal_Error	=> 6,
 		Fatal_Error		=> 7 
 		);
-	
-	
+
+
 	subtype PG_Smallint is APQ_Smallint;			-- For compatibility only (use APQ.Row_ID_Type instead)
 	subtype PG_Integer is APQ_Integer;			-- For compatibility only (use APQ.Row_ID_Type instead)
 	subtype PG_Bigint is APQ_Bigint;			-- For compatibility only (use APQ.Row_ID_Type instead)
@@ -70,7 +70,7 @@ package APQ.PostgreSQL is
 	subtype PG_Double is APQ_Double;			-- For compatibility only (use APQ.Row_ID_Type instead)
 	subtype PG_Serial is APQ_Serial;			-- For compatibility only (use APQ.Row_ID_Type instead)
 	subtype PG_Bigserial is APQ_Bigserial;			-- For compatibility only (use APQ.Row_ID_Type instead)
-	
+
 	subtype PG_Oid is APQ.Row_ID_Type;			-- For compatibility only (use APQ.Row_ID_Type instead)
 	subtype PG_Boolean is Boolean;				-- For compatibility only (use APQ_Boolean or Boolean instead)
 	subtype PG_Date is APQ_Date;				-- For compatibility only (use APQ_Date instead)
@@ -78,7 +78,7 @@ package APQ.PostgreSQL is
 	subtype PG_Timestamp is APQ_Timestamp;			-- For compatibility only (use APQ_Timestamp instead)
 	subtype PG_Timezone is APQ_Timezone;			-- For compatibility only (use APQ_Timestamp instead)
 	subtype PG_Bitstring is APQ_Bitstring;			-- For compatibility only (use APQ_Timestamp instead)
-	
+
 	type Mode_Type is (
 		Write,
 		Read,
@@ -90,11 +90,11 @@ package APQ.PostgreSQL is
 		Read_Write	=> 16#00060000#		-- Read/Write access
 		);
 	for Mode_Type'Size use 32;
-	
+
 private
 
 	type PQOid_Type is mod 2 ** 32;			-- Currently PostgreSQL uses unsigned int for Oid
-	
+
 	Null_Row_ID : constant Row_ID_Type := 0;	-- Value representing no OID
 
 end APQ.PostgreSQL;

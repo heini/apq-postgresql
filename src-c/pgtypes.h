@@ -1,3 +1,4 @@
+
 /* Borrowed from postgresql-7.2.1 sources :
  * $Id: pgtypes.h,v 1.4 2002/08/03 03:27:34 wwg Exp $
  *
@@ -6,6 +7,8 @@
  * The contents of this file is extracted from various portions
  * of other postgresql-7.2.1 works.
  */
+
+
 #ifndef _PGTYPES_H_
 #define _PGTYPES_H_
 

@@ -2,12 +2,12 @@
 --                                                                          --
 --                          APQ DATABASE BINDINGS                           --
 --                                                                          --
---                                  A P Q                                   --
+--                            A P Q - POSTGRESQL  	                    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --         Copyright (C) 2002-2007, Warren W. Gay VE3WWG                    --
---         Copyright (C) 2007-2008, Marcelo C. de Freitas (OgRo)            --
+--         Copyright (C) 2007-2008, Ydea Desenv. de Softwares Ltda          --
 --                                                                          --
 --                                                                          --
 -- APQ is free software;  you can  redistribute it  and/or modify it under  --
