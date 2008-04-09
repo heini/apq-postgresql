@@ -312,8 +312,8 @@ package body APQ.PostgreSQL.Client is
 		function Strip_Prefix(S : String) return String is
 			use Ada.Strings.Fixed, Ada.Strings;
 		begin
-			if S(1..7) = "NOTICE:" then
-				return Trim(S(8..S'Last),Left);
+			if S(S'First..S'First+6) = "NOTICE:" then
+				return Trim(S(S'First+7..S'Last),Left);
 			end if;
 			return S;
 		end Strip_Prefix;
