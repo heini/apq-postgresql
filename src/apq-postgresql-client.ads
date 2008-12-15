@@ -91,7 +91,7 @@ package APQ.PostgreSQL.Client is
 	procedure Set_Notify_Proc(C : in out Connection_Type; Notify_Proc : Notify_Proc_Type);
 	function Notify_Proc(C : Connection_Type) return Notify_Proc_Type;
 	
-	procedure Connect(C : in out Connection_Type);
+	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True);
 	procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
 	procedure Disconnect(C : in out Connection_Type);
 	

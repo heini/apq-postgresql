@@ -354,7 +354,7 @@ package body APQ.PostgreSQL.Client is
 
 
 
-	procedure Connect(C : in out Connection_Type) is
+	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True) is
 		procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
 		pragma import(C,Notice_Install,"notice_install");
 		function PQsetdbLogin(pghost, pgport, pgoptions, pgtty, dbname, login, pwd : System.Address) return PG_Conn;
@@ -377,7 +377,7 @@ package body APQ.PostgreSQL.Client is
 
 	begin
 
-		if Is_Connected(C) then
+		if Check_Connection and then Is_Connected(C) then
 			Raise_Exception(Already_Connected'Identity,
 				"PG07: Already connected (Connect).");
 		end if;
