@@ -40,10 +40,10 @@ project APQ.PostgreSQL is
 
 
 	package Linker is
-		for Default_Switches ("Ada") use
-			APQ.Linker'Default_Switches("Ada") &
-			"-lpq" &
-			"-lapq-postgresqlhelp";
+		for Default_Switches ("Ada") use (
+			"-lpq",
+			"-lapq-postgresqlhelp"
+		);
 		--for Default_Switches ("ada") use ("-ldl", "-lpq");
 	end Linker;
 
