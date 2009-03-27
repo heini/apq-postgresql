@@ -15,9 +15,9 @@ project APQ.PostgreSQL is
 	version := APQ.version;
 	
 	
-	type Supported_OS is ("WIN32", "GNU/Linux");
+	type Supported_OS is ("Windows_NT", "GNU/Linux");
 	
-	target: Supported_OS := external("TARGET", "GNU/Linux");
+	target: Supported_OS := external("OS", "GNU/Linux");
 	
 
 	for Languages use ( "Ada", "C" );
@@ -29,7 +29,13 @@ project APQ.PostgreSQL is
 	-- LIBRARY
 	for Library_Dir use "lib";
 	for Library_Name use "apq-postgresql";
-	for Library_Kind use "dynamic";
+	case target is
+		when "Windows_NT" =>
+			for Library_Kind use "static";
+
+		when "GNU/Linux" =>
+			for Library_Kind use "dynamic";
+	end case;
 	for Library_Version use "libapq-postgresql.so." & Version;
 	
 	
