@@ -3,19 +3,33 @@
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com> 
 
 
+
+#POSTGRESQL_PATH=/c/Program Files/PostgreSQL/8.3/
+#POSTGRESQL_INCLUDE=${POSTGRESQL_PATH}/include
+#POSTGRESQL_LIB=${POSTGRESQL_PATH}/lib
+
+
+
+POSTGRESQL_PATH=/c/postgresql/
+POSTGRESQL_INCLUDE=${POSTGRESQL_PATH}/include
+POSTGRESQL_LIB=${POSTGRESQL_PATH}/lib
+
+
+
 projectFile="apq-postgresql.gpr"
 
 
 libs: c_libs
-	gnatmake -P ${projectFile}
+	gnatmake -P ${projectFile} -L"${POSTGRESQL_LIB}" -lpq
 
 
 
 c_libs: c_objs
-	cd lib && gcc -shared ../obj-c/numeric.o ../obj-c/notices.o -o libapq-postgresqlhelp.so -lpq
+	echo bu
+	#cd lib && gcc -shared ../obj-c/numeric.o ../obj-c/notices.o -o libapq-postgresqlhelp.so -L"${POSTGRESQL_LIB}" -lpq
 
 c_objs:
-	cd obj-c && gcc -fPIC -I/usr/include/postgresql/ -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -fPIC -I/usr/include/postgresql/ -I../src-c ../src-c/notices.c -c -o notices.o
+	cd obj && gcc -fPIC -I/usr/include/postgresql/ -I../src-c ../src-c/numeric.c -c -o numeric.o && gcc -fPIC -I"${POSTGRESQL_INCLUDE}" -I../src-c ../src-c/notices.c -c -o notices.o
 
 all: libs
 

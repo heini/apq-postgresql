@@ -31,7 +31,7 @@ project APQ.PostgreSQL is
 	for Library_Name use "apq-postgresql";
 	case target is
 		when "Windows_NT" =>
-			for Library_Kind use "static";
+			for Library_Kind use "dynamic";
 
 		when "GNU/Linux" =>
 			for Library_Kind use "dynamic";
