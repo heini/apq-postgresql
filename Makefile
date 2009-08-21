@@ -7,7 +7,7 @@ ifndef ($(PREFIX))
 	PREFIX=/usr/local
 endif
 
-INCLUDE_PREFIX=$(PREFIX)/include
+INCLUDE_PREFIX=$(PREFIX)/include/apq-postgresql
 LIB_PREFIX=$(PREFIX)/lib
 GPR_PREFIX=$(LIB_PREFIX)/gnat
 
@@ -31,7 +31,7 @@ endif
 
 
 
-all: libs gprfile
+all: libs 
 
 projectFile="apq-postgresql.gpr"
 
@@ -49,7 +49,7 @@ c_objs:
 
 
 
-clean: gprclean
+clean:
 	gnatclean -P ${projectFile}
 	@rm -f obj-c/* lib/*
 	@echo "All clean"
@@ -68,7 +68,7 @@ gprfile:
 gprclean:
 	@rm -f gpr/apq-postgresql.gpr gpr/apq-postgresql.def
 
-install:
+install: gprfile
 	@echo "Installing files"
 	install -d $(INCLUDE_PREFIX)
 	install -d $(LIB_PREFIX)
@@ -76,3 +76,4 @@ install:
 	install src*/* -t $(INCLUDE_PREFIX)
 	install lib/* -t $(LIB_PREFIX)
 	install gpr/*.gpr -t $(GPR_PREFIX)
+	make gprclean

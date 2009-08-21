@@ -20,7 +20,7 @@ project APQ.PostgreSQL is
 
 	for Languages use ( "Ada", "C" );
 	
-	for Source_Dirs use ( prefix & "include" );
+	for Source_Dirs use ( prefix & "include/apq-postgresql" );
 	
 	-- LIBRARY
 	for Library_Dir use prefix & "lib";
