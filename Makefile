@@ -7,9 +7,16 @@ ifndef ($(PREFIX))
 	PREFIX=/usr/local
 endif
 
-INCLUDE_PREFIX=$(PREFIX)/include/apq-postgresql
-LIB_PREFIX=$(PREFIX)/lib
-GPR_PREFIX=$(LIB_PREFIX)/gnat
+ifndef ($(INCLUDE_PREFIX))
+	INCLUDE_PREFIX=$(PREFIX)/include/apq-postgresql
+endif
+
+ifndef ($(LIB_PREFIX))
+	LIB_PREFIX=$(PREFIX)/lib
+endif
+ifndef ($(GPR_PREFIX)) 
+	GPR_PREFIX=$(LIB_PREFIX)/gnat 
+endif
 
 
 #POSTGRESQL_PATH=/c/Program Files/PostgreSQL/8.3/
@@ -63,6 +70,8 @@ docs:
 gprfile:
 	@echo "Preparing GPR file.."
 	@echo prefix:=\"$(PREFIX)\" >> gpr/apq-postgresql.def
+	@echo lib_prefix:=\"$(LIB_PREFIX)\" >> gpr/apq-postgresql.def
+	@echo include_prefix:=\"$(INCLUDE_PREFIX)\" >> gpr/apq-postgresql.def
 	@gnatprep gpr/apq-postgresql.gpr.in gpr/apq-postgresql.gpr gpr/apq-postgresql.def
 
 gprclean:
