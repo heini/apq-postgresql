@@ -26,6 +26,8 @@ PROJECT_FILES=apq-postgresql.gpr
 GPR_FILES=apq-postgresql.gpr
 
 
+INCLUDE_FILES=src*/*
+
 include Makefile.include
 
 
