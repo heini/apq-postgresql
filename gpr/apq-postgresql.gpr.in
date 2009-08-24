@@ -16,10 +16,10 @@ project APQ.PostgreSQL is
 	
 	for Languages use ( "Ada", "C" );
 	
-	for Source_Dirs use ( $include_prefix );
+	for Source_Dirs use ( $include_path );
 	
 	-- LIBRARY
-	for Library_Dir use $lib_prefix;
+	for Library_Dir use $lib_path;
 	for Library_Name use "apq-postgresql";
 	for Library_Kind use APQ'Library_kind;
 	for Library_Version use "libapq-postgresql.so." & Version;

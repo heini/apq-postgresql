@@ -12,7 +12,7 @@ with "apq.gpr";
 
 project APQ.PostgreSQL is
 
-	version := APQ.version;
+	version := $version;
 	
 	
 	for Languages use ( "Ada", "C" );
