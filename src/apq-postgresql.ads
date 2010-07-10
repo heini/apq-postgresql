@@ -37,8 +37,8 @@
 -------------------------------------------------------------------------------
 
 package APQ.PostgreSQL is
-	
-	pragma Linker_Options("-lpq");
+	pragma linker_options("-lpq");
+	pragma Linker_Options("-lapq-postgresqlhelp");
 
 	type Result_Type is (
 		Empty_Query,
@@ -50,7 +50,7 @@ package APQ.PostgreSQL is
 		Nonfatal_Error,
 		Fatal_Error
 		);
-	
+
 	for Result_Type use (
 		Empty_Query		=> 0,
 		Command_OK		=> 1,
@@ -59,7 +59,7 @@ package APQ.PostgreSQL is
 		Copy_In			=> 4,
 		Bad_Response	=> 5,
 		Nonfatal_Error	=> 6,
-		Fatal_Error		=> 7 
+		Fatal_Error		=> 7
 		);
 
 

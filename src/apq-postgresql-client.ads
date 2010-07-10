@@ -49,106 +49,150 @@ with Interfaces.C_Streams;
 package APQ.PostgreSQL.Client is
 
 
-	
+
 	package Str renames Ada.Streams;
 	package CStr renames Interfaces.C_Streams;
-	
+
 	------------------------------
 	-- CLIENT DATA TYPES
 	------------------------------
-	
-	
+
+
 	type Connection_Type is new APQ.Root_Connection_Type with private;
 	type Notify_Proc_Type is access procedure(C : in out Connection_Type; Message : String);
 	type Query_Type is new Root_Query_Type with private;
 	type Blob_Type is private;
-	
+
 	type Root_Stream_Access is access all Str.Root_Stream_Type'Class;
-	
+
 	------------------------------
 	-- DATABASE CONNECTION :
 	------------------------------
-	
+
 	function Engine_Of(C : Connection_Type) return Database_Type;
 	function New_Query(C : Connection_Type) return Root_Query_Type'Class;
-	
+
 	procedure Notify_on_Standard_Error(C : in out Connection_Type; Message : String);
-	
+
 	procedure Set_Instance(C : in out Connection_Type; Instance : String);
-	
+
 	function Host_Name(C : Connection_Type) return String;
 	function Port(C : Connection_Type) return Integer;
 	function Port(C : Connection_Type) return String;
 	function DB_Name(C : Connection_Type) return String;
 	function User(C : Connection_Type) return String;
 	function Password(C : Connection_Type) return String;
-	
+
 	procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String);
-	
+
 	procedure Set_Options(C : in out Connection_Type; Options : String);
 	function Options(C : Connection_Type) return String;
-	
+
 	procedure Set_Notify_Proc(C : in out Connection_Type; Notify_Proc : Notify_Proc_Type);
 	function Notify_Proc(C : Connection_Type) return Notify_Proc_Type;
-	
+
 	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True);
 	procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
 	procedure Disconnect(C : in out Connection_Type);
-	
+
 	function Is_Connected(C : Connection_Type) return Boolean;
 	procedure Reset(C : in out Connection_Type);
 	function Error_Message(C : Connection_Type) return String;
-	function Notice_Message(C : Connection_Type) return String;
-	
+   function Notice_Message(C : Connection_Type) return String;
+   --
+   function quote_string( qkv : string ) return ada.Strings.Unbounded.Unbounded_String;
+   function quote_string( qkv : string ) return String;
+   procedure grow_key( C : in out Connection_Type); --
+
+   function  cache_key_nameval_uptodate( C : Connection_Type) return boolean;--
+   pragma inline(cache_key_nameval_uptodate);
+   -- if force = true, re-create it even if already uptodate;
+   -- if force = false,(automatic,normal daily use) re-create only if necessary/not-uptodate
+   procedure cache_key_nameval_create( C : in out Connection_Type; force : boolean := false);
+
+   function get_keyname_default_case( C : Connection_Type) return SQL_Case_Type;--
+   function get_keyval_default_case( C : Connection_Type) return SQL_Case_Type;--
+   procedure set_keyname_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type);--
+   procedure set_keyval_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type);--
+   pragma inline(get_keyname_default_case);
+   pragma inline(get_keyval_default_case);
+   pragma inline(set_keyname_default_case);
+   pragma inline(set_keyval_default_case);
+
+   -- add keyword and his respective value for the connection string.
+   -- if clear = false, just append keyword and value to list of keywords and values
+   -- if clear = true, remove all values in list before add keyword and value to list
+   -- see http://www.postgresql.org/docs/8.4/static/libpq-connect.html  or
+   -- see http://www.postgresql.org/docs/9.0/static/libpq-connect.html to a list of kewords and his values
+   --
+   -- example sslmode, sslcert, ..., sslkey, gsspi ,etc :-)
+   --
+   -- if in the list of keywords have keywords equals the value used is the last value in list.
+   -- remember to include the libs was needed
+   procedure add_key_nameval( C : in out Connection_Type;
+                             kname,kval : string := "";
+                             knamecasele, kvalcasele : boolean := true;
+                             clear : boolean := false);
+
+   procedure clear_all_key_nameval(C : in out Connection_Type; add_more_this_alloc : natural := 0);
+
+   procedure Connect_dani(C : in out Connection_Type; Check_Connection : Boolean := True);
+
+   procedure Connect_dani(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
+
+
+
+
+
 	-- Open trace output file
 	procedure Open_DB_Trace(C : in out Connection_Type; Filename : String; Mode : Trace_Mode_Type := Trace_APQ);
 	procedure Close_DB_Trace(C : in out Connection_Type);				-- Close trace output file
 	procedure Set_Trace(C : in out Connection_Type; Trace_On : Boolean := True);	-- Enable/Disable tracing
 	function Is_Trace(C : Connection_Type) return Boolean;				-- Test trace enabled/disabled
-	
+
 	function In_Abort_State(C : Connection_Type) return Boolean;
-	
+
 	No_Notify :		constant Notify_Proc_Type := null;			-- Null disables notification
 	Standard_Error_Notify :	constant Notify_Proc_Type;
-	
+
 	------------------------------
 	-- SQL QUERY API :
 	------------------------------
-	
+
 	procedure Clear(Q : in out Query_Type);
 	procedure Append_Quoted(Q : in out Query_Type; Connection : Root_Connection_Type'Class; SQL : String; After : String := "");
-	
+
 	procedure Execute(Query : in out Query_Type; Connection : in out Root_Connection_Type'Class);
 	procedure Execute_Checked(Query : in out Query_Type; Connection : in out Root_Connection_Type'Class; Msg : String := "");
-	
+
 	procedure Begin_Work(Query : in out Query_Type; Connection : in out Root_Connection_Type'Class);
 	procedure Commit_Work(Query : in out Query_Type; Connection : in out Root_Connection_Type'Class);
 	procedure Rollback_Work(Query : in out Query_Type; Connection : in out Root_Connection_Type'Class);
-	
+
 	procedure Rewind(Q : in out Query_Type);
 	procedure Fetch(Q : in out Query_Type);
 	procedure Fetch(Q : in out Query_Type; TX : Tuple_Index_Type);
-	
+
 	function End_of_Query(Q : Query_Type) return Boolean;				-- Avoid use (catch exception instead)
-	
+
 	function Tuple(Q : Query_Type) return Tuple_Index_Type;
 	function Tuples(Q : Query_Type) return Tuple_Count_Type;
-	
+
 	function Columns(Q : Query_Type) return Natural;
 	function Column_Name(Q : Query_Type; CX : Column_Index_Type) return String;
 	function Column_Index(Q : Query_Type; Name : String) return Column_Index_Type;
 	function Column_Type(Q : Query_Type; CX : Column_Index_Type) return Row_ID_Type;
-	
+
 	function Is_Null(Q : Query_Type; CX : Column_Index_Type) return Boolean;
 	function Value(Query : Query_Type; CX : Column_Index_Type) return String;
-	
+
 	function Result(Query : Query_Type) return Natural;				-- Returns Result_Type'Pos()
 	function Result(Query : Query_Type) return Result_Type;
 	function Command_Oid(Query : Query_Type) return Row_ID_Type;
 	function Null_Oid(Query : Query_Type) return Row_ID_Type;
-	
+
 	function Command_Status(Query : Query_Type) return String;			-- PostgreSQL only
-	
+
 	function Error_Message(Query : Query_Type) return String;
 	function Is_Duplicate_Key(Query : Query_Type) return Boolean;
 	function Engine_Of(Q : Query_Type) return Database_Type;
@@ -212,14 +256,33 @@ private
 	-- CONNECTION_TYPE --
 	---------------------
 
-	type Connection_Type is new APQ.Root_Connection_Type with
-		record
-			Options :	String_Ptr;			-- Debug and trace options, if any
-			Connection :	PG_Conn := Null_Connection;
-			Error_Message :	String_Ptr;			-- Error message after failed to connect (only)
-			Notice :	String_Ptr;			-- Last notice message if any
-			Notify_Proc :	Notify_Proc_Type;		-- Notify procedure or NULL
-		end record;
+   type Connection_Type is new APQ.Root_Connection_Type with
+      record
+         Options       : String_Ptr;			-- Debug and trace options, if any
+         Connection    : PG_Conn := Null_Connection;
+         Error_Message : String_Ptr;			-- Error message after failed to connect (only)
+         Notice        : String_Ptr;			-- Last notice message if any
+         Notify_Proc   : Notify_Proc_Type;		-- Notify procedure or NULL
+         ----
+         keyname : String_Ptr_Array_Access; -- see http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
+         keyval  : String_Ptr_Array_Access; -- or see http://www.postgresql.org/docs/9.0/static/libpq-connect.html
+                                            -- or yet more uptodate url,for example of keyname(s) e theirs possible keyvals :-)
+         keycount : natural := 0;
+         keyalloc : natural := 0;
+
+         keyval_Caseless   : Boolean_Array_Access;
+         keyname_Caseless  : Boolean_Array_Access;
+
+         keyname_val_cache : String_Ptr;       -- for bypass "the recreate it" ,
+         keyname_val_cache_uptodate : boolean := false; -- if keyname_val_cache_uptodate = true (True)
+
+         keyname_default_case : SQL_Case_Type := Lower_Case;
+         keyval_default_case  : SQL_Case_Type := Preserve_Case;
+         ----
+
+      end record;
+
+
 
 	procedure Initialize(C : in out Connection_Type);
 	procedure Finalize(C : in out Connection_Type);
