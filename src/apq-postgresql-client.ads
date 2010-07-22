@@ -51,7 +51,14 @@ package APQ.PostgreSQL.Client is
 
 
 	package Str renames Ada.Streams;
-	package CStr renames Interfaces.C_Streams;
+   package CStr renames Interfaces.C_Streams;
+
+   --------------------------------------------------
+   -- Connection_Notify is called by notices.c as
+   -- a callback from the libpq interface.
+   --------------------------------------------------
+   procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr);
+   pragma Export(C,Connection_Notify,"Connection_Notify");
 
 	------------------------------
 	-- CLIENT DATA TYPES
@@ -139,6 +146,8 @@ package APQ.PostgreSQL.Client is
    procedure Connect_dani(C : in out Connection_Type; Check_Connection : Boolean := True);
 
    procedure Connect_dani(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
+
+   function verifica_conninfo_cache( C : Connection_Type) return string;
 
 
 

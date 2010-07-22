@@ -61,7 +61,9 @@ package body APQ.PostgreSQL.Client is
 		Connection_Made,		-- Connection OK; waiting to send.
 		Connection_Awaiting_Response,	-- Waiting for a response
 		Connection_Auth_OK,		-- Received authentication
-		Connection_Setenv		-- Negotiating environment.
+                         Connection_Setenv,		-- Negotiating environment.
+                         Connection_ssl_startup,
+                         Connection_needed
 	);
 
 	for PQ_Status_Type use (
@@ -71,8 +73,12 @@ package body APQ.PostgreSQL.Client is
 		3,	-- CONNECTION_MADE
 		4,	-- CONNECTION_AWAITING_RESPONSE
 		5,	-- CONNECTION_AUTH_OK
-		6	-- CONNECTION_SETENV
-	);
+                6,	-- CONNECTION_SETENV
+                7,        -- Connection_ssl_startup
+                8         -- Connection_needed
+
+                        );
+   pragma convention(C,PQ_Status_Type);
 
 
 	------------------------------
@@ -229,59 +235,63 @@ package body APQ.PostgreSQL.Client is
 
 
 
-	procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String) is
+   procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String) is
 
-		procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
-			Q : Query_Type;
-		begin
-			begin
-				Prepare(Q,To_Case("USE " & DB_Name,C.SQL_Case));
-				Execute(Q,C);
-			exception
-				when SQL_Error =>
-					Raise_Exception(APQ.Use_Error'Identity,
-						"PG03: Unable to select database " & DB_Name & ". (Use_Database)");
-			end;
-		end Use_Database;
+      procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
+         Q : Query_Type;
+      begin
+         begin
+            Prepare(Q,To_Case("USE " & DB_Name,C.SQL_Case));
+            Execute(Q,C);
+         exception
+            when SQL_Error =>
+               Raise_Exception(APQ.Use_Error'Identity,
+                               "PG03: Unable to select database " & DB_Name & ". (Use_Database)");
+         end;
+      end Use_Database;
 
-	begin
-		if not Is_Connected(C) then
-			-- Modify context to connect to this database when we connect
-			Set_DB_Name(Root_Connection_Type(C),DB_Name);
-		else
-			-- Use this database now
-			Use_Database(C,DB_Name);
-			-- Update context info if no exception thrown above
-			Set_DB_Name(Root_Connection_Type(C),DB_Name);
-		end if;
-	end Set_DB_Name;
+   begin
+      if not Is_Connected(C) then
+         -- Modify context to connect to this database when we connect
+         Set_DB_Name(Root_Connection_Type(C),DB_Name);
+      else
+         -- Use this database now
+         Use_Database(C,DB_Name);
+         -- Update context info if no exception thrown above
+         Set_DB_Name(Root_Connection_Type(C),DB_Name);
+      end if;
 
+      C.keyname_val_cache_uptodate := false;
 
-
-	procedure Set_Options(C : in out Connection_Type; Options : String) is
-	begin
-		Replace_String(C.Options,Set_Options.Options);
-	end Set_Options;
+   end Set_DB_Name;
 
 
 
-	function Options(C : Connection_Type) return String is
-	begin
-		if not Is_Connected(C) then
-			if C.Options /= null then
-				return C.Options.all;
-			end if;
-		else
-			declare
-				use Interfaces.C.Strings;
-				function PQoptions(PGconn : PG_Conn) return chars_ptr;
-				pragma Import(C,PQoptions,"PQoptions");
-			begin
-				return Value_Of(PQoptions(C.Connection));
-			end;
-		end if;
-		return "";
-	end Options;
+   procedure Set_Options(C : in out Connection_Type; Options : String) is
+   begin
+      Replace_String(C.Options,Set_Options.Options);
+      C.keyname_val_cache_uptodate := false;
+   end Set_Options;
+
+
+
+   function Options(C : Connection_Type) return String is
+   begin
+      if not Is_Connected(C) then
+         if C.Options /= null then
+            return C.Options.all;
+         end if;
+      else
+         declare
+            use Interfaces.C.Strings;
+            function PQoptions(PGconn : PG_Conn) return chars_ptr;
+            pragma Import(C,PQoptions,"PQoptions");
+         begin
+            return Value_Of(PQoptions(C.Connection));
+         end;
+      end if;
+      return "";
+   end Options;
 
 
 
@@ -302,8 +312,8 @@ package body APQ.PostgreSQL.Client is
 	-- Connection_Notify is called by notices.c as
 	-- a callback from the libpq interface.
 	--------------------------------------------------
-	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr);
-	pragma Export(C,Connection_Notify,"Connection_Notify");
+--  	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr);
+--  	pragma Export(C,Connection_Notify,"Connection_Notify");
 
 
 	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr) is
@@ -897,12 +907,19 @@ package body APQ.PostgreSQL.Client is
    is
    begin
       c.keyname_default_case := sqlcase;
+
+      -- fixme: are there necessity to invalidate
+      -- the keyname_val_cache ? if yes, uncomment the line below :-)
+      -- C.keyname_val_cache_uptodate := false;
    end set_keyname_default_case;
 
    procedure set_keyval_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type)
    is
    begin
       c.keyval_default_case := sqlcase;
+      -- fixme: are there necessity to invalidate
+      -- the keyname_val_cache ? if yes, uncomment the line below :-)
+      -- C.keyname_val_cache_uptodate := false;
    end set_keyval_default_case;
    --
    procedure clone_clone_pg(To : in out Connection_Type; From : Connection_Type )
@@ -955,16 +972,9 @@ package body APQ.PostgreSQL.Client is
    --
    procedure Connect_dani(C : in out Connection_Type; Check_Connection : Boolean := True)
    is
-      use Interfaces.C.Strings;
-      procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
-      pragma import(C,Notice_Install,"notice_install");
-      function PQconnectdb(conninfo : system.address ) return PG_Conn;
-      pragma import(C,PQconnectdb,"PQconnectdb");
-
-      C_coninfo :	char_array_access;
-      A_coninfo :	System.Address := System.Null_Address;
-
       pragma optimize(time);
+
+      use Interfaces.C.Strings;
 
    begin
       if Check_Connection and then Is_Connected(C) then
@@ -979,55 +989,58 @@ package body APQ.PostgreSQL.Client is
                                    -- then the "Connection_type" already uptodate
                                    -- ( well... uptodate if really uptodate ;-)
                                    -- this will speedy up the things a little :-)
-
-      C_String(C.keyname_val_cache ,C_coninfo,A_coninfo);
-
-      C.Connection := PQconnectdb( A_coninfo ); -- blocking call :-)
-
-      if C_coninfo /= null then
-         Free(C_coninfo);
-      end if;
-
-      Free_Ptr(C.Error_Message);
-
-      if PQ_Status(C) /= Connection_OK then  -- if the connecting in a non-blocking fashion,
-                                             -- there are more option of status needing verification :-)
-                                             -- it Don't the case here
-         declare
-            procedure PQfinish(C : PG_Conn);
-            pragma Import(C,PQfinish,"PQfinish");
-            Msg : String := Strip_NL(Error_Message(C));
-         begin
-            PQfinish(C.Connection);
-            C.Connection := Null_Connection;
-            C.Error_Message := new String(1..Msg'Length);
-            C.Error_Message.all := Msg;
-            Raise_Exception(Not_Connected'Identity,
-                            "PG08: Failed to connect to database server (Connect).");
-         end;
-      end if;
-
-      Notice_Install(C.Connection,C'Address);	-- Install Connection_Notify handler
-
-      ------------------------------
-      -- SET PGDATESTYLE TO ISO;
-      --
-      -- This is necessary for all of the
-      -- APQ date handling routines to
-      -- function correctly. This implies
-      -- that all APQ applications programs
-      -- should use the ISO date format.
-      ------------------------------
       declare
-         SQL : Query_Type;
+         procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
+         pragma import(C,Notice_Install,"notice_install");
+
+         function PQconnectdb(coni : chars_ptr ) return PG_Conn;
+         pragma import(C,PQconnectdb,"PQconnectdb");
+         coni_str : string := C.keyname_val_cache.all;  --To_String(C.keyname_val_cache);
+         C_conni : chars_ptr := New_String(Str => coni_str );
       begin
-         Prepare(SQL,"SET DATESTYLE TO ISO");
-         Execute(SQL,C);
-      exception
-         when Ex : others =>
-            Disconnect(C);
-            Reraise_Occurrence(Ex);
+         C.Connection := PQconnectdb( C_conni); -- blocking call :-)
+         Free_Ptr(C.Error_Message);
+
+         if PQ_Status(C) /= Connection_OK then  -- if the connecting in a non-blocking fashion,
+            -- there are more option of status needing verification :-)
+            -- it Don't the case here
+            declare
+               procedure PQfinish(C : PG_Conn);
+               pragma Import(C,PQfinish,"PQfinish");
+               Msg : String := Strip_NL(Error_Message(C));
+            begin
+               PQfinish(C.Connection);
+               C.Connection := Null_Connection;
+               C.Error_Message := new String(1..Msg'Length);
+               C.Error_Message.all := Msg;
+               Raise_Exception(Not_Connected'Identity,
+                               "PG08: Failed to connect to database server (Connect).");
+            end;
+         end if;
+
+         Notice_Install(C.Connection,C'Address);	-- Install Connection_Notify handler
+
+         ------------------------------
+         -- SET PGDATESTYLE TO ISO;
+         --
+         -- This is necessary for all of the
+         -- APQ date handling routines to
+         -- function correctly. This implies
+         -- that all APQ applications programs
+         -- should use the ISO date format.
+         ------------------------------
+         declare
+            SQL : Query_Type;
+         begin
+            Prepare(SQL,"SET DATESTYLE TO ISO");
+            Execute(SQL,C);
+         exception
+            when Ex : others =>
+               Disconnect(C);
+               Reraise_Occurrence(Ex);
+         end;
       end;
+
    end Connect_dani;
 
    procedure Connect_dani(C : in out Connection_Type; Same_As : Root_Connection_Type'Class)
@@ -1073,20 +1086,21 @@ package body APQ.PostgreSQL.Client is
       -- because in this keys and vals
       -- maybe are key's how sslmode , gsspi etc, that are defacto needs for connecting "C"
 
-      try_copy_c_from_sameas: -- label :-)
-      begin
-         clone_clone_pg(C , Connection_Type(Same_as)); -- the work is in here "if was not generated an exception" :-]
-      exception
-          when others =>
-            blo := false; -- clone_clone_pg failed :-), maybe "sameas" var don't is "type Connection_type"
-            -- then Don't Care... Be Happy ! :-)  it'll continue :-)
-      end try_copy_c_from_sameas;
+      if Same_As.Engine_Of = Engine_PostgreSQL then
+         clone_clone_pg(C , Connection_Type(Same_as));
+      end if;
 
-      Connect_dani(C);		-- Connect to database before worrying about trace facilities
+     Connect_dani(C);	-- Connect to database before worrying about trace facilities
 
       -- TRACE FILE & TRACE SETTINGS ARE NOT CLONED
 
    end Connect_dani;
+   function verifica_conninfo_cache( C : Connection_Type) return string
+   is
+   begin
+      return To_String(c.keyname_val_cache);
+   end verifica_conninfo_cache;
+
 
 
 
@@ -2156,11 +2170,13 @@ package body APQ.PostgreSQL.Client is
 	---------------------
 
 
-	procedure Initialize(C : in out Connection_Type) is
-	begin
-		C.Port_Format := IP_Port;
-		C.Port_Number := 5432;
-	end Initialize;
+   procedure Initialize(C : in out Connection_Type) is
+   begin
+      C.Port_Format := IP_Port;
+      C.Port_Number := 5432;
+      C.keyname_val_cache_uptodate := false;
+
+   end Initialize;
 
 
 

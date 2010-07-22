@@ -38,7 +38,7 @@
 
 package APQ.PostgreSQL is
 	pragma linker_options("-lpq");
-	pragma Linker_Options("-lapq-postgresqlhelp");
+
 
 	type Result_Type is (
 		Empty_Query,
