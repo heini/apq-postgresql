@@ -365,7 +365,7 @@ package body APQ.PostgreSQL.Client is
 
 
 
-	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True) is
+	procedure Connect_old(C : in out Connection_Type; Check_Connection : Boolean := True) is
 		procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
 		pragma import(C,Notice_Install,"notice_install");
 		function PQsetdbLogin(pghost, pgport, pgoptions, pgtty, dbname, login, pwd : System.Address) return PG_Conn;
@@ -478,11 +478,11 @@ package body APQ.PostgreSQL.Client is
 				Reraise_Occurrence(Ex);
 		end;
 
-	end Connect;
+	end Connect_old;
 
 
 
-	procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class) is
+	procedure Connect_old(C : in out Connection_Type; Same_As : Root_Connection_Type'Class) is
 		type Info_Func is access function(C : Connection_Type) return String;
 
 		procedure Clone(S : in out String_Ptr; Get_Info : Info_Func) is
@@ -516,11 +516,11 @@ package body APQ.PostgreSQL.Client is
 		C.Rollback_Finalize	:= Same_As.Rollback_Finalize;
 		C.Notify_Proc		:= Connection_Type(Same_As).Notify_Proc;
 
-		Connect(C);		-- Connect to database before worrying about trace facilities
+		Connect_old(C);		-- Connect to database before worrying about trace facilities
 
 		-- TRACE FILE & TRACE SETTINGS ARE NOT CLONED
 
-	end Connect;
+	end Connect_old;
 
 
 
@@ -970,7 +970,7 @@ package body APQ.PostgreSQL.Client is
    end clone_clone_pg;
 
    --
-   procedure Connect_dani(C : in out Connection_Type; Check_Connection : Boolean := True)
+   procedure connect(C : in out Connection_Type; Check_Connection : Boolean := True)
    is
       pragma optimize(time);
 
@@ -995,7 +995,7 @@ package body APQ.PostgreSQL.Client is
 
          function PQconnectdb(coni : chars_ptr ) return PG_Conn;
          pragma import(C,PQconnectdb,"PQconnectdb");
-         coni_str : string := C.keyname_val_cache.all;  --To_String(C.keyname_val_cache);
+         coni_str : string := C.keyname_val_cache.all;
          C_conni : chars_ptr := New_String(Str => coni_str );
       begin
          C.Connection := PQconnectdb( C_conni); -- blocking call :-)
@@ -1014,7 +1014,8 @@ package body APQ.PostgreSQL.Client is
                C.Error_Message := new String(1..Msg'Length);
                C.Error_Message.all := Msg;
                Raise_Exception(Not_Connected'Identity,
-                               "PG08: Failed to connect to database server (Connect).");
+                               "PG08: Failed to connect to database server (Connect). error was: " &
+                               msg ); -- more descriptive about 'what failed' :-)
             end;
          end if;
 
@@ -1041,9 +1042,9 @@ package body APQ.PostgreSQL.Client is
          end;
       end;
 
-   end Connect_dani;
+   end connect;
 
-   procedure Connect_dani(C : in out Connection_Type; Same_As : Root_Connection_Type'Class)
+   procedure connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class)
    is
       pragma optimize(time);
 
@@ -1090,12 +1091,15 @@ package body APQ.PostgreSQL.Client is
          clone_clone_pg(C , Connection_Type(Same_as));
       end if;
 
-     Connect_dani(C);	-- Connect to database before worrying about trace facilities
+     connect(C);	-- Connect to database before worrying about trace facilities
 
       -- TRACE FILE & TRACE SETTINGS ARE NOT CLONED
 
-   end Connect_dani;
-   function verifica_conninfo_cache( C : Connection_Type) return string
+   end connect;
+
+   function verifica_conninfo_cache( C : Connection_Type) return string -- for debug purpose :-P
+                                                                        -- in the spirit there are an get_password(c) yet...
+
    is
    begin
       return To_String(c.keyname_val_cache);

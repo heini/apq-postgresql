@@ -98,8 +98,10 @@ package APQ.PostgreSQL.Client is
 	procedure Set_Notify_Proc(C : in out Connection_Type; Notify_Proc : Notify_Proc_Type);
 	function Notify_Proc(C : Connection_Type) return Notify_Proc_Type;
 
-	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True);
-	procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
+	procedure Connect_old(C : in out Connection_Type; Check_Connection : Boolean := True);
+   procedure Connect_old(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
+   pragma Obsolescent
+          (Entity => Connect_old , "use the new connect() instead of Connect_old()");
 	procedure Disconnect(C : in out Connection_Type);
 
 	function Is_Connected(C : Connection_Type) return Boolean;
@@ -143,9 +145,9 @@ package APQ.PostgreSQL.Client is
 
    procedure clear_all_key_nameval(C : in out Connection_Type; add_more_this_alloc : natural := 0);
 
-   procedure Connect_dani(C : in out Connection_Type; Check_Connection : Boolean := True);
+   procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True);
 
-   procedure Connect_dani(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
+   procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
 
    function verifica_conninfo_cache( C : Connection_Type) return string;
 

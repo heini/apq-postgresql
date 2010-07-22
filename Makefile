@@ -63,7 +63,7 @@ all: default.cgpr madegpr
 #a comercial version of your resultant binary :-) for e.g. use a Ada (C, etc) runtime
 #that permit this comercial use.
 #
-# An Very Very Very Interesting Point (not just for license lawers) is that gcc4.4+ switched
+# An Very Very Very Interesting Point (not just for license lawyers) is that gcc4.4+ switched
 #to GPL v3.0+RunTimeException, similar in the spirit to GMGPL :-) (of course gcc4.4+ includes Ada, too)
 
 default.cgpr:
@@ -105,8 +105,8 @@ libinstall:
 	install lib-c/* -t $(LIB_PATH)
 	install lib-c-static/* -t $(LIB_PATH)
 	install lib-static/* -t $(LIB_PATH)
-	install lib_ali/* -m a-w -t $(GPR_LIB_PATH)/ada/apq-postgresql/shared
-	install lib_ali_static/* -m a-w -t $(GPR_LIB_PATH)/ada/apq-postgresql/static
+	install -m0555 lib_ali/* -t $(GPR_LIB_PATH)/ada/apq-postgresql/shared
+	install -m0555 lib_ali_static/* -t $(GPR_LIB_PATH)/ada/apq-postgresql/static
 
 clean: force
 	gprclean -Papq_postgresqlhelp_bs.gpr
