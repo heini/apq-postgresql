@@ -16,6 +16,10 @@ project APQ.PostgreSQL is
 	ali_d_file := $lib_path & "/ada/apq-postgresql/shared" ;
 	ali_s_file := $lib_path & "/ada/apq-postgresql/static" ;
 	
+	type Library_Kind_Type is ("static", "relocatable","dynamic");
+
+	Library_Kind : Library_Kind_Type := apq'Library_Kind ;
+	
 	for Languages use ( "Ada", "C" );
 	
 	for Source_Dirs use ( $include_path );
@@ -23,9 +27,9 @@ project APQ.PostgreSQL is
 	-- LIBRARY
 	for Library_Dir use $lib_path;
 	for Library_Name use "apq-postgresql";
-	for Library_Kind use APQ'Library_kind;
+	for Library_Kind use Library_Kind;
 	case Library_Kind is
-		when "dynamic" =>
+		when "dynamic" | "relocatable" =>
 			for Library_ALI_Dir use ali_s_file ;
 		
 		when "static" =>
