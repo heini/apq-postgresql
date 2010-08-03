@@ -13,6 +13,7 @@ ifndef ($(SYSTEM_LIBS))
 	SYSTEM_LIBS=/usr/lib
 endif
 
+
 VERSION=$(shell cat version)
 ATUALDIR=$(shell pwd)
 DIRLIB_POSTGREHELP:=$(ATUALDIR)/lib-c
@@ -42,6 +43,10 @@ ifndef ($(GPR_PATH))
 	GPR_PATH=$(LIB_PATH)/gnat
 endif
 
+ifndef ($(GPRBUILD))
+	GPRBUILD=gprbuild
+endif
+
 ifndef ($(GPR_INCLUDE_PATH))
 	GPR_INCLUDE_PATH=$(INCLUDE_PATH)
 endif
@@ -51,10 +56,10 @@ ifndef ($(GPR_LIB_PATH))
 endif
 
 all: default.cgpr madegpr
-	gprbuild -Papq_postgresqlhelp_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	gprbuild -Papq_postgresqlhelp_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	gprbuild -Papq-postgresql_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	gprbuild -Papq-postgresql_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
+	${GPRBUILD} -Papq_postgresqlhelp_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
+	${GPRBUILD} -Papq_postgresqlhelp_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
+	${GPRBUILD} -Papq-postgresql_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
+	${GPRBUILD} -Papq-postgresql_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
 
 
 # IMPORTANT: for the guys making comercial software,
