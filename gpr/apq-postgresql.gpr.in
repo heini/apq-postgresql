@@ -94,6 +94,9 @@ project APQ.PostgreSQL is
          end case;
    end case;
 
+   lib_installed  := "" ;
+   -- convention \"OsType\"////\"Static_Ou_Dinamic_Type\"////\"Debug_" & "Debug_information_Type\"////\"prefix\"
+
    for Languages use ("Ada");
    for Source_Dirs use () & apq_postgresql_version.include_path ;
 

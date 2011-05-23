@@ -1,0 +1,20 @@
+---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
+---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+---- this project contem some information ( version and others )
+---- this will be imported where make sense this informations :-)
+
+project apq_postgresql_version is
+
+   version   := $version;    --  "3.0.1"
+   name_base := $name_base;
+   prefix    := $prefix;
+   system_libs  := $system_libs;
+
+   include_path := "" & prefix & "/include/" & name_base & "/" & version ;
+
+   lib_path     := "" & prefix & "/lib" ;
+   gpr_path     := "" & lib_path & "/gnat";
+   gpr_include_path :=  "" & include_path ;
+
+end apq_postgsql_version;
+

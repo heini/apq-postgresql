@@ -8,7 +8,8 @@ Rationale of $(libapq-postgresql_COMPILING_HOME_SRC)/log/
   $Day : integer  ( exact 2 digits)
 1.Make) $n= $n;
         touch ./lib_installed_and_in.$n.$Year$Month$Day
-		touch ./lib_installed_and_in.$n.$Year$Month$Day
+		touch ./lib_installed_and_in.last_before_install
+		echo >
 
 
 
