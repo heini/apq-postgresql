@@ -20,7 +20,10 @@ endif
 
 VERSION=$(shell cat version)
 ATUALDIR=$(shell pwd)
-#DIRLIB_POSTGREHELP:=$(ATUALDIR)/lib-c
+
+ifndef ($(NAME_BASE))
+	NAME_BASE= $(shell basename $(ATUALDIR))
+endif
 
 PQ_INCLUDE=$(shell pg_config --includedir)
 
@@ -36,7 +39,7 @@ ifndef ($(PREFIX))
 endif
 
 ifndef ($(INCLUDE_PATH))
-	INCLUDE_PATH=$(PREFIX)/include/$(shell basename $(ATUALDIR))
+	INCLUDE_PATH=$(PREFIX)/include/$(NAME_BASE)
 endif
 
 ifndef ($(LIB_PATH))
@@ -62,7 +65,7 @@ endif
 all: default.cgpr madegpr
 	$(shell $(GPRBUILD) -Papq_postgresql.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE) )
 
-
+# fixme , for now, missing -X<scenario_var>=<value> :_)
 
 # IMPORTANT: for the guys making comercial software,
 #consider altering the parameters of _gprconfig below_ if necessary,
@@ -78,18 +81,11 @@ default.cgpr:
 
 madegpr:
 	@echo "Making project_files";
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR2=\"-L$(SYSTEM_LIBS)\"" apq_postgresqlhelp_bd.gpr.in apq_postgresqlhelp_bd.gpr
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR2=\"-L$(SYSTEM_LIBS)\"" apq_postgresqlhelp_bs.gpr.in apq_postgresqlhelp_bs.gpr
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR=\"-L$(DIRLIB_POSTGREHELP)\"" apq-postgresql_bd.gpr.in apq-postgresql_bd.gpr
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR=\"-L$(DIRLIB_POSTGREHELP)\"" apq-postgresql_bs.gpr.in apq-postgresql_bs.gpr
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR=\"-L$(DIRLIB_POSTGREHELP)\"" postgresql_bd.gpr.in postgresql_bd.gpr
-	gnatprep "-Dversion=\"$(VERSION)\"" "-DLIBDIR=\"-L$(DIRLIB_POSTGREHELP)\"" postgresql_bs.gpr.in postgresql_bs.gpr
 	@echo version:=\"$(VERSION)\" > gpr/gnatprep.def
-	@echo lib_path:=\"$(GPR_LIB_PATH)\" >> gpr/gnatprep.def
-	@echo include_path:=\"$(GPR_INCLUDE_PATH)\" >> gpr/gnatprep.def
-	gnatprep gpr/apq-postgresql.gpr.in gpr/apq-postgresql.gpr gpr/gnatprep.def
-	gnatprep gpr/apq-postgresql_static.gpr.in gpr/apq-postgresql_static.gpr gpr/gnatprep.def
-	gnatprep gpr/apq-postgresql_shared.gpr.in gpr/apq-postgresql_shared.gpr gpr/gnatprep.def
+	@echo name_base:=\"$(NAME_BASE)\" > gpr/gnatprep.def
+	@echo prefix:=\"$(PREFIX)\" >> gpr/gnatprep.def
+	@echo system_libs:=\"$(SYSTEM_LIBS)\" >> gpr/gnatprep.def
+	gnatprep apq_postgresql_version.gpr.in apq_postgresql_version.gpr gpr/gnatprep.def
 
 install: includeinstall libinstall gprinstall
 

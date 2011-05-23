@@ -19,10 +19,16 @@ project APQ.PostgreSQL is
 
    type Static_Ou_Dinamic_Type is ("dynamic", "static" , "relocatable");
    type Debug_information_Type is ("yes", "no");
-   type Os_Type is ("other", "mswindows", "gnu/linux");
+   type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
+   type Lib_Exist_Type is ( "" , "yes", "no");
+
+   type lib_installed_Type is ( "" $pre-dummy );  -- pre-dummy
+   lib_installed  : lib_installed_Type := "" ;
+   -- convention "OsType"
 
    Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
+   lib_there  : lib_there_Type := "" ;
    Debug_information : Debug_information_Type := external ("Debug_information", "no");
 
    Debug  := "debug_";
