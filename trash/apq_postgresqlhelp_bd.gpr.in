@@ -13,7 +13,7 @@ project Apq_postgresqlhelp_bd is
    for Library_Options use ("-Wl,--export-dynamic", $LIBDIR2 , "-lssl" , "-lpq");
    for Externally_Built use "false";
 
-package Compiler is
+   package Compiler is
       for Default_Switches ("c") use ("-O2");
    end Compiler;
 
