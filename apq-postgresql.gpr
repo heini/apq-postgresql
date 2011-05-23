@@ -73,7 +73,7 @@ project Apq.postgresql is
    for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/" & Os & "/lib_ali/" & Debug "/" & Static_Ou_Dinamic ;
    for Library_Kind use Static_Ou_Dinamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
-   for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq");
+   for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
    for Externally_Built use "false";
 
    package Compiler is
