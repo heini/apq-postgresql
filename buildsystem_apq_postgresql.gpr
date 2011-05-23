@@ -1,0 +1,18 @@
+project Buildsystem_Apq_Postgresql is
+
+   for Languages use ("Ada", "C", "Makefile", "Project File", "Shell");
+   for Source_Dirs use ("./**");
+
+   package Naming is
+      for Specification_Suffix ("C") use ".h";
+      for Implementation_Suffix ("C") use ".c";
+      for Specification_Suffix ("project file") use "<no suffix defined>";
+      for Implementation_Suffix ("project file") use ".gpr";
+      for Specification_Suffix ("makefile") use "<no suffix defined>";
+      for Implementation_Suffix ("makefile") use "Makefile";
+      for Specification_Suffix ("shell") use "<no suffix defined>";
+      for Implementation_Suffix ("shell") use ".sh";
+   end Naming;
+
+end Buildsystem_Apq_Postgresql;
+

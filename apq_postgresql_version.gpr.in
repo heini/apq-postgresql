@@ -1,0 +1,13 @@
+---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
+---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+---- this project contem some information ( version and others )
+---- this will be imported where make sense this informations :-)
+
+project apq_postgresql_version is
+
+   version := "3.0.1";
+   system_libs := $system_libs;
+   atual_dir := $atual_dir;
+
+end apq_postgsql_version;
+
