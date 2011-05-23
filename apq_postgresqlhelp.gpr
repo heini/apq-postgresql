@@ -1,5 +1,9 @@
 ---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
 ---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+---- this Building System permit "simultaneously" (if you want) :
+---- Make static and shared libs
+---- Cross-Compiling too ;-) enjoy! :-)
+
 with apq_postgresql_version;
 project apq_postgresqlhelp is
    type Static_Ou_Dinamic_Type is ("dynamic", "static");
@@ -65,9 +69,9 @@ project apq_postgresqlhelp is
 
    for Languages use ("C");
    for Source_Dirs use ("src-c");
-   for Object_Dir use "" & Static_Ou_Dinamic & "/obj-c/" & "/" & Debug "/" & Static_Ou_Dinamic ;
+   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj-c/" & "/" & Debug "/" & Static_Ou_Dinamic ;
    for Library_Name use "apq-postgresqlhelp" ;
-   for Library_Dir use "" & Static_Ou_Dinamic & "/lib-c/" & "/" & Debug "/" & Static_Ou_Dinamic ;
+   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib-c/" & "/" & Debug "/" & Static_Ou_Dinamic ;
    for Library_Kind use Static_Ou_Dinamic;
    for Library_Version use "libapq-postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresql_version.system_libs , "-lssl" , "-lpq");

@@ -66,11 +66,11 @@ project Apq.postgresql is
 
    for Languages use ("Ada");
    for Source_Dirs use ("src");
-   for Object_Dir use "" & Static_Ou_Dinamic & "/obj/" & Debug "/" & Static_Ou_Dinamic ;
+   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj/" & Debug "/" & Static_Ou_Dinamic ;
    for Library_Name use "apq-postgresqlhelp" ;
-   for Library_Dir use "" & Static_Ou_Dinamic & "/lib/" & Debug "/" & Static_Ou_Dinamic ;
+   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib/" & Debug "/" & Static_Ou_Dinamic ;
 
-   for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/lib_ali/" & Debug "/" & Static_Ou_Dinamic ;
+   for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/" & Os & "/lib_ali/" & Debug "/" & Static_Ou_Dinamic ;
    for Library_Kind use Static_Ou_Dinamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq");
