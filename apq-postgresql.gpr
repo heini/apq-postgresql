@@ -1,3 +1,11 @@
+---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
+---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+---- this Building System permit "simultaneously" (if you want) :
+---- Make static and shared libs
+---- Cross-Compiling too ;-) enjoy! :-)
+---- obs.: the  MakeFile permit you choose the correct libs for _each_ library you type make ! :-)
+---- obs.: "make --SYSTEM_LIBS=<path_value>" can be used for it. (e.g cross-compiling
+----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
 with "apq.gpr";
 with "apq_postgresqlhelp.gpr";
 
