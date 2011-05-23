@@ -8,10 +8,11 @@ project apq_postgresql_version is
    version := $version;    --  "3.0.1"
 
    nome_base := $nome_base;
-   prefix := $prefix;
+   prefix    := $prefix;
+   system_libs  := $system_libs;
 
    include_path := "" & prefix & "/include/" & nome_base & "/" & version ;
-   system_libs  := $system_libs;
+
    lib_path     := "" & prefix & "/lib" ;
    gpr_path     := "" & lib_path & "/gnat";
    gpr_include_path :=  "" & include_path ;

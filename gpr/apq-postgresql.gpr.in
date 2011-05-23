@@ -8,7 +8,7 @@
 -- $Author: ogro $
 
 -- Date: 2011-05-23 11:56:57 -0300 (Seg, 23 May 2011)
--- Revision: 234
+-- new build system :-)
 -- Author: Daniegle , Daniel Norte de Moraes <danielcheagle@gmail.com>
 --
 
@@ -17,7 +17,7 @@ with "apq_postgresql_version.gpr";
 
 project APQ.PostgreSQL is
 
-   type Static_Ou_Dinamic_Type is ("dynamic", "static");
+   type Static_Ou_Dinamic_Type is ("dynamic", "static" , "relocatable");
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux");
 
@@ -48,7 +48,7 @@ project APQ.PostgreSQL is
    sufix2 := "";
 
    case static_ou_dinamic is
-      when "dynamic" =>
+      when "dynamic" | "relocatable" =>
          case os is
             when "gnu/linux" =>
                sufix1 := ".so.";

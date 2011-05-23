@@ -6,12 +6,14 @@
 ---- obs.: the  MakeFile permit you choose the correct libs for _each_ library you type make ! :-)
 ---- obs.: "make --SYSTEM_LIBS=<path_value>" can be used for it. (e.g cross-compiling
 ----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
+
 with "apq.gpr";
+with "apq_postgresql_version.gpr";
 with "apq_postgresqlhelp.gpr";
 
 project Apq.postgresql is
 
-   type Static_Ou_Dinamic_Type is ("dynamic", "static");
+   type Static_Ou_Dinamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux");
    Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
@@ -38,10 +40,10 @@ project Apq.postgresql is
    sufix2 := "";
    export-dynamic := "--export-dynamic";
    case static_ou_dinamic is
-      when "dynamic" =>
+      when "dynamic" | "relocatable" =>
          case os is
             when "gnu/linux" =>
-               sufix1 := ".so.";
+               sufix1 := "so.";
                sufix2 := "";
                export-dynamic := "--export-dynamic";
             when "mswindows" =>

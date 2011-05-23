@@ -6,7 +6,7 @@
 
 with apq_postgresql_version;
 project apq_postgresqlhelp is
-   type Static_Ou_Dinamic_Type is ("dynamic", "static");
+   type Static_Ou_Dinamic_Type is ("dynamic", "static", "relocatable");
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux");
    Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
@@ -35,10 +35,10 @@ project apq_postgresqlhelp is
    sufix2 := "";
    export-dynamic := "--export-dynamic";
    case static_ou_dinamic is
-      when "dynamic" =>
+      when "dynamic" | "relocatable" =>
          case os is
             when "gnu/linux" =>
-               sufix1 := ".so.";
+               sufix1 := "so.";
                sufix2 := "";
                export-dynamic := "--export-dynamic";
             when "mswindows" =>
@@ -85,10 +85,6 @@ project apq_postgresqlhelp is
    for Library_Version use "libapq-postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresql_version.system_libs , "-lssl" , "-lpq");
    for Externally_Built use "false";
-
-   package Compiler is
-      for Default_Switches ("c") use ("-O2");
-   end Compiler;
 
    package Compiler is
       for Default_Switches ("c") use ("-O2" ) & Debug_option_list_compiler ;

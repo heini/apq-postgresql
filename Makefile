@@ -18,7 +18,7 @@ ifndef ($(SYSTEM_LIBS))
 endif
 
 
-#VERSION=$(shell cat version)
+VERSION=$(shell cat version)
 ATUALDIR=$(shell pwd)
 #DIRLIB_POSTGREHELP:=$(ATUALDIR)/lib-c
 
