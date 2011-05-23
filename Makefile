@@ -4,19 +4,23 @@
 #
 # @author Daniel Norte de Moraes <danielcheagle@gmail.com>
 
-# rewrite version (more or less from scratch) for use gprbuild and Cia
+# 1) rewrite version (more or less from scratch) for use gprbuild and Cia
 # obs. you can substitute gprbuild with gprmake, if you can't use gprbuild (but not tested yet )
 #
 # "estoy aqui" :-)
+# 23 may 2011 08:33:59 GMT-3
+# New and clean update for the Build System.
+# Added cross-compiling and static and shared simultaneos generation
+#
 
 ifndef ($(SYSTEM_LIBS))
 	SYSTEM_LIBS=/usr/lib
 endif
 
 
-VERSION=$(shell cat version)
+#VERSION=$(shell cat version)
 ATUALDIR=$(shell pwd)
-DIRLIB_POSTGREHELP:=$(ATUALDIR)/lib-c
+#DIRLIB_POSTGREHELP:=$(ATUALDIR)/lib-c
 
 PQ_INCLUDE=$(shell pg_config --includedir)
 
@@ -56,10 +60,8 @@ ifndef ($(GPR_LIB_PATH))
 endif
 
 all: default.cgpr madegpr
-	${GPRBUILD} -Papq_postgresqlhelp_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	${GPRBUILD} -Papq_postgresqlhelp_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	${GPRBUILD} -Papq-postgresql_bs.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
-	${GPRBUILD} -Papq-postgresql_bd.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE)
+	$(shell $(GPRBUILD) -Papq_postgresql.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE) )
+
 
 
 # IMPORTANT: for the guys making comercial software,

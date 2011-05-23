@@ -8,14 +8,21 @@ project Apq.postgresql is
    type Os_Type is ("other", "mswindows", "gnu/linux");
    Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
-   Debug_information : Debug_information_Type := external ("Debug_information", "no");
+   Debug_information : Debug_information_Type := external ("debug_information", "no");
 
    Debug  := "debug_";
+   Debug_option_list_builder := ();
+   Debug_option_list_compiler := ();
+
    case Debug_information is
       when "yes" =>
          Debug := Debug & "yes";
+         Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+	 Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
       when "no" =>
          Debug := Debug & "no";
+          Debug_option_list_builder := Debug_option_list_builder & (  );
+	 Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-)
       when others =>
    end case;
 
@@ -66,18 +73,22 @@ project Apq.postgresql is
 
    for Languages use ("Ada");
    for Source_Dirs use ("src");
-   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj/" & Debug "/" & Static_Ou_Dinamic ;
+   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
    for Library_Name use "apq-postgresql" ;
-   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib/" & Debug "/" & Static_Ou_Dinamic ;
+   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
 
-   for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/" & Os & "/lib_ali/" & Debug "/" & Static_Ou_Dinamic ;
+   for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
    for Library_Kind use Static_Ou_Dinamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
    for Externally_Built use "false";
-
+S
    package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn", "-fPIC");
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_compiler ;
+   end Compiler;
+
+   package Builder  is
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" ) & Debug_option_list_builder ;
    end Compiler;
 
 end Apq.postgresql;

@@ -5,9 +5,16 @@
 
 project apq_postgresql_version is
 
-   version := "3.0.1";
-   system_libs := $system_libs;
-   atual_dir := $atual_dir;
+   version := $version;    --  "3.0.1"
+
+   nome_base := $nome_base;
+   prefix := $prefix;
+
+   include_path := "" & prefix & "/include/" & nome_base & "/" & version ;
+   system_libs  := $system_libs;
+   lib_path     := "" & prefix & "/lib" ;
+   gpr_path     := "" & lib_path & "/gnat";
+   gpr_include_path :=  "" & include_path ;
 
 end apq_postgsql_version;
 
