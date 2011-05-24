@@ -22,7 +22,7 @@
 ---- and  $(Builder) -Pmy_project_file.gpr
 
 with "apq.gpr";
-with "apq_postgresql_version.gpr";
+with "./apq_postgresql_version.gpr";
 
 project APQ.PostgreSQL is
    -----------------------
@@ -34,6 +34,7 @@ project APQ.PostgreSQL is
    type Lib_Exist_Type is ( "" , "yes", "no");
    type lib_installed_Type is ( "" $pre-dummy );  -- pre-dummy
    type lib_installed_prefix_type is ( "" $prefix_list );  -- string_list
+   type system_libs_type  is ("" $system_libs );
 
    --------------------------------
    -- var external declarations ---
@@ -42,6 +43,7 @@ project APQ.PostgreSQL is
    Os : Os_Type := external ("os", "gnu/linux");
    Lib_Installed_Prefix : lib_installed_prefix_type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("Debug_information", "no");
+   system_libs : system_libs_type := external ("system_libs" , "" );
 
    -------------------------------
    -- var declarations -----------
@@ -181,7 +183,7 @@ project APQ.PostgreSQL is
 
    package Builder  is
       for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" ) & Debug_option_list_builder ;
-   end Compiler;
+   end Builder;
 
 
 end APQ.PostgreSQL;

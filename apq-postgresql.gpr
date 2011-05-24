@@ -8,10 +8,13 @@
 ----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
 
 with "apq.gpr";
-with "apq_postgresql_version.gpr";
-with "apq_postgresqlhelp.gpr";
+with "./apq_postgresql_version.gpr";
+with "./apq_postgresqlhelp.gpr";
 
 project Apq.postgresql is
+   -----------------------
+   -- type declarations --
+   -----------------------
 
    type Static_Ou_Dynamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");
@@ -147,7 +150,7 @@ S
 
    package Builder  is
       for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" ) & Debug_option_list_builder ;
-   end Compiler;
+   end Builder;
 
 end Apq.postgresql;
 

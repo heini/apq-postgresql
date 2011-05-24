@@ -4,7 +4,7 @@
 ---- Make static and shared libs
 ---- Cross-Compiling too ;-) enjoy! :-)
 
-with apq_postgresql_version;
+with "./apq_postgresql_version.gpr" ;
 project apq_postgresqlhelp is
    type Static_Ou_Dynamic_Type is ("dynamic", "static", "relocatable");
    type Debug_information_Type is ("yes", "no");
@@ -20,16 +20,63 @@ project apq_postgresqlhelp is
    case Debug_information is
       when "yes" =>
          Debug := Debug & "yes";
-         Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
-	 Debug_option_list_compiler := Debug_option_list_compiler & ( "-fstack-check" ); -- fixme , if necessary :-)
+         case os is
+            when "other" => -- :0}
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
 
+            when "mswindows" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
+
+            when "gnu/linux" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
+
+            when "darwin" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
+
+            when "bsd" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
+
+            when other => -- :0]
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
+
+         end case;  -- end yes/os
       when "no" =>
          Debug := Debug & "no";
-         Debug_option_list_builder := Debug_option_list_builder & (  );
-	 Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-)
+         case os is
+            when "other" => -- :0}
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
+            when "mswindows" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "gnu/linux" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "darwin" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "bsd" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( );
+               Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when other => -- :0]
+               Debug_option_list_builder := Debug_option_list_builder & (   );
+               Debug_option_list_compiler := Debug_option_list_compiler & (   ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+         end case; -- end no/os
       when others =>
-   end case;
+   end case; -- end Debug_information
+
 
    sufix1 := "";
    sufix2 := "";
@@ -92,7 +139,7 @@ project apq_postgresqlhelp is
 
    package Builder  is
       for Default_Switches ("c") use ("-O2"  ) & Debug_option_list_builder ;
-   end Compiler;
+   end Builder;
 
 
 

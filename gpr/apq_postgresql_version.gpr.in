@@ -3,16 +3,18 @@
 ---- this project contem some information ( version and others )
 ---- this will be imported where make sense this informations :-)
 
-limited with "apq-postgresql.gpr";
+limited with "./apq-postgresql.gpr";
 
 project apq_postgresql_version is
 
    version     := $version;     -- string
    name_base   := $name_base;   -- string
-   --- type lib_installed_prefix_type is ( $prefix_list );  -- string_list  --- Does need of using o "rename" here ? :-) Obrigado Jesuis !!!!!!!!!!!! :-)
+   --system_libs  := $system_libs;
 
-   lib_installed_prefix : apq_postgresql_version.lib_installed_prefix_type := apq_postgresql_version.lib_installed_prefix;
-   system_libs  := $system_libs;
+   --- type lib_installed_prefix_type is ( $prefix_list );  -- string_list  --- Does need of using a "rename" here ? :-) Obrigado Jesuis !!!!!!!!!!!! :-)
+
+   lib_installed_prefix : apq-postgresql.lib_installed_prefix_type := apq-postgresql.lib_installed_prefix;
+   system_libs  : apq_postgresql_version.system_libs_type := apq_postgresql_version;
 
    include_path := "" & lib_installed_prefix & "/include/" & name_base & "/" & version ;
 
@@ -20,5 +22,5 @@ project apq_postgresql_version is
    gpr_path     := "" & lib_path & "/gnat";
    gpr_include_path :=  "" & include_path ;
 
-end apq_postgsql_version;
+end apq_postgresql_version;
 
