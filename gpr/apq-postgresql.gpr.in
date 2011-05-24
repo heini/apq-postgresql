@@ -17,9 +17,9 @@
 ---- obs.: the  MakeFile permit you choose the correct libs for _each_ library you type make ! :-)
 ---- obs.: "make --SYSTEM_LIBS=<path_value>" can be used for it. (e.g cross-compiling
 ----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
----- For using this project file you can:
+---- _For using_ this project file you can:
 ---- 1) just import it ' with "apq-postgresql.gpr" ' in your own my_project_file.gpr
----- and  $(Builder) -Pmy_project_file.gpr
+---- and  $(Builder) -Pmy_project_file.gpr -X<scenario_var_0>=<value> -X<scenario_var_n>=<value>
 
 with "apq.gpr";
 with "./apq_postgresql_version.gpr";
@@ -28,22 +28,22 @@ project APQ.PostgreSQL is
    -----------------------
    -- type declarations --
    -----------------------
-   type Static_Ou_Dynamic_Type is ("dynamic", "static" , "relocatable");
+   type Static_Or_Dynamic_Type is ("dynamic", "static" , "relocatable");
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
    type Lib_Exist_Type is ( "" , "yes", "no");
-   type lib_installed_Type is ( "" $pre-dummy );  -- pre-dummy
-   type lib_installed_prefix_type is ( "" $prefix_list );  -- string_list
-   type system_libs_type  is ("" $system_libs );
+   type libs_installeds_Type is ( "" $libs_installeds_list );  -- pre-dummy  -- string_list
+   type lib_installed_prefixes_type is ( "" $prefixes_list );  -- string_list
+   type system_libs_type  is ("" $system_libs_list ); -- string_list
 
    --------------------------------
    -- var external declarations ---
    --------------------------------
-   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_dynamic", "static");
+   Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "dynamic");
    Os : Os_Type := external ("os", "gnu/linux");
-   Lib_Installed_Prefix : lib_installed_prefix_type := external ("os", "gnu/linux");
-   Debug_information : Debug_information_Type := external ("Debug_information", "no");
-   system_libs : system_libs_type := external ("system_libs" , "" );
+   Lib_Installed_Prefix : libs_installeds_prefixes_type := external ("lib_prefix", "");
+   Debug_information : Debug_information_Type := external ("debug_information", "no");
+   system_lib : system_libs_type := external ("system_lib" , "" );
 
    -------------------------------
    -- var declarations -----------
@@ -54,13 +54,13 @@ project APQ.PostgreSQL is
    -- var debug's relations ship--
    -------------------------------
    Debug  := "debug_";
-   Debug_option_list_builder := ();
-   Debug_option_list_compiler := ();
+   Debug_option_list_builder := (); -- string_list null
+   Debug_option_list_compiler := (); -- string_list null
 
    case Debug_information is
 
       when "yes" =>
-         Debug := Debug & "yes"; Debug := Debug & "no"; -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
+         Debug := Debug & "yes";  -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
          case os is
             when "other" => -- :0}
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
@@ -121,58 +121,76 @@ project APQ.PostgreSQL is
 
    sufix1 := "";
    sufix2 := "";
-
-   case static_ou_Dynamic is
+   export-dynamic := "--export-dynamic";
+   case static_or_dynamic is
       when "dynamic" | "relocatable" =>
          case os is
-            when "gnu/linux" =>
-               sufix1 := ".so.";
-               sufix2 := "";
-
-            when "mswindows" =>
-               sufix1 := "";
-               sufix2 := ".dll";
-
-            when "other" =>  -- just a stub here :-) . We invite you to parcipate ! ;-)  Enjoy ! and WellCome! ^_^!!!!!!!
-               sufix1 := "";
-               sufix2 := "";
-
-            when other =>
-                sufix1 := "";
-               sufix2 := "";
-
-         end case;
-      when "static" =>
-         case os is
-            when "gnu/linux" =>
-               sufix1 := "";
-               sufix2 := "";
-
-            when "mswindows" =>
-               sufix1 := "";
-               sufix2 := "";
-
             when "other" =>
                sufix1 := "";
                sufix2 := "";
-
-            when other =>
+               export-dynamic := "--export-dynamic";
+            when "mswindows" =>
+               sufix1 := "";
+               sufix2 := ".dll";
+               export-dynamic := "--export-dynamic";
+            when "gnu/linux" =>
+               sufix1 := "so.";
+               sufix2 := "";
+               export-dynamic := "--export-dynamic";
+            when "darwin" => -- fix it ;-)
+               sufix1 := "so.";
+               sufix2 := "";
+               export-dynamic := "--export-dynamic";
+            when "bsd" =>  -- just a stub here :-)
                sufix1 := "";
                sufix2 := "";
-
+               export-dynamic := "--export-dynamic";
+            when others =>
+                sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";  -- fix it ;-)
          end case;
+      when "static" =>
+         case os is
+            when "other" =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+            when "mswindows" =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+            when "gnu/linux" =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+            when "darwin" =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+            when "bsd" =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+            when others =>
+               sufix1 := "";
+               sufix2 := "";
+               export-dynamic := "";
+         end case;
+      when others =>
    end case;
 
+
    lib_installed  := "" ;
-   -- convention \"OsType\"////\"Static_Ou_Dynamic_Type\"////\"Debug_" & "Debug_information_Type\"////\"prefix\"
+   -- convention \"OsType\"////\"Static_Or_Dynamic_Type\"////\"Debug_" & "Debug_information_Type\"////\"prefix\"
 
    for Languages use ("Ada");
    for Source_Dirs use () & apq_postgresql_version.include_path ;
 
    for Library_Name use "apq-postgresql" ;
-   for Library_Dir use "" & apq_postgresql_version.lib_path & "/" & Static_Ou_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
-   for Library_ALI_Dir use  "" & apq_postgresql_version.lib_path & "/" & Static_Ou_Dynamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
-   for Library_Kind use Static_Ou_Dynamic;
+   for Library_Dir use "" & apq_postgresql_version.lib_path & "/" & Static_Or_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
+   for Library_ALI_Dir use  "" & apq_postgresql_version.lib_path & "/" & Static_Or_Dynamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
+   for Library_Kind use Static_Or_Dynamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Externally_Built use "true";
 

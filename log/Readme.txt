@@ -1,15 +1,16 @@
 Rationale of $(libapq-postgresql_COMPILING_HOME_SRC)/log/
 
-1.File) lib_installed_and_in.all  
+1.File) lib_installed_and_in.all
 1.R) contain  all parsed lib_installed_and_in.$n.$Year$Month$Day
- $n : integer starting in 0 
+ $n : integer starting in 0
  $Year : integer  ( at least 4 digits)
   $Month : integer  ( exact 2 digits)
   $Day : integer  ( exact 2 digits)
+2.FILE)	 lib_installed_and_in.backup_unparsed
+1.R)
 1.Make) $n= $n;
-        touch ./lib_installed_and_in.$n.$Year$Month$Day
-		touch ./lib_installed_and_in.last_before_install
-		echo >
+	touch ./lib_installed_and_in.last_before_install
+	echo "$lib_and_cia" > ./lib_installed_and_in.last_before_install
 
 
 

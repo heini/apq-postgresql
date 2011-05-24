@@ -13,8 +13,8 @@ project apq_postgresql_version is
 
    --- type lib_installed_prefix_type is ( $prefix_list );  -- string_list  --- Does need of using a "rename" here ? :-) Obrigado Jesuis !!!!!!!!!!!! :-)
 
-   lib_installed_prefix : apq-postgresql.lib_installed_prefix_type := apq-postgresql.lib_installed_prefix;
-   system_libs  : apq_postgresql_version.system_libs_type := apq_postgresql_version;
+   lib_installed_prefix : apq-postgresql.libs_installeds_Type := apq-postgresql.lib_installed_prefix;
+   system_lib  : apq-postgresql.system_libs_type := apq_postgresql_version;
 
    include_path := "" & lib_installed_prefix & "/include/" & name_base & "/" & version ;
 
