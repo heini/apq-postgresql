@@ -3,8 +3,8 @@
 ---- this project contem some information ( version and others )
 ---- this will be imported where make sense this informations :-)
 
-limited with "apq-postgresql.gpr"
-s
+limited with "apq-postgresql.gpr";
+
 project apq_postgresql_version is
 
    version     := $version;     -- string
