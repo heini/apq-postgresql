@@ -6,10 +6,10 @@
 
 with apq_postgresql_version;
 project apq_postgresqlhelp is
-   type Static_Ou_Dinamic_Type is ("dynamic", "static", "relocatable");
+   type Static_Ou_Dynamic_Type is ("dynamic", "static", "relocatable");
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
-   Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
+   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_Dynamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
 
@@ -34,7 +34,7 @@ project apq_postgresqlhelp is
    sufix1 := "";
    sufix2 := "";
    export-dynamic := "--export-dynamic";
-   case static_ou_dinamic is
+   case static_ou_Dynamic is
       when "dynamic" | "relocatable" =>
          case os is
             when "gnu/linux" =>
@@ -78,10 +78,10 @@ project apq_postgresqlhelp is
 
    for Languages use ("C");
    for Source_Dirs use ("src-c");
-   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj-c/" & "/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
+   for Object_Dir use "" & Static_Ou_Dynamic & "/" & Os & "/obj-c/" & "/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
    for Library_Name use "apq-postgresqlhelp" ;
-   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib-c/" & "/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
-   for Library_Kind use Static_Ou_Dinamic;
+   for Library_Dir use "" & Static_Ou_Dynamic & "/" & Os & "/lib-c/" & "/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
+   for Library_Kind use Static_Ou_Dynamic;
    for Library_Version use "libapq-postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresql_version.system_libs , "-lssl" , "-lpq");
    for Externally_Built use "false";

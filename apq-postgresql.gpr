@@ -13,10 +13,10 @@ with "apq_postgresqlhelp.gpr";
 
 project Apq.postgresql is
 
-   type Static_Ou_Dinamic_Type is ("dynamic", "static", "relocatable" );
+   type Static_Ou_Dynamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
-   Static_Ou_Dinamic : Static_Ou_Dinamic_Type := external ("static_ou_dinamic", "static");
+   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_Dynamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
 
@@ -87,7 +87,7 @@ project Apq.postgresql is
    sufix1 := "";
    sufix2 := "";
    export-dynamic := "--export-dynamic";
-   case static_ou_dinamic is
+   case static_ou_Dynamic is
       when "dynamic" | "relocatable" =>
          case os is
             when "gnu/linux" =>
@@ -131,12 +131,12 @@ project Apq.postgresql is
 
    for Languages use ("Ada");
    for Source_Dirs use ("src");
-   for Object_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/obj/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
+   for Object_Dir use "" & Static_Ou_Dynamic & "/" & Os & "/obj/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
    for Library_Name use "apq-postgresql" ;
-   for Library_Dir use "" & Static_Ou_Dinamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
+   for Library_Dir use "" & Static_Ou_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
 
-   for Library_ALI_Dir use  "" & Static_Ou_Dinamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dinamic ;
-   for Library_Kind use Static_Ou_Dinamic;
+   for Library_ALI_Dir use  "" & Static_Ou_Dynamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Ou_Dynamic ;
+   for Library_Kind use Static_Ou_Dynamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
    for Externally_Built use "false";

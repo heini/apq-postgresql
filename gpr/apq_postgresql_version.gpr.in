@@ -3,11 +3,14 @@
 ---- this project contem some information ( version and others )
 ---- this will be imported where make sense this informations :-)
 
+limited with "apq-postgresql.gpr"
+s
 project apq_postgresql_version is
 
-   version   := $version;    --  "3.0.1"
-   name_base := $name_base;
-   prefix    := $prefix;
+   version     := $version;     -- string
+   name_base   := $name_base;   -- string
+   type prefix_type is ( $prefix_list );  -- string_list
+   prefix : prefix_type  := extern();
    system_libs  := $system_libs;
 
    include_path := "" & prefix & "/include/" & name_base & "/" & version ;
