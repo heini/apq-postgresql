@@ -18,7 +18,7 @@
 ---- obs.: "make --SYSTEM_LIBS=<path_value>" can be used for it. (e.g cross-compiling
 ----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
 ---- For using this project file you can:
----- 1) just import it "with "apq-postgresql.gpr" " in your own my_project_file.gpr
+---- 1) just import it ' with "apq-postgresql.gpr" ' in your own my_project_file.gpr
 ---- and  $(Builder) -Pmy_project_file.gpr
 
 with "apq.gpr";
@@ -33,38 +33,89 @@ project APQ.PostgreSQL is
    type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
    type Lib_Exist_Type is ( "" , "yes", "no");
    type lib_installed_Type is ( "" $pre-dummy );  -- pre-dummy
-   type prefix_type is ( $prefix_list );  -- string_list
+   type lib_installed_prefix_type is ( "" $prefix_list );  -- string_list
 
    --------------------------------
    -- var external declarations ---
    --------------------------------
-   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_Dynamic", "static");
+   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_dynamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
-   Prefix : prefix_type := external ("os", "gnu/linux");
+   Lib_Installed_Prefix : lib_installed_prefix_type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("Debug_information", "no");
 
    -------------------------------
    -- var declarations -----------
    -------------------------------
-   lib_there  : lib_there_Type := "" ;
+   Lib_Exist_Type  : Lib_Exist_Type := "" ;
+
+   -------------------------------
+   -- var debug's relations ship--
+   -------------------------------
    Debug  := "debug_";
    Debug_option_list_builder := ();
    Debug_option_list_compiler := ();
 
-
    case Debug_information is
+
       when "yes" =>
-         Debug := Debug & "yes";
-	 Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
-	 Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+         Debug := Debug & "yes"; Debug := Debug & "no"; -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
+         case os is
+            when "other" => -- :0}
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
+            when "mswindows" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+
+            when "gnu/linux" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+
+            when "darwin" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+
+            when "bsd" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+
+            when other => -- :0]
+               Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
+               Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
+
+         end case;  -- end yes/os
       when "no" =>
-         Debug := Debug & "no";
-	 Debug_option_list_builder := Debug_option_list_builder & (  );
-	 Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-)
+         Debug := Debug & "no"; -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
+         case os is
+            when "other" => -- :0}
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
+            when "mswindows" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "gnu/linux" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "darwin" =>
+               Debug_option_list_builder := Debug_option_list_builder & (  );
+               Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when "bsd" =>
+               Debug_option_list_builder := Debug_option_list_builder & ( );
+               Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+            when other => -- :0]
+               Debug_option_list_builder := Debug_option_list_builder & (   );
+               Debug_option_list_compiler := Debug_option_list_compiler & (   ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
+
+         end case; -- end no/os
       when others =>
-   end case;
+   end case; -- end Debug_information
+
 
    sufix1 := "";
    sufix2 := "";
@@ -80,7 +131,7 @@ project APQ.PostgreSQL is
                sufix1 := "";
                sufix2 := ".dll";
 
-            when "other" =>  -- just a stub here :-) . We invite yo to parcipate ! ;-)  Enjoy ! and WellCome! ^_^!!!!!!!
+            when "other" =>  -- just a stub here :-) . We invite you to parcipate ! ;-)  Enjoy ! and WellCome! ^_^!!!!!!!
                sufix1 := "";
                sufix2 := "";
 

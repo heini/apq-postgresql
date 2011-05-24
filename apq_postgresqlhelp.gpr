@@ -9,7 +9,7 @@ project apq_postgresqlhelp is
    type Static_Ou_Dynamic_Type is ("dynamic", "static", "relocatable");
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
-   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_Dynamic", "static");
+   Static_Ou_Dynamic : Static_Ou_Dynamic_Type := external ("static_ou_dynamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
 
