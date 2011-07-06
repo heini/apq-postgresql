@@ -1,3 +1,4 @@
+
 # Makefile for the AW_Lib
 #
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com>
@@ -14,15 +15,15 @@
 #
 
 ifndef ($(SYSTEM_LIBS))
-	SYSTEM_LIBS=/usr/lib
+	SYSTEM_LIBS:=/usr/lib
 endif
 
-
-VERSION=$(shell cat version)
-ATUALDIR=$(shell pwd)
+VERSION:=$(shell cat version)
+ATUALDIR:=$(shell pwd)
+REALLY_ATUALDIR=$(shell pwd)
 
 ifndef ($(NAME_BASE))
-	NAME_BASE= $(shell basename $(ATUALDIR))
+	NAME_BASE:=$(shell basename $(ATUALDIR))
 endif
 
 PQ_INCLUDE=$(shell pg_config --includedir)

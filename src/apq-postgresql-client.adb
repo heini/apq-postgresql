@@ -51,7 +51,6 @@ package body APQ.PostgreSQL.Client is
 	Seek_Set : constant Interfaces.C.int := 0;
 	Seek_Cur : constant Interfaces.C.int := 1;
 	Seek_End : constant Interfaces.C.int := 2;
-
 	No_Date : Ada.Calendar.Time;
 
 	type PQ_Status_Type is (

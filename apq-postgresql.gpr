@@ -109,11 +109,11 @@ project Apq.postgresql is
       when "dynamic" | "relocatable" =>
          case os is
             when "other" =>
-               sufix1 := "";
+               sufix1 := "so.";
                sufix2 := "";
                export-dynamic := "--export-dynamic";
             when "mswindows" =>
-               sufix1 := "";
+               sufix1 := "so.";
                sufix2 := ".dll";
                export-dynamic := "--export-dynamic";
             when "gnu/linux" =>
@@ -122,41 +122,41 @@ project Apq.postgresql is
                export-dynamic := "--export-dynamic";
             when "darwin" => -- fix it ;-)
                sufix1 := "so.";
-               sufix2 := "";
+               sufix2 := ".lib";
                export-dynamic := "--export-dynamic";
             when "bsd" =>  -- just a stub here :-)
-               sufix1 := "";
-               sufix2 := "";
+               sufix1 := "so.";
+               sufix2 := ".idx";
                export-dynamic := "--export-dynamic";
             when others =>
-               sufix1 := "";
+               sufix1 := "so.";
                sufix2 := "";
                export-dynamic := "";  -- fix it ;-)
          end case;
       when "static" =>
          case os is
             when "other" =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
             when "mswindows" =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
             when "gnu/linux" =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
             when "darwin" =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
             when "bsd" =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
             when others =>
-               sufix1 := "";
+               sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
          end case;
