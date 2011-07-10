@@ -142,7 +142,7 @@ do
 			cp $my_atual_dir/apq_postgresqlhelp.gpr $my_tmp/
 
 			IFS=","
-			for support_dirs in obj,lib_ali,ali
+			for support_dirs in obj,lib_ali,ali,obj_c,lib_ali_c,ali_c
 			do
 				mkdir -p $made_dirs/$sist_oses/$libbuildtype/$debuga/$support_dirs
 

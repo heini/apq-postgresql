@@ -35,10 +35,11 @@ project Apq.postgresql is
    type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");
    type Os_Type is ("other", "mswindows", "linux" , "darwin" , "bsd" );
+   --
    Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "static");
-   Os : Os_Type := external ("os", "gnu/linux");
+   Os : Os_Type := external ("os", "linux");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
-
+   --
    Debug  := "debug_";
    Debug_option_list_builder := ();  -- null string_list
    Debug_option_list_compiler := (); -- null string_list
@@ -55,7 +56,7 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
-            when "gnu/linux" =>
+            when "linux" =>
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
@@ -83,7 +84,7 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & (  );
                Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
-            when "gnu/linux" =>
+            when "linux" =>
                Debug_option_list_builder := Debug_option_list_builder & (  );
                Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
@@ -117,7 +118,7 @@ project Apq.postgresql is
                sufix1 := "so.";
                sufix2 := ".dll";
                export-dynamic := "--export-dynamic";
-            when "gnu/linux" =>
+            when "linux" =>
                sufix1 := "so.";
                sufix2 := "";
                export-dynamic := "--export-dynamic";
@@ -144,7 +145,7 @@ project Apq.postgresql is
                sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
-            when "gnu/linux" =>
+            when "linux" =>
                sufix1 := "static.";
                sufix2 := "";
                export-dynamic := "";
@@ -166,7 +167,7 @@ project Apq.postgresql is
 
 
    for Languages use ("Ada");
-   for Source_Dirs use ("src");
+   for Source_Dirs use () & apq_postgresql_version.mysource ;
    for Object_Dir use "" & Static_Or_Dynamic & "/" & Os & "/obj/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
    for Library_Name use "apq-postgresql" ;
    for Library_Dir use "" & Static_Or_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
