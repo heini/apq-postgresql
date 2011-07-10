@@ -28,21 +28,23 @@
 ########################################
 ### constant var declarations  #########
 ########################################
-	known_oses_list="linux mswindows darwin bsd other"
-	known_build_types="dynamic static relocable"
+#known_oses_list="linux,mswindows,darwin,bsd,other"
+#known_build_types="dynamic,static,relocable"
+
 	known_version=$(shell cat version)
 	atual_dir=$(shell pwd)
 	name_base=$(shell basename $(atual_dir))
-#    ssl_include:=$(system_libs)/openssl
+
+ifndef ($(prefixes))
+	prefixes='all:foe:/usr/local'
+endif
+
 #    eg:  make install --prefixes="os:os2:osn:foe:/path1"
 #    eg2: make install --prefixes="os:os2:ons:foe:/path1:/aqui/acola/lah:/usr/local:/pathn"
 #    You can use wildcard "all" in Os part ;-) and 
 #    the build system will (try;) install all compiled libs , for all compiled OSes :-)
 #    eg3: make install --prefixes="all:foe:/path1:/path2:/pathn"
 #
-ifndef ($(prefixes))
-	prefixes='all:foe:/usr/local'
-endif
 
 ifndef ($(oses))
 	oses='linux'
@@ -50,6 +52,10 @@ endif
 
 ifndef ($(lib_build_types))
 	lib_build_types='dynamic,static'
+endif
+
+ifndef ($(build_with_debug_too))	# yes no
+	build_with_debug_too='no'
 endif
 
 ifndef ($(add_compiler_paths))
@@ -64,38 +70,24 @@ ifndef ($(ssl_include_paths))
 	ssl_include_paths='/usr/lib/openssl'
 endif
 
-ifndef ($(pg_config_path_cmd))
-	pg_config_path_cmd='/usr/bin/pg_config'
+ifndef ($(pg_config_path))
+	pg_config_path='/usr/bin'
 endif
 
-ifndef ($(gprconfig_path_cmd))
-	gprconfig_path_cmd='/usr/bin/gprconfig'
+ifndef ($(gprconfig_path))
+	gprconfig_path='/usr/bin'
 endif
 
-ifndef ($(gprbuild_path_cmd))
-	gprbuild_path_cmd='/usr/bin/gprbuild'
+ifndef ($(gprbuild_path))
+	gprbuild_path='/usr/bin'
 endif
 
-FUN2=$(shell my_oses=$(11) ; \
-		my_libtyps=$(12) ; \
-		my_compilers_paths=$(13) ; \
-		my_system_libs_paths=$(14) ; \
-		my_ssl_incl_paths=$(15) ; \
-		my_pg_config_path_cmd=$(16) ; \
-		my_gprbuild_path_cmd=$(17) ; \
-		my_gprconfig_path_cmd=$(18) ; \
-		my_known_oses_list=$(1) ; \
-		my_known_build_types=$(2) ; \
-		my_known_version=$(3) ; \
-		my_atual_dir=$(4) ; \
-		my_tmp=$${my_oses,,} ; \
-	)
+##############################
+#### targets #################
+##############################
 
 configura:
-	$(call FUN2,"$(known_oses_list)" ,"$(known_build_types)" ,"$(known_version)" ,"$(atual_dir)" ,"reserved" ,"reserved" ,"reserved" ,"reserved" ,"reserved" ,"reserved" \
-		,"$(oses)" ,"$(lib_build_types)" ,"$(add_compiler_paths)" ,"$(system_libs_paths)" ,"$(ssl_include_paths)" ,"$(pg_config_path_cmd)" \
-		,"$(gprbuild_path_cmd)" ,"$(gprconfig_path_cmd)" ,"reserved" ,"reserved" ,"reserved" ,"reserved" \
-		)
+	@echo $(shell $(atual_dir)/configura.sh "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_paths)" "$(pg_config_path)" "$(gprconfig_path)" "$(gprbuild_path)" "$()")
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
