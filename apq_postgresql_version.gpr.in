@@ -10,8 +10,7 @@ project apq_postgresql_version is
    system_libs  := ( ) & $system_libs ;
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
-
-
+   basedir	:= "" & $basedir ;
 
 end apq_postgsql_version;
 

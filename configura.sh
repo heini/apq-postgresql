@@ -134,6 +134,7 @@ do
 				printf	"system_libs:=$libdir3  \n"		#min two spaces before "\n" because quotes
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"	#min two spaces before "\n" because quotes
+				printf	"basedir:=\"$my_atual_dir/build\"  \n"	#min two spaces before "\n" because quotes
 			}	> $my_tmp/kov.def
 
 			IFS="$ifsbackup"
