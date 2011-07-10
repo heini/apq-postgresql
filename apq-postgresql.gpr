@@ -169,13 +169,9 @@ project Apq.postgresql is
    for Languages use ("Ada");
    for Source_Dirs use () & apq_postgresql_version.mysource ;
    for Object_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj/";
-   --for Object_Dir use "" & Static_Or_Dynamic & "/" & Os & "/obj/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
    for Library_Name use "apq-postgresql" ;
    for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib/ ;
-   --for Library_Dir use "" & Static_Or_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
-
    for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_ali/ ;
-   --for Library_ALI_Dir use  "" & Static_Or_Dynamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
    for Library_Kind use Static_Or_Dynamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
