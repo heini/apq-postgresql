@@ -1,136 +1,107 @@
-
-# Makefile for the AW_Lib
+## Makefile for libapq-postgresql and associated files
 #
 # @author Marcelo Coraça de Freitas <marcelo.batera@gmail.com>
 #
 # @author Daniel Norte de Moraes <danielcheagle@gmail.com>
-
-# 1) rewrite version (more or less from scratch) for use gprbuild and Cia
-# obs. you can substitute gprbuild with gprmake, if you can't use gprbuild (but not tested yet )
 #
 # "estoy aqui" :-)
 # 23 may 2011 08:33:59 GMT-3
 # New and clean update for the Build System.
 # Added cross-compiling and static and shared simultaneos generation
 #
-
-ifndef ($(SYSTEM_LIBS))
-	SYSTEM_LIBS:=/usr/lib
-endif
-
-VERSION:=$(shell cat version)
-ATUALDIR:=$(shell pwd)
-REALLY_ATUALDIR=$(shell pwd)
-
-ifndef ($(NAME_BASE))
-	NAME_BASE:=$(shell basename $(ATUALDIR))
-endif
-
-PQ_INCLUDE=$(shell pg_config --includedir)
-
-INCLUDE_FILES=src*/*
-
-ifndef ($(SSL_INCLUDE))
-	SSL_INCLUDE=$(SYSTEM_LIBS)/openssl
-endif
-
-
-ifndef ($(PREFIX))
-	PREFIX=/usr/local
-endif
-
-ifndef ($(INCLUDE_PATH))
-	INCLUDE_PATH=$(PREFIX)/include/$(NAME_BASE)
-endif
-
-ifndef ($(LIB_PATH))
-	LIB_PATH=$(PREFIX)/lib
-endif
-
-ifndef ($(GPR_PATH))
-	GPR_PATH=$(LIB_PATH)/gnat
-endif
-
-ifndef ($(GPRBUILD))
-	GPRBUILD=gprbuild
-endif
-
-ifndef ($(GPR_INCLUDE_PATH))
-	GPR_INCLUDE_PATH=$(INCLUDE_PATH)
-endif
-
-ifndef ($(GPR_LIB_PATH))
-	GPR_LIB_PATH=$(LIB_PATH)
-endif
-
-all: default.cgpr madegpr
-	$(shell $(GPRBUILD) -Papq_postgresql.gpr -cargs -I $(PQ_INCLUDE) -I $(SSL_INCLUDE) )
-
-# fixme , for now, missing -X<scenario_var>=<value> :_)
-
+# 06 july 2011 06:32:23 GMT-3
+# rewrite from scratch.
+# New and clean update for the Build System.
+# Added cross-compiling and static and shared simultaneos generation
+#
+#
 # IMPORTANT: for the guys making comercial software,
-#consider altering the parameters of _gprconfig below_ if necessary,
+#consider altering the parameters of _gprconfig_ if necessary,
 #for oblige gprbuild to _use_ the compilers,linkers etc that permit
 #a comercial version of your resultant binary :-) for e.g. use a Ada (C, etc) runtime
 #that permit this comercial use.
 #
 # An Very Very Very Interesting Point (not just for license lawyers) is that gcc4.4+ switched
 #to GPL v3.0+RunTimeException, similar in the spirit to GMGPL :-) (of course gcc4.4+ includes Ada, too)
+#
+#
+########################################
+### constant var declarations  #########
+########################################
+	known_oses_list="linux mswindows darwin bsd other"
+	known_build_types="dynamic static relocable"
+	known_version=$(shell cat version)
+	atual_dir=$(shell pwd)
+	name_base=$(shell basename $(atual_dir))
+#    ssl_include:=$(system_libs)/openssl
+#    eg:  make install --prefixes="os:os2:osn:foe:/path1"
+#    eg2: make install --prefixes="os:os2:ons:foe:/path1:/aqui/acola/lah:/usr/local:/pathn"
+#    You can use wildcard "all" in Os part ;-) and 
+#    the build system will (try;) install all compiled libs , for all compiled OSes :-)
+#    eg3: make install --prefixes="all:foe:/path1:/path2:/pathn"
+#
+ifndef ($(prefixes))
+	prefixes='all:foe:/usr/local'
+endif
 
-default.cgpr:
-	gprconfig --batch --config Ada,,default  --config C -o $@
+ifndef ($(oses))
+	oses='linux'
+endif
 
-madegpr:
-	@echo "Making project_files";
-	@echo version:=\"$(VERSION)\" > gpr/gnatprep.def
-	@echo name_base:=\"$(NAME_BASE)\" > gpr/gnatprep.def
-	@echo prefix:=\"$(PREFIX)\" >> gpr/gnatprep.def
-	@echo system_libs:=\"$(SYSTEM_LIBS)\" >> gpr/gnatprep.def
-	gnatprep apq_postgresql_version.gpr.in apq_postgresql_version.gpr gpr/gnatprep.def
+ifndef ($(lib_build_types))
+	lib_build_types='dynamic,static'
+endif
 
-install: includeinstall libinstall gprinstall
+ifndef ($(add_compiler_paths))
+	add_compiler_paths=''
+endif
 
-gprinstall:
-	@echo Installing GPR files..
-	install -d $(GPR_PATH)
-	install gpr/*.gpr -t $(GPR_PATH)
+ifndef ($(system_libs_paths))
+	system_libs_paths='/usr/lib'
+endif
 
-includeinstall:
-	@echo Installing include and source files...
-	install -d $(INCLUDE_PATH)
-	install $(INCLUDE_FILES) -t $(INCLUDE_PATH)
+ifndef ($(ssl_include_paths))
+	ssl_include_paths='/usr/lib/openssl'
+endif
 
-libinstall:
-	@echo Installing library files...
-	install -d $(LIB_PATH)
-	install -d $(GPR_LIB_PATH)/ada/apq-postgresql/shared
-	install -d $(GPR_LIB_PATH)/ada/apq-postgresql/static
-	install lib/* -t $(LIB_PATH)
-	install lib-c/* -t $(LIB_PATH)
-	install lib-c-static/* -t $(LIB_PATH)
-	install lib-static/* -t $(LIB_PATH)
-	install -m0555 lib_ali/* -t $(GPR_LIB_PATH)/ada/apq-postgresql/shared
-	install -m0555 lib_ali_static/* -t $(GPR_LIB_PATH)/ada/apq-postgresql/static
+ifndef ($(pg_config_path_cmd))
+	pg_config_path_cmd='/usr/bin/pg_config'
+endif
 
-clean: force
-	gprclean -Papq_postgresqlhelp_bs.gpr
-	gprclean -Papq_postgresqlhelp_bd.gpr
-	gprclean -Ppostgresql_bs.gpr
-	gprclean -Ppostgresql_bd.gpr
-	rm apq_postgresqlhelp_bd.gpr
-	rm apq_postgresqlhelp_bs.gpr
-	rm apq-postgresql_bd.gpr
-	rm apq-postgresql_bs.gpr
-	rm postgresql_bd.gpr
-	rm postgresql_bs.gpr
-	rm default.cgpr
-	rm gpr/gnatprep.def
-	rm gpr/*.gpr
+ifndef ($(gprconfig_path_cmd))
+	gprconfig_path_cmd='/usr/bin/gprconfig'
+endif
+
+ifndef ($(gprbuild_path_cmd))
+	gprbuild_path_cmd='/usr/bin/gprbuild'
+endif
+
+FUN2=$(shell my_oses=$(11) ; \
+		my_libtyps=$(12) ; \
+		my_compilers_paths=$(13) ; \
+		my_system_libs_paths=$(14) ; \
+		my_ssl_incl_paths=$(15) ; \
+		my_pg_config_path_cmd=$(16) ; \
+		my_gprbuild_path_cmd=$(17) ; \
+		my_gprconfig_path_cmd=$(18) ; \
+		my_known_oses_list=$(1) ; \
+		my_known_build_types=$(2) ; \
+		my_known_version=$(3) ; \
+		my_atual_dir=$(4) ; \
+		my_tmp=$${my_oses,,} ; \
+	)
+
+configura:
+	$(call FUN2,"$(known_oses_list)" ,"$(known_build_types)" ,"$(known_version)" ,"$(atual_dir)" ,"reserved" ,"reserved" ,"reserved" ,"reserved" ,"reserved" ,"reserved" \
+		,"$(oses)" ,"$(lib_build_types)" ,"$(add_compiler_paths)" ,"$(system_libs_paths)" ,"$(ssl_include_paths)" ,"$(pg_config_path_cmd)" \
+		,"$(gprbuild_path_cmd)" ,"$(gprconfig_path_cmd)" ,"reserved" ,"reserved" ,"reserved" ,"reserved" \
+		)
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
 
 showversion:
-	@echo $(VERSION)
+	@echo $(known_version)
+
 
 force:
