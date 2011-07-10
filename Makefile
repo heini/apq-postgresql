@@ -87,7 +87,7 @@ endif
 ##############################
 
 configura:
-	@echo $(shell $(atual_dir)/configura.sh "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_paths)" "$(pg_config_path)" "$(gprconfig_path)" "$(gprbuild_path)" "$()")
+	@echo $(shell $(atual_dir)/configura.sh "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_paths)" "$(pg_config_path)" "$(gprconfig_path)" "$(gprbuild_path)" "$(build_with_debug_too)")
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
