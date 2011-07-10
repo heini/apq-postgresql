@@ -1,5 +1,6 @@
 ---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
 ---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+----
 ---- this Building System permit "simultaneously" (if you want) :
 ---- Make static and shared libs
 ---- Cross-Compiling too ;-) enjoy! :-)
@@ -33,7 +34,7 @@ project Apq.postgresql is
 
    type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");
-   type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
+   type Os_Type is ("other", "mswindows", "linux" , "darwin" , "bsd" );
    Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "static");
    Os : Os_Type := external ("os", "gnu/linux");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
