@@ -6,14 +6,14 @@
 #: version	: 1.0
 #: Description: made configuration for posterior compiling by gprbuild.
 #: Description: You don't need run this script manually.
-#: Options	:  "OSes" "libtypes,libtypes_n" "paths_for_compiler:paths_for_compiler_n"  \
-	#		"system_libs_paths:system_libs_paths_n"  "ssl_include_paths" "path_pg_config"  \
-	#		"path_gprconfig"  "path_gprbuild"  "with_debug_too"
+#: Options	:  "OSes" "libtypes,libtypes_n" "compiler_path1:compiler_pathn"  \
+	#		"system_libs_path1:system_libs_pathn"  "ssl_include_paths" "pg_config_path"  \
+	#		"gprconfig_path"  "gprbuild_path"  "with_debug_too"
 
 
 if [ $# -ne 9 ]; then
 	printf ' You dont need use it by hand. read INSTALL for more info and direction.  \n'
-	printf 'configura "OSes" "libtypes,libtypes_n" "paths_for_compiler:paths_for_compiler_n" "system_libs_paths:system_libs_paths_n"  "ssl_include_paths" "path_pg_config"  "path_gprconfig"  "path_gprbuild"  "with_debug_too"  \n'
+	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_paths" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too"  \n'
 	exit 1
 fi;
 
@@ -25,7 +25,7 @@ _oses=$1
 my_libtypes=
 _libtypes=$2
 _base_name=
-my_paths_for_compiler=$3
+my_compiler_paths=$3
 my_system_libs_paths=
 _system_libs_paths=$4
 my_ssl_include_paths=
@@ -93,8 +93,6 @@ case $_with_debug_too in
 		;;
 esac
 
-libdir2=
-libdir3=
 lib_system1=
 lib_system2=
 lib_system3=
@@ -127,15 +125,15 @@ do
 		do
 			my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 			mkdir -p "$my_tmp"
-			
-			IFS="$ifsbackup"
+
+			IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
 			#min two spaces before "\n" because quotes
 			{	printf	"$my_tmp  \n"
 				printf	"$debuga  \n"
 				printf	"$libbuildtype  \n"
 				printf	"$sist_oses  \n"
-				printf	"$my_paths_for_compiler  \n"
+				printf	"$my_compiler_paths  \n"
 				printf	"$my_gprconfig_path  \n"
 				printf	"$my_gprbuild_path  \n"
 				printf	"${my_pg_config_path}  \n"
@@ -165,7 +163,7 @@ do
 			IFS=",$ifsbackup"
 
 			for support_dirs in obj lib_ali ali obj_c lib_ali_c ali_c
-			do			
+			do
 				mkdir -p "$my_tmp"/$support_dirs
 			done # support_dirs
 		done # debuga

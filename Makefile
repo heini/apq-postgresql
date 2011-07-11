@@ -29,6 +29,7 @@
 ########################################
 ### constant var declarations  #########
 ########################################
+
 #known_oses_list=""
 #known_build_types=""
 
@@ -36,16 +37,21 @@
 	atual_dir:=$(shell pwd)
 	name_base:=$(shell basename $(atual_dir))
 
+### (obs.: can be altered in command line :-)  ###
+###  eg: make configura oses=linux,mswindows lib_build_types=dynamic,static \
+			system_libs_paths=/usr/source:/usr/local:/lib/got \
+			build_with_debug_too=yes
+
 ifndef ($(prefixes))
 	prefixes=all:foe:/usr/local
 endif
 
 #    eg:  make install prefixes=os:os2:osn:foe:/path1
-#    eg2: make install prefixes=os:os2:ons:foe:/path1:/aqui/acola/lah:/usr/local:/pathn
+#    eg2: make install prefixes=os:os2:osn:foe:/path1:/aqui/acola/lah:/usr/local:/pathn
 #    You can use wildcard "all" in Os part ;-) and 
-#    the build system will (try;) install all compiled libs , for all compiled OSes :-)
+#    the build system will (try;) _install_ all compiled libs , for all compiled OSes :-)
 #    eg3: make install prefixes=all:foe:/path1:/path2:/pathn
-#
+#	Ah! "foe" was used in place of "eof" because (maybe) "eof" can confuse shell
 
 ifndef ($(oses))		# linux,mswindows,darwin,bsd,other
 	oses:=linux
