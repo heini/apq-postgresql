@@ -31,9 +31,9 @@
 #known_oses_list="linux,mswindows,darwin,bsd,other"
 #known_build_types="dynamic,static,relocable"
 
-	known_version=$(shell cat version)
-	atual_dir=$(shell pwd)
-	name_base=$(shell basename $(atual_dir))
+	known_version:=$(shell cat version)
+	atual_dir:=$(shell pwd)
+	name_base:=$(shell basename $(atual_dir))
 
 ifndef ($(prefixes))
 	prefixes='all:foe:/usr/local'
