@@ -47,10 +47,14 @@ _with_debug_too=$9
 
 # fix me if necessary:
 # need more sanatization
+_pg_config_path=${_pg_config_path:-/usr/bin}${_pg_config_path}
+my_pg_config_path=${_pg_config_path}
 
-my_pg_config_path=$_pg_config_path
-my_gprconfig_path=$_gprconfig_path
-my_gprbuild_path=$_gprbuild_path
+_gprconfig_path=${_gprconfig_path:-/usr/bin}${_gprconfig_path}
+my_gprconfig_path=${_gprconfig_path}
+
+_gprbuild_path=${_gprbuild_path:-/usr/bin}${_gprbuild_path}
+my_gprbuild_path=${_gprbuild_path}
 
 _oses=${_oses:-linux}${_oses}
 _oses=${_oses,,}
@@ -94,6 +98,8 @@ _with_debug_too=${_with_debug_too,,}
 #to_lower
 
 case $_with_debug_too in
+	*onlydebug*)	my_with_debug_too=debug
+		;;
 	*yes*)	my_with_debug_too=normal,debug
 		;;
 	*no*)	my_with_debug_too=normal

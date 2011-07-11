@@ -54,7 +54,7 @@ ifndef ($(lib_build_types))
 	lib_build_types='dynamic,static'
 endif
 
-ifndef ($(build_with_debug_too))	# yes no
+ifndef ($(build_with_debug_too))	# yes no onlydebug
 	build_with_debug_too='no'
 endif
 
