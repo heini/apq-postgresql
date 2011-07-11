@@ -47,39 +47,39 @@ endif
 #
 
 ifndef ($(oses))
-	oses='linux'
+	oses:='linux'
 endif
 
 ifndef ($(lib_build_types))
-	lib_build_types='dynamic,static'
+	lib_build_types:='dynamic,static'
 endif
 
 ifndef ($(build_with_debug_too))	# yes no onlydebug
-	build_with_debug_too='no'
+	build_with_debug_too:='no'
 endif
 
 ifndef ($(add_compiler_paths))
-	add_compiler_paths=''
+	add_compiler_paths:=''
 endif
 
 ifndef ($(system_libs_paths))
-	system_libs_paths='/usr/lib'
+	system_libs_paths:='/usr/lib'
 endif
 
 ifndef ($(ssl_include_paths))
-	ssl_include_paths='/usr/lib/openssl'
+	ssl_include_paths:='/usr/lib/openssl'
 endif
 
 ifndef ($(pg_config_path))
-	pg_config_path='/usr/bin'
+	pg_config_path:='/usr/bin'
 endif
 
 ifndef ($(gprconfig_path))
-	gprconfig_path='/usr/bin'
+	gprconfig_path:='/usr/bin'
 endif
 
 ifndef ($(gprbuild_path))
-	gprbuild_path='/usr/bin'
+	gprbuild_path:='/usr/bin'
 endif
 
 ##############################

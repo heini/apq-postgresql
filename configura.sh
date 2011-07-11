@@ -30,7 +30,8 @@ _libtypes=$2
 _base_name=
 my_paths_for_compiler=$3
 
-my_system_libs_paths=
+my_system_libs_paths=""
+
 _system_libs_paths=$4
 
 my_ssl_include_paths=
@@ -47,16 +48,20 @@ _with_debug_too=$9
 
 # fix me if necessary:
 # need more sanatization
-_pg_config_path=${_pg_config_path:-/usr/bin}${_pg_config_path}
-my_pg_config_path=${_pg_config_path}
+_pg_config_path=${_pg_config_path:=/usr/bin}
+my_pg_config_path=$_pg_config_path
 
-_gprconfig_path=${_gprconfig_path:-/usr/bin}${_gprconfig_path}
+_gprconfig_path=${_gprconfig_path:=/usr/bin}
 my_gprconfig_path=${_gprconfig_path}
 
-_gprbuild_path=${_gprbuild_path:-/usr/bin}${_gprbuild_path}
+_gprbuild_path=${_gprbuild_path:=/usr/bin}
 my_gprbuild_path=${_gprbuild_path}
 
-_oses=${_oses:-linux}${_oses}
+_ssl_include_paths=${_ssl_include_paths:=/usr/lib/openssl}
+my_ssl_include_paths=${_ssl_include_paths}
+_system_libs_paths=${_system_libs_paths:=/usr/lib}
+
+_oses=${_oses:=linux}
 _oses=${_oses,,}
 # ${var,,} -> to_lower(var). min bash v4.0
 
@@ -71,7 +76,7 @@ do
 	esac
 done
 
-_libtypes=${_libtypes:-dynamic,static}${_libtypes}
+_libtypes=${_libtypes:=dynamic,static}
 _libtypes=${_libtypes,,}
 # to_lower
 
@@ -86,11 +91,7 @@ do
 	esac
 done
 
-
-_ssl_include_paths=${_ssl_include_paths:-/usr/lib/openssl}${_ssl_include_paths}
-my_ssl_include_paths=${_ssl_include_paths}
-
-_with_debug_too=${_with_debug_too:-no}${_with_debug_too}
+_with_debug_too=${_with_debug_too:=no}
 _with_debug_too=${_with_debug_too,,}
 #to_lower
 
@@ -106,7 +107,7 @@ esac
 libdir2=
 libdir3=
 
-_system_libs_paths=${_system_libs_paths:-/usr/lib}${_system_libs_paths}
+############### comentar
 
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
@@ -132,8 +133,10 @@ do
 		do
 			my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 			mkdir -p "$my_tmp"
+			
+			IFS="$ifsbackup"
 
-				#min two spaces before "\n" because quotes
+			#min two spaces before "\n" because quotes
 			{	printf	"$my_tmp  \n"
 				printf	"$debuga  \n"
 				printf	"$libbuildtype  \n"
@@ -155,6 +158,8 @@ do
 			gnatprep "$my_atual_dir/apq_postgresql_version.gpr.in"  "$my_tmp/apq_postgresql_version.gpr"  "$my_tmp/kov.def"
 			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"
 			cp "$my_atual_dir/apq_postgresqlhelp.gpr"  "$my_tmp/"
+
+			IFS=",$ifsbackup"
 
 			for support_dirs in obj lib_ali ali obj_c lib_ali_c ali_c
 			do
