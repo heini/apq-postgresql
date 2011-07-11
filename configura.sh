@@ -107,26 +107,33 @@ esac
 libdir2=
 libdir3=
 
-#####
+lib_system1=
+lib_system2=
+lib_system3=
+lib_system4=
+lib_system5=
+lib_system6=
+lib_system7=
+lib_system8=
+lib_system9=
+lib_system10=
+
+unset z
 
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
 do
-	libdir2="${libdir2:+${libdir2}, }\"L${alibdirsystem}\" "
-	libdir3="${libdir3:+$libdir3} L${alibdirsystem} "
 
-
+	[ ${z:=1} -gt 10 ] && break;
+	madeit=" lib_system$z=\"L${alibdirsystem}\"  "
+	eval $madeit
+	z=$(( $z + 1 ))
 
 done
-
-my_system_libs_paths="$libdir3"
-libdir2=" ${libdir2}  "
-#note: min of two spaces before ")"  :-)
 
 IFS=",$ifsbackup"
 
 made_dirs=${my_atual_dir}/build
-
 
 for sist_oses in $my_oses
 do
@@ -152,7 +159,17 @@ do
 
 				#min two spaces before "\n" because quotes
 			{	printf	"version:=\"$my_version\"  \n"
-				printf	"system_libs:=$libdir2  \n"	
+				printf  "system_lib1:=\"$lib_system1\"  \n"
+				printf  "system_lib2:=\"$lib_system2\"  \n"
+				printf  "system_lib3:=\"$lib_system3\"  \n"
+				printf  "system_lib4:=\"$lib_system4\"  \n"
+				printf  "system_lib5:=\"$lib_system5\"  \n"
+				printf  "system_lib6:=\"$lib_system6\"  \n"
+				printf  "system_lib7:=\"$lib_system7\"  \n"
+				printf  "system_lib8:=\"$lib_system8\"  \n"
+				printf  "system_lib9:=\"$lib_system9\"  \n"
+				printf  "system_lib10:=\"$lib_system10\"  \n"
+
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
 				printf	"basedir:=\"$my_atual_dir/build\"  \n"
