@@ -23,8 +23,6 @@ ifsbackup="$IFS"
 my_version=$(cat version)
 my_atual_dir=$(pwd)
 
-IFS=
-
 my_oses=
 _oses=$1
 my_libtypes=
@@ -50,17 +48,13 @@ _with_debug_too=$9
 # fix me if necessary:
 # need more sanatization
 
-my_system_libs_paths=$_system_libs_paths
-my_ssl_include_paths=$_ssl_include_paths
 my_pg_config_path=$_pg_config_path
 my_gprconfig_path=$_gprconfig_path
 my_gprbuild_path=$_gprbuild_path
 
-IFS="$ifsbackup"
-
 _oses=${_oses:-linux}${_oses}
 _oses=${_oses,,}
-# ${var,,) -> to_lower(var). min bash v4.0
+# ${var,,} -> to_lower(var). min bash v4.0
 
 for r in linux mswindows darwin bsd other
 do
@@ -73,26 +67,29 @@ do
 	esac
 done
 
+_libtypes=${_libtypes:-dynamic,static}${_libtypes}
 _libtypes=${_libtypes,,}
 # to_lower
 
-for r2 in static dynamic relocatable
+for q in static dynamic relocatable
 do
 	case $_libtypes in
 		*all*)	my_libtypes=static,dynamic,relocatable
 			break
 			;;
-		*"$r2"*)	my_libtypes=${my_libtypes:+${my_libtypes},}$r2
+		*$q*)	my_libtypes=${my_libtypes:+${my_libtypes},}$q
 			;;
 	esac
 done
 
-my_libtypes=${my_libtypes:-static,dynamic}$my_libtypes
 
-my_system_libs_paths=${_system_libs_paths:-/usr/lib}$_system_libs_paths
+_system_libs_paths=${_system_libs_paths:-/usr/lib}${_system_libs_paths}
+my_system_libs_paths=${_system_libs_paths}
 
-my_ssl_include_paths=${_ssl_include_paths:-/usr/lib/openssl}$_ssl_include_paths
+_ssl_include_paths=${_ssl_include_paths:-/usr/lib/openssl}${_ssl_include_paths}
+my_ssl_include_paths=${_ssl_include_paths}
 
+_with_debug_too=${_with_debug_too:-no}${_with_debug_too}
 _with_debug_too=${_with_debug_too,,}
 #to_lower
 
@@ -102,8 +99,6 @@ case $_with_debug_too in
 	*no*)	my_with_debug_too=normal
 		;;
 esac
-
-my_with_debug_too=${my_with_debug_too:-normal}$my_with_debug_too
 
 libdir2=
 libdir3=
@@ -156,7 +151,7 @@ do
 			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"
 			cp "$my_atual_dir/apq_postgresqlhelp.gpr"  "$my_tmp/"
 
-			for support_dirs in obj lib_ali ali,obj_c lib_ali_c ali_c
+			for support_dirs in obj lib_ali ali obj_c lib_ali_c ali_c
 			do
 			
 				mkdir -p "$my_tmp"/$support_dirs
