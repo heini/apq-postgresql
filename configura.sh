@@ -87,9 +87,6 @@ do
 done
 
 
-_system_libs_paths=${_system_libs_paths:-/usr/lib}${_system_libs_paths}
-my_system_libs_paths=${_system_libs_paths}
-
 _ssl_include_paths=${_ssl_include_paths:-/usr/lib/openssl}${_ssl_include_paths}
 my_ssl_include_paths=${_ssl_include_paths}
 
@@ -109,8 +106,10 @@ esac
 libdir2=
 libdir3=
 
+_system_libs_paths=${_system_libs_paths:-/usr/lib}${_system_libs_paths}
+
 IFS=";:$ifsbackup"
-for alibdirsystem in $my_system_libs_paths
+for alibdirsystem in $_system_libs_paths
 do
 	libdir2="${libdir2:+${libdir2},}\" L${alibdirsystem}\" "
 	libdir3="${libdir3:+$libdir3} L${alibdirsystem} "
