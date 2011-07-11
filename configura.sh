@@ -42,13 +42,14 @@ _with_debug_too=$9
 # fix me if necessary:
 # need more sanatization
 _pg_config_path=${_pg_config_path:=/usr/bin}
+#_pg_config_path=${_pg_config_path//[''``]/""}
 my_pg_config_path=$_pg_config_path
 
 _gprconfig_path=${_gprconfig_path:=/usr/bin}
-my_gprconfig_path=${_gprconfig_path}
+my_gprconfig_path=$_gprconfig_path
 
 _gprbuild_path=${_gprbuild_path:=/usr/bin}
-my_gprbuild_path=${_gprbuild_path}
+my_gprbuild_path=$_gprbuild_path
 
 _ssl_include_paths=${_ssl_include_paths:=/usr/lib/openssl}
 my_ssl_include_paths=${_ssl_include_paths}
@@ -137,7 +138,7 @@ do
 				printf	"$my_paths_for_compiler  \n"
 				printf	"$my_gprconfig_path  \n"
 				printf	"$my_gprbuild_path  \n"
-				printf	"$my_pg_config_path  \n"
+				printf	"${my_pg_config_path}  \n"
 			}>"$my_tmp/kov.log"
 
 				#min two spaces before "\n" because quotes
