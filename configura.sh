@@ -107,17 +107,20 @@ esac
 libdir2=
 libdir3=
 
-############### comentar
+#####
 
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
 do
-	libdir2="${libdir2:+${libdir2},}\" L${alibdirsystem}\" "
+	libdir2="${libdir2:+${libdir2}, }\"L${alibdirsystem}\" "
 	libdir3="${libdir3:+$libdir3} L${alibdirsystem} "
+
+
+
 done
 
 my_system_libs_paths="$libdir3"
-libdir2="( ${libdir2}  )"
+libdir2=" ${libdir2}  "
 #note: min of two spaces before ")"  :-)
 
 IFS=",$ifsbackup"

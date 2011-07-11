@@ -7,7 +7,7 @@ project apq_postgresql_version is
 
    version   := $version ;    --  eg.: "3.0.1"
    prefix    := $prefix ;
-   system_libs  := ( ) & $system_libs ;
+   system_libs  := ( ) & ( $system_libs  );
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
    basedir	:= "" & $basedir ;

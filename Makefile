@@ -62,7 +62,7 @@ ifndef ($(add_compiler_paths))
 	add_compiler_paths:=''
 endif
 
-ifndef ($(system_libs_paths))
+ifndef ($(system_libs_paths))		# max 10 paths
 	system_libs_paths:='/usr/lib'
 endif
 
