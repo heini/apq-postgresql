@@ -75,15 +75,15 @@ ifndef ($(ssl_include_path))
 endif
 
 ifndef ($(pg_config_path))
-	pg_config_path:= dirname $( which pg_config || printf "/usr/bin/pg_config" )
+	pg_config_path:=$(shell dirname $(shell which pg_config || printf "/usr/bin/pg_config" ))
 endif
 
 ifndef ($(gprconfig_path))
-	gprconfig_path:= dirname $( which gprconfig || printf "/usr/bin/gprconfig" )
+	gprconfig_path:=$(shell dirname $(shell which gprconfig || printf "/usr/bin/gprconfig" ))
 endif
 
 ifndef ($(gprbuild_path))
-	gprbuild_path:= dirname $( which gprbuild || printf "/usr/bin/gprbuild" )
+	gprbuild_path:=$(shell dirname $(shell which gprbuild || printf "/usr/bin/gprbuild" ))
 endif
 
 
@@ -99,6 +99,5 @@ docs:
 
 showversion:
 	@echo $(known_version)
-
-
+	
 force:
