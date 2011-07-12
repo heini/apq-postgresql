@@ -29,16 +29,12 @@
 ########################################
 ### constant var declarations  #########
 ########################################
-
-#known_oses_list=""
-#known_build_types=""
-
 	known_version:=$(shell cat version)
 	atual_dir:=$(shell pwd)
 	name_base:=$(shell basename $(atual_dir))
 
 ### (obs.: can be altered in command line :-)  ###
-###  eg: make configura oses=linux,mswindows lib_build_types=dynamic,static \
+###  eg: make configure oses=linux,mswindows lib_build_types=dynamic,static \
 			system_libs_paths=/usr/source:/usr/local:/lib/got \
 			build_with_debug_too=yes
 
@@ -66,7 +62,7 @@ ifndef ($(build_with_debug_too))	# yes no onlydebug
 endif
 
 ifndef ($(add_compiler_paths))
-	add_compiler_paths:=/usr/bin
+	add_compiler_paths:=none
 endif
 
 ifndef ($(system_libs_paths))		# path1:path2:pathn   
@@ -74,28 +70,29 @@ ifndef ($(system_libs_paths))		# path1:path2:pathn
 	system_libs_paths:=/usr/lib
 endif
 
-ifndef ($(ssl_include_paths))
+ifndef ($(ssl_include_path))
 	ssl_include_paths:=/usr/lib/openssl
 endif
 
 ifndef ($(pg_config_path))
-	pg_config_path:=/usr/bin
+	pg_config_path:= dirname $( which pg_config || printf "/usr/bin/pg_config" )
 endif
 
 ifndef ($(gprconfig_path))
-	gprconfig_path:=/usr/bin
+	gprconfig_path:= dirname $( which gprconfig || printf "/usr/bin/gprconfig" )
 endif
 
 ifndef ($(gprbuild_path))
-	gprbuild_path:=/usr/bin
+	gprbuild_path:= dirname $( which gprbuild || printf "/usr/bin/gprbuild" )
 endif
+
 
 ##############################
 #### targets #################
 ##############################
 
-configura:
-	@echo $(shell $(atual_dir)/configura.sh "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_paths)" $(pg_config_path) $(gprconfig_path) $(gprbuild_path) "$(build_with_debug_too)")
+configure:
+	@echo $(shell $(atual_dir)/configura.sh "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_path)" $(pg_config_path) $(gprconfig_path) $(gprbuild_path) "$(build_with_debug_too)")
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done

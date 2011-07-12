@@ -1,13 +1,105 @@
+	Revision 1.0
+	Obs.: The new Build-System are _in _construction process_. not all targets exist now.
+	All options 'names' are in lowercase. Options 'values' are lowercase or is at your will ;-)
+but remember , now days, most systems are 'case sensitive'
+	And a prominente warning: how a _Developer_ don't use "spaces" in names et all ;-) _you_ will be 
+more happy if you follow this advice. :-)
+	Well, I opted by use "foe" in place of "eof" for minor clashes with shells and most names and values
+are self descriptive. most times the "plural" names accept more que one value simultaneously 
+and "singular" names accept just one value simultaneously.	
+	And for now, while building "The Build System", It is 'fairly quiet' about successes 
+and failures. but this is only for now :-). keep it in mind. :-)
 
-Installation instructions:
+1) makefile targets
+1.1) configure
+1.2) compile
+1.3) install
+1.4) clean
+1.5) distclean
+2) mixing all things ( example of real usage)
+
+	A word about options(in all targets): Most times, 
+and often, (if you follow sintatic rules [ eg: separator &cia]),
+you _Can_ mix/add more que one value in option 'values' simultaneously. :-)
 
 
-make PREFIX=/where/to/install
-make install PREFIX=/where/to/install
+1.1) target configure
+	command "make configure"
+
+	Create directory "build",  and support files and directories.
+	The effect is "acumulative" _and_ "cached/logged"  in per "individual" library basis; each time
+you hit this command, it add and/or alter the correspondent files.
+
+	Of course, is non-sense hit "make configure" without his options :-)
+but if you do, it will take default values that don't can be what you want :-)
+		
+1.1.2) options for "configure" target
+
+1.1.2.1) how choose System Operation(s)
+1.1.2.1.2)	tag "oses="		separator ","
+		eg: "make configure oses=linux "
+		eg: "make configure oses=linux,bsd,mswindows "
+		known values: all,linux,mswindows,darwin,bsd,other
+		default value: linux
+
+1.1.2.2) how choose what types of lib are for build
+1.1.2.2.2)	tag "lib_build_types="	separator ","
+		eg:	"make configure lib_build_types=static "
+		eg:	"make configure lib_build_types=relocatable "
+		eg: "make configure lib_build_types=dynamic "
+or mix values at your will:-)
+		eg: "make configure lib_build_types=static,relocatable,dynamic "
+		known values: all,static,dynamic,relocatable
+		default value: static,dynamic
+
+1.1.2.3) how choose one(1) or more(2+) path(s) for search compilers ( and tools) when compiling
+1.1.2.3.2)	tag "add_compiler_paths="	separator ":" or ";"
+		eg:	"make configure add_compiler_paths=/usr/where/I/made/supercompiler/not_in/system_path_or/bring_to_front_in_path_search "
+		eg:	"make configura add_compiler_paths=/usr/tools/bin:/home/dani/cross_compiling/bin:/usr/local/gnat-2012/bin:/etc "
+		known values ? I will rely in you :-)
+		default value: "none" (without double quotes)
+
+1.1.2.4) how choose one(1) or more(2+) paths for search libs when building,compiling and linking
+1.1.2.4.2)	tag "system_libs_paths="	separator ":" or ";"
+			maximum of ten(10) paths _each time_ you hit this command. But it will "alter/substitute" old values
+in "per lib"(a.k.a 'individual') basis. long as they are up to ten(10) values, the number of values in old or new values
+doesn't matter. Enjoy! =]
+		eg:	"make configure system_libs_paths=/usr/lib "
+		eg	"make configure system_libs_paths=/usr/local/lib/gtkada/lib:/etc/local/lib:/etc/cross/mingw64/lib:/etc/bsd/lib:/etc/etc/lib
+		all known values: Are you kidding me ? :-)
+		default value: /usr/lib
+
+1.1.2.5) how choose one(1) include path for openssl (or similar) 
+		Always keep in mind this "motto target configure" ---> "_always_ in per lib_ basis_" =]
+1.1.2.5.2)	tag "ssl_include_path=" separator ? don't exist :-)
+		eg: "make configure ssl_include_path=/usr/lib/openssl "
+		all Known values: I ( and we ) do not known :o]
+		default value: /usr/lib/openssl
+
+1.1.2.6) how choose one(1) _PATH_ on which is the binary of pg_config that "I Want"
+1.1.2.6.2)	tag "pg_config_path="	separator ? don't exist =]
+		eg:	"make configure pg_config_path=/usr/bin "
+		known values: well... in Debian Sid, now days, is /usr/bin But I will rely in you to discover the correct value ;-)
+		default value: /usr/bin
+
+1.1.2.7) how choose one(1) _PATH_ on which is the binary of gprconfig that "I Want"
+1.1.2.7.2)	tag "gprconfig_path="	separator ? don't exist =]
+		eg:	"make configure gprconfig_path=/usr/bin "
+		known values: I admit! I don't known... Because this I will rely in You Brave and Brighter Developer. Thank's :-)
+		default value: /usr/bin
+
+1.1.2.8) how choose one(1) _PATH_ on which is the binary of gprbuild that "I Want"
+1.1.2.8.2)	tag "gprbuild_path="	separator ? don't exist =]
+		eg:	"make configure gprbuild_path=/usr/bin "
 
 
-it'll install:
 
-sources + include files at $(PREFIX)/include
-shared library at $(PREFIX)/lib
-gpr files at $(PREFIX)/lib/gnat
+
+
+
+
+
+
+
+
+
