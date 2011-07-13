@@ -33,6 +33,8 @@
 	atual_dir:=$(shell pwd)
 	name_base:=$(shell basename $(atual_dir))
 
+	path_backup:=$(shell printf "${PATH}" )
+
 ### (obs.: can be altered in command line :-)  ###
 ###  eg: make configure oses=linux,mswindows lib_build_types=dynamic,static \
 			system_libs_paths=/usr/source:/usr/local:/lib/got \
@@ -75,15 +77,15 @@ ifndef ($(ssl_include_path))
 endif
 
 ifndef ($(pg_config_path))
-	pg_config_path:=$(shell dirname $(shell which pg_config || printf "/usr/bin/pg_config" ))
+	pg_config_path:=$(shell dirname $(shell PATH="$(add_compiler_paths):$(path_backup)" ;  which pg_config || printf "/usr/bin/pg_config" ))
 endif
 
 ifndef ($(gprconfig_path))
-	gprconfig_path:=$(shell dirname $(shell which gprconfig || printf "/usr/bin/gprconfig" ))
+	gprconfig_path:=$(shell dirname $(shell PATH="$(add_compiler_paths):$(path_backup)" ;  which gprconfig || printf "/usr/bin/gprconfig" ))
 endif
 
-ifndef ($(gprbuild_path))
-	gprbuild_path:=$(shell dirname $(shell which gprbuild || printf "/usr/bin/gprbuild" ))
+ifndef ($(gprbuild_path)) #
+	gprbuild_path:=$(shell dirname $(shell PATH="$(add_compiler_paths):$(path_backup)" ;  which gprbuild || printf "/usr/binggg/gprbuild" ))
 endif
 
 
@@ -99,5 +101,6 @@ docs:
 
 showversion:
 	@echo $(known_version)
-	
+	@printf "$(pg_config_path) \n$(gprbuild_path) \n" 
+
 force:
