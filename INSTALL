@@ -148,6 +148,18 @@ re-installation of libs, when installing 'global gpr'
 BUT installation or re-installation of libs is 
 still possible ( this will occur before installing global gpr ) ;-)
 
+1.4) target clean
+	command "make clean"
+	remove all object and ali files in "build" directory
+
+1.4.2) options for "clean" target ? none, all options are ignored with "clean" target
+
+1.5) target distclean
+	command "make distclean"
+	remove "build" directory. Bye Bye ;-)
+
+1.5.2) options for "distclean" target ? none, all options are ignored with "distclean" target
+
 
 2) mixing all things ( example real usage)
 
