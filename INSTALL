@@ -112,8 +112,8 @@ doesn't matter. Enjoy! =]
 		otherwise, lib will be ignored during this phase
 1.2.2.1.2)	tag "oses="		separator ","
 		eg:	"make compile oses=all"
-		known values:( same of configura oses= ) all,linux,mswindows,darwin,bsd,other
-		default value:( idem configura oses= ) linux
+		known values:( same of configure oses= ) all,linux,mswindows,darwin,bsd,other
+		default value:( idem configure oses= ) linux
 
 1.3) target install
 	command "make install"
@@ -132,7 +132,7 @@ doesn't matter. Enjoy! =]
 		obs.: you may need to use "prefixes=none" to avoid unnecessary 
 re-installation of libs, when installing 'global gpr'
 
-1.3.2.2) how choose global project .gpr ( contains all memorized 
+1.3.2.2) how choose where install global project .gpr ( It contains all memorized 
  and cached and installed libs [for that System Operation that I choose]
  in one(1) .gpr for dayly use)
 1.3.2.2.2)	tag "global_gpr="	separators ":" (or ";") and one(1) ":foe:"
