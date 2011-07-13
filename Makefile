@@ -85,7 +85,7 @@ ifndef ($(gprconfig_path))
 endif
 
 ifndef ($(gprbuild_path)) #
-	gprbuild_path:=$(shell dirname $(shell PATH="$(add_compiler_paths):$(path_backup)" ;  which gprbuild || printf "/usr/binggg/gprbuild" ))
+	gprbuild_path:=$(shell dirname $(shell PATH="$(add_compiler_paths):$(path_backup)" ;  which gprbuild || printf "/usr/bin/gprbuild" ))
 endif
 
 
@@ -101,6 +101,5 @@ docs:
 
 showversion:
 	@echo $(known_version)
-	@printf "$(pg_config_path) \n$(gprbuild_path) \n" 
 
 force:
