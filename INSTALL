@@ -58,6 +58,8 @@ or mix values at your will:-)
 		eg:	"make configura add_compiler_paths=/usr/tools/bin:/home/dani/cross_compiling/bin:/usr/local/gnat-2012/bin:/etc "
 		known values ? I will rely in you :-)
 		default value: "none" (without double quotes)
+		IMPORTANT:  "add_compiler_paths" is considered first when searching automatically for commands; 
+		searching for paths and commands gprbuild, pg_config and gprconfig is an examples of this behavior :-)
 
 1.1.2.4) how choose one(1) or more(2+) paths for search libs when building,compiling and linking
 1.1.2.4.2)	tag "system_libs_paths="	separator ":" or ";"
@@ -80,26 +82,74 @@ doesn't matter. Enjoy! =]
 1.1.2.6.2)	tag "pg_config_path="	separator ? don't exist =]
 		eg:	"make configure pg_config_path=/usr/bin "
 		known values: well... in Debian Sid, now days, is /usr/bin But I will rely in you to discover the correct value ;-)
-		default value: /usr/bin
+		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.7) how choose one(1) _PATH_ on which is the binary of gprconfig that "I Want"
 1.1.2.7.2)	tag "gprconfig_path="	separator ? don't exist =]
 		eg:	"make configure gprconfig_path=/usr/bin "
 		known values: I admit! I don't known... Because this I will rely in You Brave and Brighter Developer. Thank's :-)
-		default value: /usr/bin
+		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.8) how choose one(1) _PATH_ on which is the binary of gprbuild that "I Want"
 1.1.2.8.2)	tag "gprbuild_path="	separator ? don't exist =]
 		eg:	"make configure gprbuild_path=/usr/bin "
+		know values: I don't known =]
+		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
+
+1.1.2.9) how choose the type or type(s) of lib, about presence of debug information, "I Want"
+1.1.2.8.2)	tag "with_debug_too="	separator? don't exist :-)
+		eg:	"make configure with_debug_too=yes "
+		known values: no,yes,onlydebug
+		default value: no
+
+1.2) target compile
+	command "make compile"
+
+1.2.2)	option for "compile" target
+
+1.2.2.1) how choose System Operations for compiling
+		importante: just yet _configured_ lib(s) will be compiled, 
+		otherwise, lib will be ignored during this phase
+1.2.2.1.2)	tag "oses="		separator ","
+		eg:	"make compile oses=all"
+		known values:( same of configura oses= ) all,linux,mswindows,darwin,bsd,other
+		default value:( idem configura oses= ) linux
+
+1.3) target install
+	command "make install"
+
+1.3.2) options for "install" target
+
+1.3.2.1) how choose System Operations _AND_ Where path to install
+1.3.2.1.2)	tag "prefixes="		separators ":" (or ";") and one(1) ":foe:"
+		usage: "make install prefixes=os1:os2:osn:foe:/path1:pathn "
+		eg:	"make install prefixes=all:foe:/usr/local "
+		eg:	"make install prefixes=linux:mswindows:foe:/usr/local "
+		eg:	"make install prefixes=linux:mswindows:foe:/usr/local/lib:/usr/lib:/etc/mylib/lib:/etc/etc/etc/lib "
+		eg: "make install prefixes=none "
+		known values: "none" (without double quotes) and well... I don't know... :-) I rely in you for it =]
+		obs.: "none" is a wildcard for the non-existent "none:foe:none"
+		obs.: you may need to use "prefixes=none" to avoid unnecessary 
+re-installation of libs, when installing 'global gpr'
+
+1.3.2.2) how choose global project .gpr ( contains all memorized 
+ and cached and installed libs [for that System Operation that I choose]
+ in one(1) .gpr for dayly use)
+1.3.2.2.2)	tag "global_gpr="	separators ":" (or ";") and one(1) ":foe:"
+		usage: "make install global_gpr=os1:os2:osn:foe:/path1:pathn "
+		eg:	"make install prefixes=none global_gpr=all:foe:/usr/local "
+		eg:	"make install prefixes=none global_gpr=all:foe:/usr/local:/usr/backup "
+		eg:	"make install prefixes=none global_gpr=linux,mswindows:foe:/usr/local:/usr/backup "
+		known values: "none" (without double quotes) and well... I don't know... :-) I rely in you for it =]
+		default value: "none" (without double quotes)
+		obs.: "none" is a wildcard for the non-existent "none:foe:none"
+		obs.: you may need to use "prefixes=none" to avoid unnecessary 
+re-installation of libs, when installing 'global gpr' 
+BUT installation or re-installation of libs is 
+still possible ( this will occur before installing global gpr ) ;-)
 
 
+2) mixing all things ( example real usage)
 
-
-
-
-
-
-
-
-
+ "for be done" :-)
 

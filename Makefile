@@ -63,6 +63,8 @@ ifndef ($(build_with_debug_too))	# yes no onlydebug
 	build_with_debug_too:=no
 endif
 
+### add_compiler_paths is considered first when searching automatically for commands; 
+### commands gprbuild, pg_config and gprconfig is a example of this behavior :-)
 ifndef ($(add_compiler_paths))
 	add_compiler_paths:=none
 endif
