@@ -1,27 +1,40 @@
 #!/bin/bash
+#: title	: base
+#: date		: 2011-jul-09
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.0
+#: Description: base scripts and functions for configuring,compiling and installing.
+#: Description: You don't need run this script manually.
+#: Description: For It use makefile targets. See INSTALL file.
 
-
-if [ $# -lt 1 ]; then
-	prinft 'I need minimum of 1 options'
+if [ $# -eq 0 ]; then
+	printf "I need minimum of 1 options\n"
 	exit 1;
 fi;
 
-_command=$1
-_command=${_command,,}
-my_command=
-
-case $_command in
-	^configure*) my_command="configure" ;;
-	^compile*) my_command="compile" ;;
-	^install*) my_command="install" ;;  #need double quotes. "string install" not command install :-)
-	^clean*) my_command="clean" ;;
-	^distclean*) my_command="disclean" ;;
-	^*) printf "I dont known this command :-)" ;
+case ${1,,} in  
+	"configure" ) my_commande='configuring' ;;
+	"compile" ) my_commande='compilling' ;;
+	"install" ) my_commande='installing' ;;
+	"clean" ) my_commande='cleaning' ;;
+	"distclean" ) my_commande='dist_cleaning' ;;
+	* ) printf "I dont known this command take 1 :-)\n" ;
 		exit 1
 		;;
-esac
+esac;
 
 shift
+
+##################################
+##### support functions ##########
+##################################
+
+
+
+##################################
+##### target functions ##########
+##################################
 
 _configure(){
 #: title	: configure
@@ -39,14 +52,17 @@ _configure(){
 if [ $# -ne 9 ]; then
 	printf ' You dont need use it by hand. read INSTALL for more info and direction.  \n'
 	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_paths" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too"  \n'
+	printf "$# \n";
 	exit 1
 fi;
 
-ifsbackup="$IFS"
-my_version=$(cat version)
-my_atual_dir=$(pwd)
-my_oses=
-_oses=$1
+local ifsbackup="$IFS"
+local IFS="$ifsbackup"
+
+local my_version=$(cat version)
+local my_atual_dir=$(pwd)
+local my_oses=
+local _oses=$1
 my_libtypes=
 _libtypes=$2
 _base_name=
@@ -200,14 +216,20 @@ exit 0;   # end ;-)
 
 } #end _configure
 
+ #need double quotes. "string install" not command install :-\)
 
-case my_command in
-	"configure")  ;;
-	"compile")  ;;
-	"install")  ;;  #need double quotes. "string install" not command install :-)
-	"clean")  ;;
-	"distclean")  ;;
-	*) printf "I dont known this command :-)" ;
+case $my_commande in
+	'configuring' ) _configure "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9"
+		;;
+	'compilling' ) echo "EBA"
+		;;
+	'installing' ) 
+		;; 
+	'cleaning' ) 
+		;;
+	'dist_cleaning' )  ;;
+	*  ) printf 'I dont known this command :-\)\n' ;
+		printf "_${my_command}_\n"
 		exit 1
 		;;
 esac
