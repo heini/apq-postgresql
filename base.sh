@@ -19,12 +19,12 @@ case ${1,,} in
 	"install" ) my_commande='installing' ;;
 	"clean" ) my_commande='cleaning' ;;
 	"distclean" ) my_commande='dist_cleaning' ;;
-	* ) printf "I dont known this command take 1 :-)\n" ;
+	* ) printf "I dont known this command take 1 :-\)\n" ;
 		exit 1
 		;;
 esac;
 
-shift
+shift 1 ;
 
 ##################################
 ##### support functions ##########
@@ -216,19 +216,21 @@ exit 0;   # end ;-)
 
 } #end _configure
 
- #need double quotes. "string install" not command install :-\)
+####################################
+######   operative part   ##########
+####################################
 
 case $my_commande in
-	'configuring' ) _configure "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9"
+	'configuring' )  [ $# -eq 9 ] && _configure "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" || printf "configure need nine\(9\) options\n" ; exit 1
 		;;
-	'compilling' ) echo "EBA"
+	'compilling' )  echo "EBA"
 		;;
 	'installing' ) 
 		;; 
 	'cleaning' ) 
 		;;
 	'dist_cleaning' )  ;;
-	*  ) printf 'I dont known this command :-\)\n' ;
+	*  ) printf "I dont known this command :-\)\n" ;
 		printf "_${my_command}_\n"
 		exit 1
 		;;
