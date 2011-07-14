@@ -1,5 +1,30 @@
 #!/bin/bash
-#: title	: configura
+
+
+if [ $# -lt 1 ]; then
+	prinft 'I need minimum of 1 options'
+	exit 1;
+fi;
+
+_command=$1
+_command=${_command,,}
+my_command=
+
+case $_command in
+	^configure*) my_command="configure" ;;
+	^compile*) my_command="compile" ;;
+	^install*) my_command="install" ;;  #need double quotes. "string install" not command install :-)
+	^clean*) my_command="clean" ;;
+	^distclean*) my_command="disclean" ;;
+	^*) printf "I dont known this command :-)" ;
+		exit 1
+		;;
+esac
+
+shift
+
+_configure(){
+#: title	: configure
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
@@ -173,3 +198,16 @@ IFS="$ifsbackup"
 
 exit 0;   # end ;-)
 
+} #end _configure
+
+
+case my_command in
+	"configure")  ;;
+	"compile")  ;;
+	"install")  ;;  #need double quotes. "string install" not command install :-)
+	"clean")  ;;
+	"distclean")  ;;
+	*) printf "I dont known this command :-)" ;
+		exit 1
+		;;
+esac
