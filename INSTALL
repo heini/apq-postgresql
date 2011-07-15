@@ -108,45 +108,44 @@ doesn't matter. Enjoy! =]
 1.2.2)	option for "compile" target
 
 1.2.2.1) how choose System Operations for compiling
-		importante: just yet _configured_ lib(s) will be compiled, 
+		important:  _configured_ lib(s) will be compiled, 
 		otherwise, lib will be ignored during this phase
 1.2.2.1.2)	tag "oses="		separator ","
 		eg:	"make compile oses=all"
 		known values:( same of configure oses= ) all,linux,mswindows,darwin,bsd,other
 		default value:( idem configure oses= ) linux
 
+
 1.3) target install
 	command "make install"
 
 1.3.2) options for "install" target
 
-1.3.2.1) how choose System Operations _AND_ Where path to install
-1.3.2.1.2)	tag "prefixes="		separators ":" (or ";") and one(1) ":foe:"
-		usage: "make install prefixes=os1:os2:osn:foe:/path1:pathn "
-		eg:	"make install prefixes=all:foe:/usr/local "
-		eg:	"make install prefixes=linux:mswindows:foe:/usr/local "
-		eg:	"make install prefixes=linux:mswindows:foe:/usr/local/lib:/usr/lib:/etc/mylib/lib:/etc/etc/etc/lib "
-		eg: "make install prefixes=none "
-		known values: "none" (without double quotes) and well... I don't know... :-) I rely in you for it =]
-		obs.: "none" is a wildcard for the non-existent "none:foe:none"
-		obs.: you may need to use "prefixes=none" to avoid unnecessary 
-re-installation of libs, when installing 'global gpr'
+1.3.2.1) how choose System Operations for installing
+		important:  _compiled_ lib(s) will be installed, 
+		otherwise, lib will be ignored during this phase
+1.3.2.1.2)	tag "oses="		separator ","
+		eg:	"make install oses=all "
+		known values:( same of configure and compile oses= ) all,linux,mswindows,darwin,bsd,other
+		default value:( idem configure or compile oses= ) linux
 
-1.3.2.2) how choose where install global project .gpr ( It contains all memorized 
- and cached and installed libs [for that System Operation that I choose]
- in one(1) .gpr for dayly use)
-1.3.2.2.2)	tag "global_gpr="	separators ":" (or ";") and one(1) ":foe:"
-		usage: "make install global_gpr=os1:os2:osn:foe:/path1:pathn "
-		eg:	"make install prefixes=none global_gpr=all:foe:/usr/local "
-		eg:	"make install prefixes=none global_gpr=all:foe:/usr/local:/usr/backup "
-		eg:	"make install prefixes=none global_gpr=linux,mswindows:foe:/usr/local:/usr/backup "
-		known values: "none" (without double quotes) and well... I don't know... :-) I rely in you for it =]
-		default value: "none" (without double quotes)
-		obs.: "none" is a wildcard for the non-existent "none:foe:none"
-		obs.: you may need to use "prefixes=none" to avoid unnecessary 
-re-installation of libs, when installing 'global gpr' 
-BUT installation or re-installation of libs is 
-still possible ( this will occur before installing global gpr ) ;-)
+1.3.2.2) how choose where install 
+1.3.2.2.2)	tag "prefix="	separator? don't exist :-)
+		eg:	"make install prefix=/usr/local "
+		known values: I don't know... :-) I rely in you for it =]
+		default value: /usr/local
+
+1.3.3) where it will install
+1.3.3.1) src+include /prefix/include
+1.3.3.2) .ali	/prefix/lib/shared/ali
+				/prefix/lib/shared/debug/ali
+				/prefix/lib/static/ali
+				/prefix/lib/static/debug/ali
+1.3.3.3) .so	/prefix/lib/shared
+				/prefix/lib/shared/debug
+1.3.3.4) .a		/prefix/lib/static
+				/prefix/lib/static/debug
+1.3.3.5) .gpr	/prefix/prefix/lib/lib/gnat
 
 1.4) target clean
 	command "make clean"
