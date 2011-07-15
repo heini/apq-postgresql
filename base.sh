@@ -186,34 +186,31 @@ do
 				printf	"${my_pg_config_path}  \n"
 			}>"$my_tmp/kov.log"
 
-
+			local madeit3=
+			local at_count_tmp=
+			local madeit2=
 
 				#min two spaces before "\n" because quotes
 			{	printf	"version:=\"$my_version\"  \n"
-				
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
-				printf	"basedir:=\"$my_atual_dir/build\"  \n"
-				
-				# system_libs part
-				local at_count_tmp=
-				local madeit2=
-				local madeit3=
-				#  "system_libs  := \( \) & \( "
-				while [ ${at_count_tmp:=1} -lt ${max_count:=11} ]
+				printf	"basedir:=\"$my_atual_dir/build\"  \n"	
+				while [ ${at_count_tmp:=1} -le ${at_count:=11} ]
 				do
 					madeit2="lib_system$at_count_tmp" ;
-					[ $at_count_tmp -le $at_count ] && printf  "${madeit2}:=\"${!madeit2}\"  \n" ; madeit3=${madeit3:+${madeit3},}\$"$madeit2 " || break
-					at_count_tmp=$(( $at_count_tmp + 1 ))
-				done
+					madeit3="${madeit3:+${madeit3},} \$$madeit2 " ;
+					printf  "${madeit2}:=\"${!madeit2}\"  \n" ;				
+					at_count_tmp=$(( $at_count_tmp + 1 )) ;
+				done ;
+				printf "\n"
 
 			}>"$my_tmp/kov.def"
 
-			{
-				$( cat "$my_atual_dir/apq_postgresql_version_part1.gpr.in.in" )
-				printf  "system_libs  := \( \) & \( $madeit3  \)  "
-
-			}>"$my_tmp/apq_postgresql_version.gpr.in"
+			cat "$my_atual_dir/apq_postgresql_version_part1.gpr.in.in" > "$my_tmp/apq_postgresql_version.gpr.in"
+			printf  'system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+			printf  " $madeit3 " >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+			printf  ' ) ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+					
 
 			gnatprep "$my_tmp/apq_postgresql_version.gpr.in"  "$my_tmp/apq_postgresql_version.gpr"  "$my_tmp/kov.def"
 			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"
