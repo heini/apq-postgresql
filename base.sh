@@ -66,8 +66,33 @@ printf $my_oses
 } # end 
 
 _choose_libtype(){
-	echo stub
-}
+#: title	: _choose_libtype
+#: date		: 2011-jul-15
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.0
+#: Description: sanitize list of lib types separated by ","
+#: Options	: "libtype,libtype_n"
+
+local _libtypes=$1
+_libtypes=${_libtypes:=dynamic,static}
+_libtypes=${_libtypes,,}
+local my_libtypes=
+local a=
+for a in static dynamic relocatable
+do
+	case $_libtypes in
+		*all*) my_libtypes=static,dynamic,relocatable
+			break
+			;;
+		*"$a"*) my_libtypes=${my_libtypes:+${my_libtypes},}$a
+			;;
+	esac
+done
+my_libtypes=${my_libtypes:=dynamic,static}
+printf $my_libtypes
+
+} # end 
 
 _choose_debug(){
 	echo stub
@@ -104,9 +129,8 @@ local IFS="$ifsbackup"
 local my_version=$(cat version)
 local my_atual_dir=$(pwd)
 local my_oses=$(_choose_so "$1" )
-# local _oses=$1
-local my_libtypes=
-local _libtypes=$2
+local my_libtypes=$(_choose_libtype "$2" )
+
 local _base_name=
 local my_compiler_paths=$3
 local my_system_libs_paths=
@@ -139,19 +163,6 @@ my_ssl_include_paths=${_ssl_include_paths}
 
 _system_libs_paths=${_system_libs_paths:=/usr/lib}
 
-_libtypes=${_libtypes:=dynamic,static}
-_libtypes=${_libtypes,,}
-# ${var,,} -> to_lower(var). min bash v4.0
-for q in static dynamic relocatable
-do
-	case $_libtypes in
-		*all*)	my_libtypes=static,dynamic,relocatable
-			break
-			;;
-		*$q*)	my_libtypes=${my_libtypes:+${my_libtypes},}$q
-			;;
-	esac
-done
 _with_debug_too=${_with_debug_too:=no}
 _with_debug_too=${_with_debug_too,,}
 case $_with_debug_too in
