@@ -26,6 +26,8 @@ esac;
 
 shift 1 ;
 
+global_ifs_bk="$IFS"
+
 ##################################
 ##### support functions ##########
 ##################################
@@ -35,8 +37,33 @@ shift 1 ;
 #####################
 
 _choose_so(){
-	echo stub
-}
+#: title	: _choose_so
+#: date		: 2011-jul-15
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.0
+#: Description: sanitize list of Systems Operations separated by ","
+#: Options	:  "OSes"
+
+local _oses=$1
+_oses=${_oses:=linux}
+_oses=${_oses,,}
+local my_oses=
+local a=
+for a in linux mswindows darwin bsd other
+do
+	case $_oses in
+		*all*) my_oses=linux,mswindows,darwin,bsd,other
+			break
+			;;
+		*"$a"*) my_oses=${my_oses:+${my_oses},}$a
+			;;
+	esac
+done
+my_oses=${my_oses:=linux}
+printf $my_oses
+
+} # end 
 
 _choose_libtype(){
 	echo stub
@@ -76,8 +103,8 @@ local IFS="$ifsbackup"
 
 local my_version=$(cat version)
 local my_atual_dir=$(pwd)
-local my_oses=
-local _oses=$1
+local my_oses=$(_choose_so "$1" )
+# local _oses=$1
 local my_libtypes=
 local _libtypes=$2
 local _base_name=
@@ -112,19 +139,6 @@ my_ssl_include_paths=${_ssl_include_paths}
 
 _system_libs_paths=${_system_libs_paths:=/usr/lib}
 
-_oses=${_oses:=linux}
-_oses=${_oses,,}
-# ${var,,} -> to_lower(var). min bash v4.0
-for r in linux mswindows darwin bsd other
-do
-	case $_oses in
-		*all*) my_oses=linux,mswindows,darwin,bsd,other
-			break
-			;;
-		*"$r"*) my_oses=${my_oses:+${my_oses},}$r
-			;;
-	esac
-done
 _libtypes=${_libtypes:=dynamic,static}
 _libtypes=${_libtypes,,}
 # ${var,,} -> to_lower(var). min bash v4.0
@@ -247,7 +261,7 @@ case $my_commande in
 		;;
 	'dist_cleaning' )  ;;
 	*  ) printf "I dont known this command :-\)\n" ;
-		printf "_${my_command}_\n"
+		printf "_${my_commande}_\n"
 		exit 1
 		;;
 esac
