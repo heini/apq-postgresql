@@ -4,11 +4,11 @@
 but remember , now days, most systems are 'case sensitive'
 	And a prominente warning: how a _Developer_ don't use "spaces" in names et all ;-) _you_ will be 
 more happy if you follow this advice. :-)
-	Well, I opted by use "foe" in place of "eof" for minor clashes with shells and most names and values
-are self descriptive. most times the "plural" names accept more que one value simultaneously 
-and "singular" names accept just one value simultaneously.	
-	And for now, while building "The Build System", It is 'fairly quiet' about successes 
-and failures. but this is only for now :-). keep it in mind. :-)
+	Well, I opted by use most names and values self descriptives. most times the "plural" names 
+accept more que one value simultaneously and "singular" names accept
+just one value simultaneously.	
+	And for now, while building "The Build System", It is 'fairly quiet' about
+	successes and failures. but this is only for now :-). keep it in mind. :-)
 
 1) makefile targets
 1.1) configure
@@ -122,10 +122,12 @@ doesn't matter. Enjoy! =]
 1.3.2) options for "install" target
 
 1.3.2.1) how choose System Operations for installing
-		important:  _compiled_ lib(s) will be installed, 
+		Important:  _compiled_ lib(s) will be installed, 
 		otherwise, lib will be ignored during this phase
 1.3.2.1.2)	tag "oses="		separator ","
 		eg:	"make install oses=all "
+		Important: with "all" _the first one OS_ will be used for 
+install; the others will be ignored.
 		known values:( same of configure and compile oses= ) all,linux,mswindows,darwin,bsd,other
 		default value:( idem configure or compile oses= ) linux
 
@@ -145,7 +147,7 @@ doesn't matter. Enjoy! =]
 				/prefix/lib/shared/debug
 1.3.3.4) .a		/prefix/lib/static
 				/prefix/lib/static/debug
-1.3.3.5) .gpr	/prefix/prefix/lib/lib/gnat
+1.3.3.5) .gpr	/prefixlib/lib/gnat
 
 1.4) target clean
 	command "make clean"
