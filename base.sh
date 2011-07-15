@@ -30,6 +30,21 @@ shift 1 ;
 ##### support functions ##########
 ##################################
 
+#####################
+### sanitization  ###
+#####################
+
+_choose_so(){
+	echo stub
+}
+
+_choose_libtype(){
+	echo stub
+}
+
+_choose_debug(){
+	echo stub
+}
 
 
 ##################################
@@ -50,9 +65,9 @@ _configure(){
 
 
 if [ $# -ne 9 ]; then
-	printf ' You dont need use it by hand. read INSTALL for more info and direction.  \n'
-	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_paths" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too"  \n'
-	printf "$# \n";
+	printf ' You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
+	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_paths" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too" ' ; printf "\n" ;
+	
 	exit 1
 fi;
 
@@ -63,25 +78,25 @@ local my_version=$(cat version)
 local my_atual_dir=$(pwd)
 local my_oses=
 local _oses=$1
-my_libtypes=
-_libtypes=$2
-_base_name=
-my_compiler_paths=$3
-my_system_libs_paths=
-_system_libs_paths=$4
-my_ssl_include_paths=
-_ssl_include_paths=$5
-my_pg_config_path=
-_pg_config_path=$6
-my_gprconfig_path=
-_gprconfig_path=$7
-my_gprbuild_path=
-_gprbuild_path=$8
-my_with_debug_too=
-_with_debug_too=$9
+local my_libtypes=
+local _libtypes=$2
+local _base_name=
+local my_compiler_paths=$3
+local my_system_libs_paths=
+local _system_libs_paths=$4
+local my_ssl_include_paths=
+local _ssl_include_paths=$5
+local my_pg_config_path=
+local _pg_config_path=$6
+local my_gprconfig_path=
+local _gprconfig_path=$7
+local my_gprbuild_path=
+local _gprbuild_path=$8
+local my_with_debug_too=
+local _with_debug_too=$9
 
 # fix me if necessary:
-# need more sanatization
+# need more sanitization
 _pg_config_path=${_pg_config_path:=/usr/bin}
 #_pg_config_path=${_pg_config_path//[''``]/""}
 my_pg_config_path=$_pg_config_path
@@ -134,30 +149,21 @@ case $_with_debug_too in
 		;;
 esac
 
-lib_system1=
-lib_system2=
-lib_system3=
-lib_system4=
-lib_system5=
-lib_system6=
-lib_system7=
-lib_system8=
-lib_system9=
-lib_system10=
-
-unset z
+local at_count=
+local max_count=11
 
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
 do
-	[ ${z:=1} -gt 10 ] && break;
-	madeit=" lib_system$z=\"-L${alibdirsystem}\"  "
+	[ ${at_count:=1} -ge ${max_count:=11} ] && break;
+	madeit=" lib_system$at_count=\"-L$alibdirsystem\"  "
 	eval $madeit
-	z=$(( $z + 1 ))
+	at_count=$(( $at_count + 1 ))
 done
 IFS=",$ifsbackup"
 
-made_dirs=${my_atual_dir}/build
+local made_dirs=${my_atual_dir}/build
+
 for sist_oses in $my_oses
 do
 	for libbuildtype in $my_libtypes
@@ -182,16 +188,16 @@ do
 
 				#min two spaces before "\n" because quotes
 			{	printf	"version:=\"$my_version\"  \n"
-				printf  "system_lib1:=\"$lib_system1\"  \n"
-				printf  "system_lib2:=\"$lib_system2\"  \n"
-				printf  "system_lib3:=\"$lib_system3\"  \n"
-				printf  "system_lib4:=\"$lib_system4\"  \n"
-				printf  "system_lib5:=\"$lib_system5\"  \n"
-				printf  "system_lib6:=\"$lib_system6\"  \n"
-				printf  "system_lib7:=\"$lib_system7\"  \n"
-				printf  "system_lib8:=\"$lib_system8\"  \n"
-				printf  "system_lib9:=\"$lib_system9\"  \n"
-				printf  "system_lib10:=\"$lib_system10\"  \n"
+				
+				local at_count_tmp=
+				local madeit2=
+				while [ ${at_count_tmp:=1} -lt ${max_count:=11} ]
+				do
+					madeit2="lib_system$at_count_tmp" ;
+					[ $at_count_tmp -le $at_count ] && printf  "${madeit2}:=\"${!madeit2}\"  \n" || printf  "${madeit2}:=\"\"  \n" 
+					at_count_tmp=$(( $at_count_tmp + 1 ))
+				done
+
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
 				printf	"basedir:=\"$my_atual_dir/build\"  \n"

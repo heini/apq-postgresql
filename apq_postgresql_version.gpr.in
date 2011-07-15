@@ -7,8 +7,8 @@ project apq_postgresql_version is
 
    version   := $version ;    --  eg.: "3.0.1"
 
-   system_libs  := ( ) & ( $system_lib1 , $system_lib2 , $system_lib3 , $system_lib4 , $system_lib5 ,
-                          $system_lib6 , $system_lib7 , $system_lib8 , $system_lib9 , $system_lib10 );
+   system_libs  := ( ) & ( $lib_system1 , $lib_system2 , $lib_system3 , $lib_system4 , $lib_system5 ,
+                          $lib_system6 , $lib_system7 , $lib_system8 , $lib_system9 , $lib_system10 );
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
    basedir	:= "" & $basedir ;
