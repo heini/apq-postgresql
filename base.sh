@@ -95,8 +95,31 @@ printf $my_libtypes
 } # end 
 
 _choose_debug(){
-	echo stub
-}
+#: title	: _choose_debug
+#: date		: 2011-jul-15
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.0
+#: Description: choose the type of lib, related about debug information
+#: Options	:  "with_debug_too"
+
+local _with_debug_too=$1
+_with_debug_too=${_with_debug_too:=no}
+_with_debug_too=${_with_debug_too,,}
+local my_with_debug_too=
+
+case $_with_debug_too in
+	*onlydebug* )	my_with_debug_too=debug
+		;;
+	*yes* )	  my_with_debug_too=normal,debug
+		;;
+	*no* )	  my_with_debug_too=normal
+		;;
+esac
+my_with_debug_too=${my_with_debug_too:=normal}
+printf $my_with_debug_too
+
+} # end
 
 _discover_acmd_path(){
 #: title	: _discover_acmd_path
@@ -130,13 +153,12 @@ _configure(){
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.0
+#: version	: 1.01
 #: Description: made configuration for posterior compiling by gprbuild.
 #: Description: You don't need run this script manually.
 #: Options	:  "OSes" "libtypes,libtypes_n" "compiler_path1:compiler_pathn"  \
-	#		"system_libs_path1:system_libs_pathn"  "ssl_include_paths" "pg_config_path"  \
-	#		"gprconfig_path"  "gprbuild_path"  "with_debug_too"
-
+#:		"system_libs_path1:system_libs_pathn"  "ssl_include_paths" "pg_config_path"  \
+#:		"gprconfig_path"  "gprbuild_path"  "with_debug_too"
 
 if [ $# -ne 9 ]; then
 	printf ' You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
@@ -165,8 +187,7 @@ local my_gprconfig_path=
 local _gprconfig_path=$7
 local my_gprbuild_path=
 local _gprbuild_path=$8
-local my_with_debug_too=
-local _with_debug_too=$9
+local my_with_debug_too=$(_choose_debug "$9" )
 
 
 # fix me if necessary:
@@ -186,20 +207,10 @@ my_ssl_include_paths=${_ssl_include_paths}
 
 _system_libs_paths=${_system_libs_paths:=/usr/lib}
 
-_with_debug_too=${_with_debug_too:=no}
-_with_debug_too=${_with_debug_too,,}
-case $_with_debug_too in
-	*onlydebug*)	my_with_debug_too=debug
-		;;
-	*yes*)	my_with_debug_too=normal,debug
-		;;
-	*no*)	my_with_debug_too=normal
-		;;
-esac
-
 local at_count=
 local max_count=11
-
+# 10(ten) libs is a resonable value for now.
+# if you need more , feel free to contact us and suggest changes. :-)
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
 do
