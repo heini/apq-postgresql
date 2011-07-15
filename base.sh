@@ -98,6 +98,28 @@ _choose_debug(){
 	echo stub
 }
 
+_discover_acmd_path(){
+#: title	: _discover_acmd_path
+#: date		: 2011-jul-15
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.0
+#: Description:  Discover automatically a _PATH_ for a command OR use a default
+#: Options	: "cmd" "add_these_path(s)" "or_default_path"
+# need more sanitization
+#
+local cmdo="$1"
+local these_paths="$2"
+local default_path="$3"
+local path_backup="$PATH"
+case $cmdo in
+	*\)* | *\(* | *\{* | *\}* | *\$*  )  printf '/usr/bin/boo' ; exit 1
+		;;
+esac
+local my_path="$(PATH="$these_paths:$path_backup"; which "$cmdo" || printf "$default_path/stub" )"
+printf "$(dirname $my_path )"
+
+} #end
 
 ##################################
 ##### target functions ##########
@@ -146,16 +168,17 @@ local _gprbuild_path=$8
 local my_with_debug_too=
 local _with_debug_too=$9
 
+
 # fix me if necessary:
 # need more sanitization
-_pg_config_path=${_pg_config_path:=/usr/bin}
+_pg_config_path=${_pg_config_path:=$(_discover_acmd_path "pg_config" "$my_compiler_paths" "/usr/bin" )}
 #_pg_config_path=${_pg_config_path//[''``]/""}
 my_pg_config_path=$_pg_config_path
 
-_gprconfig_path=${_gprconfig_path:=/usr/bin}
+_gprconfig_path=${_gprconfig_path:=$(_discover_acmd_path "gprconfig" "$my_compiler_paths" "/usr/bin" )}
 my_gprconfig_path=$_gprconfig_path
 
-_gprbuild_path=${_gprbuild_path:=/usr/bin}
+_gprbuild_path=${_gprbuild_path:=$(_discover_acmd_path "gprbuild" "$my_compiler_paths" "/usr/bin" )}
 my_gprbuild_path=$_gprbuild_path
 
 _ssl_include_paths=${_ssl_include_paths:=/usr/lib/openssl}
@@ -232,7 +255,7 @@ do
 			}>"$my_tmp/kov.def"
 
 			cat "$my_atual_dir/apq_postgresql_version_part1.gpr.in.in" > "$my_tmp/apq_postgresql_version.gpr.in"
-			printf  'system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			printf  " $madeit3 " >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			printf  ' ) ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			cat "$my_atual_dir/apq_postgresql_version_part3.gpr.in.in" >> "$my_tmp/apq_postgresql_version.gpr.in"
