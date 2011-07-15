@@ -14,7 +14,8 @@ project Buildsystem_Apq_Postgresql is
       for Implementation_Suffix ("shell") use ".sh";
       for Implementation_Exceptions ("project file") use ("*.gpr.in");
       for Implementation_Exceptions ("makefile") use ("MakeFile.include", "*.txt");
-      for Implementation_Exceptions ("Makefile") use ("Makefile.include", "Makefile.include.");
+      for Implementation_Exceptions ("makefile") use ("Makefile.include", "Makefile.include.");
+      for Implementation_Exceptions ("Project File") use ("*.gpr.in", "*.gpr.in.*");
    end Naming;
 
 end Buildsystem_Apq_Postgresql;
