@@ -7,11 +7,11 @@ project apq_postgresql_version is
 
    version   := $version ;    --  eg.: "3.0.1"
 
-   system_libs  := ( ) & ( $lib_system1 , $lib_system2 , $lib_system3 , $lib_system4 , $lib_system5 ,
-                          $lib_system6 , $lib_system7 , $lib_system8 , $lib_system9 , $lib_system10 );
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
    basedir	:= "" & $basedir ;
 
-end apq_postgsql_version;
+   --- starting from here, automatic pre-var creating
+   -- system_libs  := ( ) & ( "lib1", "lib2", "lib10") ;
+
 
