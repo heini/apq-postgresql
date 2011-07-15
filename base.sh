@@ -195,7 +195,7 @@ do
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
 				printf	"basedir:=\"$my_atual_dir/build\"  \n"	
-				while [ ${at_count_tmp:=1} -le ${at_count:=11} ]
+				while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
 				do
 					madeit2="lib_system$at_count_tmp" ;
 					madeit3="${madeit3:+${madeit3},} \$$madeit2 " ;
@@ -210,6 +210,7 @@ do
 			printf  'system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			printf  " $madeit3 " >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			printf  ' ) ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+			cat "$my_atual_dir/apq_postgresql_version_part3.gpr.in.in" >> "$my_tmp/apq_postgresql_version.gpr.in"
 					
 
 			gnatprep "$my_tmp/apq_postgresql_version.gpr.in"  "$my_tmp/apq_postgresql_version.gpr"  "$my_tmp/kov.def"
