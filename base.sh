@@ -291,6 +291,150 @@ exit 0;   # end ;-)
 
 } #end _configure
 
+_compile(){
+	if [ $# -ne 1 ]; then
+		printf 'compile "OSes" '
+		printf "\n"
+	fi
+	local ifsbackup="$IFS"
+	local IFS="$ifsbackup"
+	local my_atual_dir=$(pwd)
+	local my_oses=$(_choose_so "$1" )
+	local my_libtypes=$(_choose_libtype "all" )
+	local my_with_debug_too=$(_choose_debug "yes" )
+	local made_dirs=$my_atual_dir/build
+	local my_count=1
+	if [ -d "$made_dirs" ]; then
+		printf ' "build" dir dont exist or dont is a directory '
+		printf "\n"
+		exit 1
+	fi
+	local line1_my_tmp=
+	local line2_debuga=
+	local line3_libtype=
+	local line4_os=
+	local line5_compile_paths=
+	local line6_gprconfig_path=
+	local line7_gprbuild_path=
+	local line8_pg_config_path=
+
+	IFS=",$ifsbackup"
+
+	local sist_oses=
+	local libbuildtype=
+	local debuga=
+	local my_tmp=
+		
+	for sist_oses in $my_oses 
+	do
+		for libbuildtype in $my_libtypes
+		do
+			for debuga in $my_with_debug_too
+			do
+				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
+				# IFS="$ifsbackup"
+				if [ -f "my_tmp/kov.log" ] && \
+					[ $(wc -l < "$my_tmp/kov.log" ) -ge 8 ] && \
+					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
+					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
+					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
+				then
+					{
+						read line1_my_tmp
+						read line2_debuga
+						read line3_libtype
+						read line4_os
+						read line5_compile_paths
+						read line6_gprconfig_path
+						read line7_gprbuild_path
+						read line8_pg_config_path
+					}<"$my_tmp/kov.log"
+					
+					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
+						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
+						[ -n "$line8_pg_config_path" ];
+					then
+						while :
+						do
+							[ -d "$line6_gprconfig_path" ] && break
+							line6_gprconfig_path=$(dirname $line6_gprconfig_path)
+						done
+
+						while :
+						do
+							[ -d "$line7_gprbuild_path" ] && break
+							line7_gprbuild_path=$(dirname $line7_gprbuild_path)
+						done
+
+						while :
+						do
+							[ -d "$line8_pg_config_path" ] && break
+							line8_pg_config_path=$(dirname $line8_pg_config_path)
+						done
+
+						my_count=${my_count:=1}
+						local madeit1="line1_$my_count=\"$my_tmp\" ";
+						local madeit2="line2_$my_count=\"$debuga\" ";
+						local madeit3="line3_$my_count=\"$libbuildtype\" ";
+						local madeit4="line4_$my_count=\"$sist_oses\" ";
+						local madeit5="line5_$my_count=\"$line5_compile_paths\" ";
+						local madeit6="line6_$my_count=\"$line6_gprconfig_path\" ";
+						local madeit7="line7_$my_count=\"$line7_gprbuild_path\" ";
+						local madeit8="line8_$my_count=\"$line8_pg_config_path\" ";
+
+						eval "$madeit1"
+						eval "$madeit2"
+						eval "$madeit3"
+						eval "$madeit4"
+						eval "$madeit5"
+						eval "$madeit6"
+						eval "$madeit7"
+						eval "$madeit8"
+
+						my_count=$(( $my_count + 1 ))
+					fi
+				fi
+			done # debuga
+		done # libbuildtype
+	done # sist_oses
+
+	if [ $my_count -gt 1 ]; then
+		while [ ${my_count2:=1} -lt $my_count ];
+		do
+			madeit1="line1_$my_count2"
+			madeit2="line2_$my_count2"
+			madeit3="line3_$my_count2"
+			madeit4="line4_$my_count2"
+			madeit5="line5_$my_count2"
+			madeit6="line6_$my_count2"
+			madeit7="line7_$my_count2"
+			madeit8="line8_$my_count2"
+			( PATH="${!madeit5}:$PATH"; \
+				cd "${!madeit6}" ; \
+				./gprconfig --batch --config Ada,,default --config C -o "${!madeit1}/kov.cgpr" ; \
+				pq_include=(cd "${!madeit8}"; ./pg_config --includedir); \
+				cd "${!madeit7}" ; \
+				./gprbuild -d --config="${!madeit1}/kov.cgpr" \
+				-Xstatic_or_dynamic=${!madeit3} -Xos=${!madeit4} \
+				-Xdebug_information=( if [ "${!madeit2}" = "normal" ]; then printf "no"; else printf "yes"; fi ) \
+				-P"${!madeit1}/apq-postgresql.gpr"  
+			)
+			
+			my_count2=$(( $my_count2 + 1 ))
+
+		done
+
+	else
+		printf ' nothing to compile '
+		printf "\n"
+	fi
+
+	exit 0  # end :-)
+
+
+} #end _compile
+
+
 ####################################
 ######   operative part   ##########
 ####################################
@@ -298,7 +442,7 @@ exit 0;   # end ;-)
 case $my_commande in
 	'configuring' )  [ $# -eq 9 ] && _configure "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" || printf "configure need nine\(9\) options\n" ; exit 1
 		;;
-	'compilling' )  echo "EBA"
+	'compilling' )  [ $# -eq 1 ] && _compile "$1" || printf "compile need one\(1\) option\n" ; exit 1
 		;;
 	'installing' ) 
 		;; 
