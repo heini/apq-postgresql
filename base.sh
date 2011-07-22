@@ -295,20 +295,24 @@ _compile(){
 	if [ $# -ne 1 ]; then
 		printf 'compile "OSes" '
 		printf "\n"
+		exit 1
 	fi
 	local ifsbackup="$IFS"
 	local IFS="$ifsbackup"
+
 	local my_atual_dir=$(pwd)
 	local my_oses=$(_choose_so "$1" )
 	local my_libtypes=$(_choose_libtype "all" )
 	local my_with_debug_too=$(_choose_debug "yes" )
-	local made_dirs=$my_atual_dir/build
+	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ -d "$made_dirs" ]; then
 		printf ' "build" dir dont exist or dont is a directory '
 		printf "\n"
 		exit 1
 	fi
+	
+	##################################
 	local line1_my_tmp=
 	local line2_debuga=
 	local line3_libtype=
@@ -320,12 +324,13 @@ _compile(){
 
 	IFS=",$ifsbackup"
 
+
 	local sist_oses=
 	local libbuildtype=
 	local debuga=
 	local my_tmp=
 		
-	for sist_oses in $my_oses 
+	for sist_oses in $my_oses
 	do
 		for libbuildtype in $my_libtypes
 		do
@@ -333,12 +338,14 @@ _compile(){
 			do
 				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 				# IFS="$ifsbackup"
+
 				if [ -f "my_tmp/kov.log" ] && \
 					[ $(wc -l < "$my_tmp/kov.log" ) -ge 8 ] && \
 					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
+				
 					{
 						read line1_my_tmp
 						read line2_debuga
@@ -354,19 +361,19 @@ _compile(){
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
 						[ -n "$line8_pg_config_path" ];
 					then
-						while :
+						while true;
 						do
 							[ -d "$line6_gprconfig_path" ] && break
 							line6_gprconfig_path=$(dirname $line6_gprconfig_path)
 						done
 
-						while :
+						while true;
 						do
 							[ -d "$line7_gprbuild_path" ] && break
 							line7_gprbuild_path=$(dirname $line7_gprbuild_path)
 						done
 
-						while :
+						while true;
 						do
 							[ -d "$line8_pg_config_path" ] && break
 							line8_pg_config_path=$(dirname $line8_pg_config_path)
@@ -377,10 +384,10 @@ _compile(){
 						local madeit2="line2_$my_count=\"$debuga\" ";
 						local madeit3="line3_$my_count=\"$libbuildtype\" ";
 						local madeit4="line4_$my_count=\"$sist_oses\" ";
-						local madeit5="line5_$my_count=\"$line5_compile_paths\" ";
-						local madeit6="line6_$my_count=\"$line6_gprconfig_path\" ";
-						local madeit7="line7_$my_count=\"$line7_gprbuild_path\" ";
-						local madeit8="line8_$my_count=\"$line8_pg_config_path\" ";
+						local madeit5="line5_$my_count=\"${line5_compile_paths%[:space:]*}\" ";
+						local madeit6="line6_$my_count=\"${line6_gprconfig_path%[:space:]*}\" ";
+						local madeit7="line7_$my_count=\"${line7_gprbuild_path%[:space:]*}\" ";
+						local madeit8="line8_$my_count=\"${line8_pg_config_path%[:space:]*}\" ";
 
 						eval "$madeit1"
 						eval "$madeit2"
@@ -409,14 +416,14 @@ _compile(){
 			madeit6="line6_$my_count2"
 			madeit7="line7_$my_count2"
 			madeit8="line8_$my_count2"
-			( PATH="${!madeit5}:$PATH"; \
-				cd "${!madeit6}" ; \
+			$( PATH="${!madeit5}:$PATH" ;
+				cd "${!madeit6}" ; 
 				./gprconfig --batch --config Ada,,default --config C -o "${!madeit1}/kov.cgpr" ; \
-				pq_include=(cd "${!madeit8}"; ./pg_config --includedir); \
+				pq_include=$(cd "${!madeit8}" ; ./pg_config --includedir ); \
 				cd "${!madeit7}" ; \
 				./gprbuild -d --config="${!madeit1}/kov.cgpr" \
 				-Xstatic_or_dynamic=${!madeit3} -Xos=${!madeit4} \
-				-Xdebug_information=( if [ "${!madeit2}" = "normal" ]; then printf "no"; else printf "yes"; fi ) \
+				-Xdebug_information=$( if [ "${!madeit2}" = "normal" ]; then printf "no"; else printf "yes"; fi; ) \
 				-P"${!madeit1}/apq-postgresql.gpr"  
 			)
 			
