@@ -312,7 +312,6 @@ _compile(){
 		exit 1
 	fi
 	
-	##################################
 	local line1_my_tmp=
 	local line2_debuga=
 	local line3_libtype=
@@ -338,8 +337,8 @@ _compile(){
 			do
 				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 				# IFS="$ifsbackup"
-
-				if [ -f "my_tmp/kov.log" ] && \
+				
+				if [ -f "$my_tmp/kov.log" ] && \
 					[ $(wc -l < "$my_tmp/kov.log" ) -ge 8 ] && \
 					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
@@ -356,7 +355,9 @@ _compile(){
 						read line7_gprbuild_path
 						read line8_pg_config_path
 					}<"$my_tmp/kov.log"
+					#  %[:space:]*
 					
+				
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
 						[ -n "$line8_pg_config_path" ];
