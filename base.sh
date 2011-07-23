@@ -306,7 +306,7 @@ _compile(){
 	local my_with_debug_too=$(_choose_debug "yes" )
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
-	if [ -d "$made_dirs" ]; then
+	if [ ! -d "$made_dirs" ]; then
 		printf ' "build" dir dont exist or dont is a directory '
 		printf "\n"
 		exit 1
