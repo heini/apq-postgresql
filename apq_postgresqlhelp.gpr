@@ -127,7 +127,7 @@ project apq_postgresqlhelp is
 
 
    for Languages use ("C");
-   for Source_Dirs use () & apq_postgresql_version.myhelpsource ;
+   for Source_Dirs use ( ) & apq_postgresql_version.myhelpsource ;
    for Object_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj_c/";
    for Library_Name use "apq_postgresqlhelp" ;
    for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_c/" ;
@@ -138,11 +138,11 @@ project apq_postgresqlhelp is
    for Externally_Built use "false";
 
    package Compiler is
-      for Default_Switches ("c") use ("-O2" ) & Debug_option_list_compiler ;
+      for Default_Switches ("C") use ("-O2" ) & Debug_option_list_compiler ;
    end Compiler;
 
    package Builder  is
-      for Default_Switches ("c") use ("-O2"  ) & Debug_option_list_builder ;
+      for Default_Switches ("C") use ("-O2"  ) & Debug_option_list_builder ;
    end Builder;
 
 
