@@ -218,6 +218,7 @@ do
 	madeit=" lib_system$at_count=\"-L$alibdirsystem\"  "
 	eval $madeit
 	at_count=$(( $at_count + 1 ))
+	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem" ; ###############
 done
 IFS=",$ifsbackup"
 
@@ -240,6 +241,7 @@ do
 				printf	"$my_gprconfig_path  \n"
 				printf	"$my_gprbuild_path  \n"
 				printf	"${my_pg_config_path}  \n"
+				printf	"${my_system_libs_paths}  \n"
 			}>"$my_tmp/kov.log"
 
 			local madeit3=
@@ -338,7 +340,7 @@ _compile(){
 				# IFS="$ifsbackup"
 				
 				if [ -f "$my_tmp/kov.log" ] && \
-					[ $(wc -l < "$my_tmp/kov.log" ) -ge 5 ] && \
+					[ $(wc -l < "$my_tmp/kov.log" ) -ge 6 ] && \
 					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
@@ -354,12 +356,13 @@ _compile(){
 						read line6_gprconfig_path
 						read line7_gprbuild_path
 						read line8_pg_config_path
+						read line10_my_system_libs_paths
 					}<"$my_tmp/kov.log"
 					#  %[:space:]*
 
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
-						[ -n "$line8_pg_config_path" ] && [ -n "$line9_ssl_include_path" ];
+						[ -n "$line8_pg_config_path" ] && [ -n "$line9_ssl_include_path" ] && [ -n "$line10_my_system_libs_paths" ];
 					then
 						while true;
 						do
@@ -395,6 +398,7 @@ _compile(){
 						madeit7=" line7_$my_count=\"$line7_gprbuild_path\" "
 						madeit8=" line8_$my_count=\"$line8_pg_config_path\" "
 						madeit9=" line9_$my_count=\"$line9_ssl_include_path\" "
+						madeit10=" line10_$my_count=\"$line10_my_system_libs_paths\" "
 
 						eval $madeit1
 						eval $madeit2
@@ -405,6 +409,7 @@ _compile(){
 						eval $madeit7
 						eval $madeit8
 						eval $madeit9
+						eval $madeit10
 						
 						my_count=$(( $my_count + 1 ))
 					fi
@@ -434,6 +439,8 @@ _compile(){
 			madeit8=${!aab}
 			aab="line9_${my_count2}"
 			madeit9=${!aab}
+			aab="line10_${my_count2}"
+			madeit10=${!aab}
 
 			if [ "$madeit2" = "normal" ];
 			then 
@@ -447,8 +454,8 @@ _compile(){
 			# using gnat and gpbuild from toolchain Act-San :-)
 			# remember ins this case add /usr/gnat/bin to your add_compiler_paths in configure target makefile 
 			# if you already made /usr/gnat/bin in your front path, just try add (e.g) /usr/bin to add_compiler_paths if it do not work =]
-			echo $(PATH="$my_path:$madeit5" ; $(cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./kov_gprconfig.log ) && PATH="$my_path:$madeit5" && \
-				$(cd "$madeit1" && "$madeit7"/gprbuild --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I /usr/lib -I $pq_include -I $madeit9 >> ./kov_gprbuild.log ) 
+			echo $(PATH="$my_path:$madeit5" ; $(cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./gprconfig.log ) && PATH="$my_path:$madeit5" && \
+				$(cd "$madeit1" && "$madeit7"/gprbuild --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >> ./gprbuild.log ) 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))
