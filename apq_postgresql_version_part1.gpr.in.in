@@ -11,7 +11,22 @@ project apq_postgresql_version is
    mysource	:= ( ) & $mysource ;
    basedir	:= "" & $basedir ;
 
-   --- starting from here, automatic pre-var creating
-   -- system_libs  := ( ) & ( "lib1", "lib2", "lib10") ;
+   type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
+   type Debug_information_Type is ("yes", "no");
+   type Os_Type is ("other", "mswindows", "linux" , "darwin" , "bsd" );
+   --
+   Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "static");
+   Os : Os_Type := external ("os", "linux");
+   Debug_information : Debug_information_Type := external ("debug_information", "no");
+   --
+   Debug  := "";
+   Debug_option_list_builder := ();  -- null string_list
+   Debug_option_list_compiler := (); -- null string_list
 
+   case debug_information is
+      when "yes" =>
+         Debug := Debug & "debug";
+      when "no" =>
+         Debug := Debug & "normal";
+	end case;
 
