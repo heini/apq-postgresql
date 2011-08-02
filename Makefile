@@ -59,7 +59,7 @@ endif
 ### add_compiler_paths is considered first when searching automatically for commands; 
 ### commands gprbuild, pg_config and gprconfig is a example of this behavior :-)
 ifndef ($(add_compiler_paths))
-	add_compiler_paths:=none
+	add_compiler_paths:=/usr/bin
 endif
 
 ifndef ($(system_libs_paths))		# path1:path2:pathn   

@@ -455,7 +455,7 @@ _compile(){
 			# remember ins this case add /usr/gnat/bin to your add_compiler_paths in configure target makefile 
 			# if you already made /usr/gnat/bin in your front path, just try add (e.g) /usr/bin to add_compiler_paths if it do not work =]
 			echo $(PATH="$my_path:$madeit5" ; $(cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./gprconfig.log ) && PATH="$my_path:$madeit5" && \
-				$(cd "$madeit1" && "$madeit7"/gprbuild --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >> ./gprbuild.log ) 
+				$(cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >> ./gprbuild.log ) 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))
