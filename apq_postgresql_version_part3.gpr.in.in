@@ -1,4 +1,17 @@
 
+   dummy_source := "" & $mysource & "../src_dummy/";
+
+for Languages use ("Ada");
+   for Source_Dirs use () & dummy_source ;
+   for Object_Dir use "" & dummy_source ;
+   
+   package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) ;
+   end Compiler;
+
+   package Builder  is
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) ;
+   end Builder;
 
 end apq_postgresql_version;
 

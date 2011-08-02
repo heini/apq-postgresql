@@ -129,11 +129,11 @@ project apq_postgresqlhelp is
    for Languages use ("C");
    for Source_Dirs use () & apq_postgresql_version.myhelpsource ;
    for Object_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj_c/";
-   for Library_Name use "apq-postgresqlhelp" ;
+   for Library_Name use "apq_postgresqlhelp" ;
    for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_c/" ;
    -- no Ada sources :-) for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/ali_c/" ;
    for Library_Kind use Static_Or_Dynamic;
-   for Library_Version use "libapq-postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
+   for Library_Version use "libapq_postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export_dynamic ) & apq_postgresql_version.system_libs  & ( "-lssl" , "-lpq");
    for Externally_Built use "false";
 
