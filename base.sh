@@ -275,7 +275,7 @@ do
 
 			IFS=",$ifsbackup"
 
-			for support_dirs in obj lib ali obj_c lib_c ali_c
+			for support_dirs in obj lib ali obj_c lib_c ali_c obj_dummy lib_dummy ali_dummy
 			do
 				mkdir -p "$my_tmp"/$support_dirs
 			done # support_dirs
