@@ -162,7 +162,7 @@ _configure(){
 
 if [ $# -ne 9 ]; then
 	printf ' You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
-	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_paths" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too" ' ; printf "\n" ;
+	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too" ' ; printf "\n" ;
 	
 	exit 1
 fi;
@@ -179,8 +179,8 @@ local _base_name=
 local my_compiler_paths=$3
 local my_system_libs_paths=
 local _system_libs_paths=$4
-local my_ssl_include_paths=
-local _ssl_include_paths=$5
+local my_ssl_include_path=
+local _ssl_include_path=$5
 local my_pg_config_path=
 local _pg_config_path=$6
 local my_gprconfig_path=
@@ -202,8 +202,8 @@ my_gprconfig_path=$_gprconfig_path
 _gprbuild_path=${_gprbuild_path:=$(_discover_acmd_path "gprbuild" "$my_compiler_paths" "/usr/bin" )}
 my_gprbuild_path=$_gprbuild_path
 
-_ssl_include_paths=${_ssl_include_paths:=/usr/lib/openssl}
-my_ssl_include_paths=${_ssl_include_paths}
+_ssl_include_path=${_ssl_include_path:=/usr/lib/openssl}
+my_ssl_include_path=${_ssl_include_path}
 
 _system_libs_paths=${_system_libs_paths:=/usr/lib}
 
@@ -235,10 +235,7 @@ do
 			IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
 			#min two spaces before "\n" because quotes
-			{	printf	"$my_tmp  \n"
-				printf	"$debuga  \n"
-				printf	"$libbuildtype  \n"
-				printf	"$sist_oses  \n"
+			{	printf	"$my_ssl_include_path  \n"
 				printf	"$my_compiler_paths  \n"
 				printf	"$my_gprconfig_path  \n"
 				printf	"$my_gprbuild_path  \n"
@@ -339,17 +336,18 @@ _compile(){
 				# IFS="$ifsbackup"
 				
 				if [ -f "$my_tmp/kov.log" ] && \
-					[ $(wc -l < "$my_tmp/kov.log" ) -ge 8 ] && \
+					[ $(wc -l < "$my_tmp/kov.log" ) -ge 5 ] && \
 					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
+					
+						line1_my_tmp="$my_tmp"
+						line2_debuga="$debuga"
+						line3_libtype="$libbuildtype"
+						line4_os="$sist_oses"
 				
-					{
-						read line1_my_tmp
-						read line2_debuga
-						read line3_libtype
-						read line4_os
+					{	read line9_ssl_include_path
 						read line5_compile_paths
 						read line6_gprconfig_path
 						read line7_gprbuild_path
@@ -360,7 +358,7 @@ _compile(){
 				
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
-						[ -n "$line8_pg_config_path" ];
+						[ -n "$line8_pg_config_path" ] && [ -n "$line9_ssl_include_path" ];
 					then
 						while true;
 						do
@@ -389,6 +387,7 @@ _compile(){
 						local madeit6="line6_$my_count=\"${line6_gprconfig_path%[:space:]*}\" ";
 						local madeit7="line7_$my_count=\"${line7_gprbuild_path%[:space:]*}\" ";
 						local madeit8="line8_$my_count=\"${line8_pg_config_path%[:space:]*}\" ";
+						local madeit9="line9_$my_count=\"${line9_ssl_include_path%[:space:]*}\" ";
 
 						eval "$madeit1"
 						eval "$madeit2"
@@ -398,6 +397,7 @@ _compile(){
 						eval "$madeit6"
 						eval "$madeit7"
 						eval "$madeit8"
+						eval "$madeit9"
 
 						my_count=$(( $my_count + 1 ))
 					fi
@@ -409,23 +409,25 @@ _compile(){
 	if [ $my_count -gt 1 ]; then
 		while [ ${my_count2:=1} -lt $my_count ];
 		do
-			madeit1="line1_$my_count2"
-			madeit2="line2_$my_count2"
-			madeit3="line3_$my_count2"
-			madeit4="line4_$my_count2"
-			madeit5="line5_$my_count2"
-			madeit6="line6_$my_count2"
-			madeit7="line7_$my_count2"
-			madeit8="line8_$my_count2"
-			$( PATH="${!madeit5}:$PATH" ;
-				cd "${!madeit6}" ; 
-				./gprconfig --batch --config Ada,,default --config C -o "${!madeit1}/kov.cgpr" ; \
-				pq_include=$(cd "${!madeit8}" ; ./pg_config --includedir ); \
-				cd "${!madeit7}" ; \
-				./gprbuild -d --config="${!madeit1}/kov.cgpr" \
-				-Xstatic_or_dynamic=${!madeit3} -Xos=${!madeit4} \
-				-Xdebug_information=$( if [ "${!madeit2}" = "normal" ]; then printf "no"; else printf "yes"; fi; ) \
-				-P"${!madeit1}/apq-postgresql.gpr"  
+			eval " madeit1=\"line1_$my_count2\" "
+			eval " madeit2=\"line2_$my_count2\" "
+			eval " madeit3=\"line3_$my_count2\" "
+			eval " madeit4=\"line4_$my_count2\" "
+			eval " madeit5=\"line5_$my_count2\" "
+			eval " madeit6=\"line6_$my_count2\" "
+			eval " madeit7=\"line7_$my_count2\" "
+			eval " madeit8=\"line8_$my_count2\" "
+			eval " madeit9=\"line9_$my_count2\" "
+
+			$( PATH="$madeit5:$PATH" ;
+				cd "$madeit6" ; 
+				./gprconfig --batch --config Ada,,default --config C -o "$madeit1/kov.cgpr" ; \
+				pq_include=$(cd "$madeit8" ; ./pg_config --includedir ); \
+				cd "$madeit7" ; \
+				./gprbuild -d --config="$madeit1/kov.cgpr" \
+				-Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 \
+				-Xdebug_information=$( if [ "$madeit2" = "normal" ]; then printf "no"; else printf "yes"; fi; ) \
+				 -P"$madeit1/apq-postgresql.gpr"  -I $pq_include -I $madeit9 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))

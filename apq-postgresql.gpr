@@ -176,7 +176,7 @@ project Apq.postgresql is
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
    for Externally_Built use "false";
-S
+
    package Compiler is
       for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_compiler ;
    end Compiler;

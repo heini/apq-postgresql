@@ -40,16 +40,9 @@
 			system_libs_paths=/usr/source:/usr/local:/lib/got \
 			build_with_debug_too=yes
 
-ifndef ($(prefixes))
-	prefixes=all:foe:/usr/local
+ifndef ($(prefix))
+	prefix=/usr/local
 endif
-
-#    eg:  make install prefixes=os:os2:osn:foe:/path1
-#    eg2: make install prefixes=os:os2:osn:foe:/path1:/aqui/acola/lah:/usr/local:/pathn
-#    You can use wildcard "all" in Os part ;-) and 
-#    the build system will (try;) _install_ all compiled libs , for all compiled OSes :-)
-#    eg3: make install prefixes=all:foe:/path1:/path2:/pathn
-#	Ah! "foe" was used in place of "eof" because (maybe) "eof" can confuse shell
 
 ifndef ($(oses))		# linux,mswindows,darwin,bsd,other
 	oses:=linux
@@ -75,7 +68,7 @@ ifndef ($(system_libs_paths))		# path1:path2:pathn
 endif
 
 ifndef ($(ssl_include_path))
-	ssl_include_paths:=/usr/lib/openssl
+	ssl_include_path:=/usr/lib/openssl
 endif
 
 ifndef ($(pg_config_path))
