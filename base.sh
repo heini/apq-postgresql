@@ -265,7 +265,7 @@ do
 			cat "$my_atual_dir/apq_postgresql_version_part1.gpr.in.in" > "$my_tmp/apq_postgresql_version.gpr.in"
 			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			printf  " $madeit3 " >> "$my_tmp/apq_postgresql_version.gpr.in" ;
-			printf  ' ) ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
+			printf  ' ); ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
 			cat "$my_atual_dir/apq_postgresql_version_part3.gpr.in.in" >> "$my_tmp/apq_postgresql_version.gpr.in"
 					
 
@@ -275,7 +275,7 @@ do
 
 			IFS=",$ifsbackup"
 
-			for support_dirs in obj lib_ali ali obj_c lib_ali_c ali_c
+			for support_dirs in obj lib ali obj_c lib_c ali_c
 			do
 				mkdir -p "$my_tmp"/$support_dirs
 			done # support_dirs
@@ -298,6 +298,7 @@ _compile(){
 	local IFS="$ifsbackup"
 
 	local my_atual_dir=$(pwd)
+	local my_path=$( echo $PATH )
 	local my_oses=$(_choose_so "$1" )
 	local my_libtypes=$(_choose_libtype "all" )
 	local my_with_debug_too=$(_choose_debug "yes" )
@@ -361,20 +362,26 @@ _compile(){
 					then
 						while true;
 						do
-							[ -d $line6_gprconfig_path ] && break
-							line6_gprconfig_path=$(dirname $line6_gprconfig_path)
+							[ -d "$line6_gprconfig_path" ] && break
+							line6_gprconfig_path=$(dirname "$line6_gprconfig_path" )
 						done
 
 						while true;
 						do
-							[ -d $line7_gprbuild_path ] && break
-							line7_gprbuild_path=$(dirname $line7_gprbuild_path)
+							[ -d "$line7_gprbuild_path" ] && break
+							line7_gprbuild_path=$(dirname "$line7_gprbuild_path" )
 						done
 
 						while true;
 						do
-							[ -d $line8_pg_config_path ] && break
-							line8_pg_config_path=$(dirname $line8_pg_config_path)
+							[ -d "$line8_pg_config_path" ] && break
+							line8_pg_config_path=$(dirname "$line8_pg_config_path" )
+						done
+						
+						while true;
+						do
+							[ -d "$line9_ssl_include_path" ] && break
+							line9_ssl_include_path=$(dirname "$line9_ssl_include_path" )
 						done
 
 						my_count=${my_count:=1}
@@ -433,16 +440,14 @@ _compile(){
 			else
 				madeit2="yes";
 			fi
-			pq_include=$(cd "$madeit8" ; ./pg_config --includedir )
+			pq_include=$( "$madeit8"/pg_config --includedir )
 
-			$( PATH="$madeit5:$PATH" ;
-				cd "$madeit6" ; 
-				./gprconfig --batch --config Ada,,default --config C -o "$madeit1/kov.cgpr" ; \
-				cd "$madeit7" ; \
-				./gprbuild -d --config="$madeit1/kov.cgpr" \
-				-Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 \
-				-Xdebug_information=$madeit2 \
-				 -P"$madeit1/apq-postgresql.gpr" -cargs -I $pq_include -I $madeit9 
+		echo	$( PATH="$madeit5:$my_path" ;
+				"$madeit6"/gprconfig --batch --config Ada --config C -o "$madeit1/kov.cgpr" ; \
+				"$madeit7"/gprbuild -d --config="$madeit1/kov.cgpr" \
+				-Xstatic_or_dynamic="$madeit3" -Xos="$madeit4" \
+				-Xdebug_information="$madeit2" \
+				 -P"$madeit1/apq-postgresql.gpr" -cargs -I$pq_include -I$madeit9 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))

@@ -43,7 +43,7 @@ project apq_postgresqlhelp is
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
 
-            when other => -- :0]
+            when others => ---- :0]
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check" ); -- fixme , if necessary :-)
 
@@ -71,56 +71,57 @@ project apq_postgresqlhelp is
                Debug_option_list_builder := Debug_option_list_builder & ( );
                Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
-            when other => -- :0]
+            when others => -- :0]
                Debug_option_list_builder := Debug_option_list_builder & (   );
                Debug_option_list_compiler := Debug_option_list_compiler & (   ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
          end case; -- end no/os
       when others =>
+		  null;
    end case; -- end Debug_information
 
 
    sufix1 := "";
    sufix2 := "";
-   export-dynamic := "--export-dynamic";
+   export_dynamic := "--export-dynamic";
    case static_or_dynamic is
       when "dynamic" | "relocatable" =>
          case os is
             when "linux" =>
                sufix1 := "so.";
                sufix2 := "";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "mswindows" =>
                sufix1 := "";
                sufix2 := ".dll";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "other" =>  -- just a stub here :-)
                sufix1 := "";
                sufix2 := "";
-               export-dynamic := "--export-dynamic";
-            when other =>
+               export_dynamic := "--export-dynamic";
+            when others =>
                 sufix1 := "";
                sufix2 := "";
-               export-dynamic := "";  -- fix it ;-)
+               export_dynamic := "";  -- fix it ;-)
          end case;
       when "static" =>
          case os is
-            when "gnu/linux" =>
+            when "linux" =>
                sufix1 := "";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "mswindows" =>
                sufix1 := "";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "other" =>
                sufix1 := "";
                sufix2 := "";
-               export-dynamic := "";
-            when other =>
+               export_dynamic := "";
+            when others =>
                sufix1 := "";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
          end case;
    end case;
 
@@ -129,11 +130,11 @@ project apq_postgresqlhelp is
    for Source_Dirs use () & apq_postgresql_version.myhelpsource ;
    for Object_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj_c/";
    for Library_Name use "apq-postgresqlhelp" ;
-   for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_c/ ;
-   -- no Ada sources :-) for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_ali_c/ ;
+   for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_c/" ;
+   -- no Ada sources :-) for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/ali_c/" ;
    for Library_Kind use Static_Or_Dynamic;
    for Library_Version use "libapq-postgresqlhelp." & sufix1 & apq_postgresql_version.version & sufix2 ;
-   for Library_Options use ("-Wl," & export-dynamic , apq_postgresql_version.system_libs , "-lssl" , "-lpq");
+   for Library_Options use ("-Wl," & export_dynamic ) & apq_postgresql_version.system_libs  & ( "-lssl" , "-lpq");
    for Externally_Built use "false";
 
    package Compiler is

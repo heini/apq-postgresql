@@ -23,7 +23,7 @@
 ----
 ----
 
-with "apq.gpr";
+with "/usr/share/ada/adainclude/apq.gpr";
 with "./apq_postgresql_version.gpr";
 with "./apq_postgresqlhelp.gpr";
 
@@ -44,7 +44,7 @@ project Apq.postgresql is
    Debug_option_list_builder := ();  -- null string_list
    Debug_option_list_compiler := (); -- null string_list
 
-   case Debug_information is
+   case debug_information is
       when "yes" =>
          Debug := Debug & "debug";
          case os is
@@ -68,7 +68,7 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
-            when other => -- :0]
+            when others => ---- :0]
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
@@ -96,73 +96,75 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( );
                Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
-            when other => -- :0]
+            when others => -- :0]
                Debug_option_list_builder := Debug_option_list_builder & (   );
                Debug_option_list_compiler := Debug_option_list_compiler & (   ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
          end case; -- end no/os
       when others =>
+		  null;
    end case; -- end Debug_information
 
    sufix1 := "";
    sufix2 := "";
-   export-dynamic := "--export-dynamic";
+   export_dynamic := "--export-dynamic";
    case static_or_dynamic is
       when "dynamic" | "relocatable" =>
          case os is
             when "other" =>
                sufix1 := "so.";
                sufix2 := "";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "mswindows" =>
                sufix1 := "so.";
                sufix2 := ".dll";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "linux" =>
                sufix1 := "so.";
                sufix2 := "";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "darwin" => -- fix it ;-)
                sufix1 := "so.";
                sufix2 := ".lib";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when "bsd" =>  -- just a stub here :-)
                sufix1 := "so.";
                sufix2 := ".idx";
-               export-dynamic := "--export-dynamic";
+               export_dynamic := "--export-dynamic";
             when others =>
                sufix1 := "so.";
                sufix2 := "";
-               export-dynamic := "";  -- fix it ;-)
+               export_dynamic := "";  -- fix it ;-)
          end case;
       when "static" =>
          case os is
             when "other" =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "mswindows" =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "linux" =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "darwin" =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when "bsd" =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
             when others =>
                sufix1 := "static.";
                sufix2 := "";
-               export-dynamic := "";
+               export_dynamic := "";
          end case;
       when others =>
+		  null;
    end case;
 
 
@@ -170,11 +172,11 @@ project Apq.postgresql is
    for Source_Dirs use () & apq_postgresql_version.mysource ;
    for Object_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj/";
    for Library_Name use "apq-postgresql" ;
-   for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib/ ;
-   for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_ali/ ;
+   for Library_Dir use "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib/" ;
+   for Library_ALI_Dir use  "" & apq_postgresql_version.basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/ali/" ;
    for Library_Kind use Static_Or_Dynamic;
    for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
-   for Library_Options use ("-Wl," & export-dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
+   for Library_Options use ("-Wl," & export_dynamic , "-L" & apq_postgresqlhelp'Library_dir , "-lssl" , "-lpq" , "-lapq-postgresqlhelp" );
    for Externally_Built use "false";
 
    package Compiler is
