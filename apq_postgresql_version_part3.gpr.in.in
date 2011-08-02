@@ -1,5 +1,4 @@
 
-   dummy_source := "" & $mysource & "../src_dummy/";
    
 
    -----------------------
@@ -142,14 +141,14 @@
    end case;
 
    for Languages use ("Ada");
-   for Source_Dirs use () &  dummy_source ;
+   for Source_Dirs use ( ) & mydummysource  ;
    for Object_Dir use "" & basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj_dummy/";
    for Library_Name use "apq_dummy" ;
    for Library_Dir use "" & basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/lib_dummy/" ;
    for Library_ALI_Dir use  "" & basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/ali_dummy/" ;
    for Library_Kind use Static_Or_Dynamic;
    for Library_Version use "libapq_dummy." & sufix1 & version & sufix2 ;
-   for Library_Options use ("-Wl," & export_dynamic  );
+   --for Library_Options use ("-Wl," & export_dynamic  );
    for Externally_Built use "false";
 
   package Compiler is

@@ -9,6 +9,8 @@ project apq_postgresql_version is
 
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
+   mydummysource := ( ) & $mydummysource ;
    basedir	:= "" & $basedir ;
+
 
 

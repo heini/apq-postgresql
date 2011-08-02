@@ -250,6 +250,7 @@ do
 			{	printf	"version:=\"$my_version\"  \n"
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
+				printf	"mydummysource:=\"$my_atual_dir/src_dummy/\"  \n"
 				printf	"basedir:=\"$my_atual_dir/build\"  \n"	
 				while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
 				do
