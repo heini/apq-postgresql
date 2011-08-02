@@ -442,13 +442,13 @@ _compile(){
 				madeit2="yes";
 			fi
 			pq_include=$( "$madeit8"/pg_config --includedir )
-
-		echo	$( PATH="$madeit5:$my_path" ;
-				"$madeit6"/gprconfig --batch --config Ada --config C -o "$madeit1/kov.cgpr" ; \
-				"$madeit7"/gprbuild -d --config="$madeit1/kov.cgpr" \
-				-Xstatic_or_dynamic="$madeit3" -Xos="$madeit4" \
-				-Xdebug_information="$madeit2" \
-				 -P"$madeit1/apq-postgresql.gpr" -cargs -I$pq_include -I$madeit9 
+			
+			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
+			# using gnat and gpbuild from toolchain Act-San :-)
+			# remember ins this case add /usr/gnat/bin to your add_compiler_paths in configure target makefile 
+			# if you already made /usr/gnat/bin in your front path, just try add (e.g) /usr/bin to add_compiler_paths if it do not work =]
+			echo $(PATH="$my_path:$madeit5" ; $(cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./kov_gprconfig.log ) && PATH="$my_path:$madeit5" && \
+				$(cd "$madeit1" && "$madeit7"/gprbuild --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I /usr/lib -I $pq_include -I $madeit9 >> ./kov_gprbuild.log ) 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))
