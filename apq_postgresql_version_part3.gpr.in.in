@@ -1,6 +1,18 @@
 
    dummy_source := "" & $mysource & "../src_dummy/";
-   ---------------------------------------------------
+   
+
+   -----------------------
+   -- type declarations --
+   -----------------------
+
+   type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
+   type Debug_information_Type is ("yes", "no");
+   type Os_Type is ("other", "mswindows", "linux" , "darwin" , "bsd" );
+   --
+   Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "static");
+   Os : Os_Type := external ("os", "linux");
+   Debug_information : Debug_information_Type := external ("debug_information", "no");
    --
    Debug  := "";
    Debug_option_list_builder := ();  -- null string_list
@@ -129,15 +141,6 @@
 		  null;
    end case;
 
-   package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_compiler ;
-   end Compiler;
-
-   package Builder  is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_builder ;
-   end Builder;
--------------------------------------------------------------
-
    for Languages use ("Ada");
    for Source_Dirs use () &  dummy_source ;
    for Object_Dir use "" & basedir & "/" & Os & "/" & Static_Or_Dynamic & "/" & debug & "/obj_dummy/";
@@ -149,12 +152,12 @@
    for Library_Options use ("-Wl," & export_dynamic  );
    for Externally_Built use "false";
 
-   package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) ;
+  package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_compiler ;
    end Compiler;
 
    package Builder  is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" )  ;
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" , "-fPIC" ) & Debug_option_list_builder ;
    end Builder;
 
 end apq_postgresql_version;
