@@ -354,51 +354,50 @@ _compile(){
 						read line8_pg_config_path
 					}<"$my_tmp/kov.log"
 					#  %[:space:]*
-					
-				
+
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
 						[ -n "$line8_pg_config_path" ] && [ -n "$line9_ssl_include_path" ];
 					then
 						while true;
 						do
-							[ -d "$line6_gprconfig_path" ] && break
+							[ -d $line6_gprconfig_path ] && break
 							line6_gprconfig_path=$(dirname $line6_gprconfig_path)
 						done
 
 						while true;
 						do
-							[ -d "$line7_gprbuild_path" ] && break
+							[ -d $line7_gprbuild_path ] && break
 							line7_gprbuild_path=$(dirname $line7_gprbuild_path)
 						done
 
 						while true;
 						do
-							[ -d "$line8_pg_config_path" ] && break
+							[ -d $line8_pg_config_path ] && break
 							line8_pg_config_path=$(dirname $line8_pg_config_path)
 						done
 
 						my_count=${my_count:=1}
-						local madeit1="line1_$my_count=\"$my_tmp\" ";
-						local madeit2="line2_$my_count=\"$debuga\" ";
-						local madeit3="line3_$my_count=\"$libbuildtype\" ";
-						local madeit4="line4_$my_count=\"$sist_oses\" ";
-						local madeit5="line5_$my_count=\"${line5_compile_paths%[:space:]*}\" ";
-						local madeit6="line6_$my_count=\"${line6_gprconfig_path%[:space:]*}\" ";
-						local madeit7="line7_$my_count=\"${line7_gprbuild_path%[:space:]*}\" ";
-						local madeit8="line8_$my_count=\"${line8_pg_config_path%[:space:]*}\" ";
-						local madeit9="line9_$my_count=\"${line9_ssl_include_path%[:space:]*}\" ";
+						madeit1=" line1_$my_count=\"$my_tmp\" "
+						madeit2=" line2_$my_count=\"$debuga\" "
+						madeit3=" line3_$my_count=\"$libbuildtype\" "
+						madeit4=" line4_$my_count=\"$sist_oses\" "
+						madeit5=" line5_$my_count=\"$line5_compile_paths\" "
+						madeit6=" line6_$my_count=\"$line6_gprconfig_path\" "
+						madeit7=" line7_$my_count=\"$line7_gprbuild_path\" "
+						madeit8=" line8_$my_count=\"$line8_pg_config_path\" "
+						madeit9=" line9_$my_count=\"$line9_ssl_include_path\" "
 
-						eval "$madeit1"
-						eval "$madeit2"
-						eval "$madeit3"
-						eval "$madeit4"
-						eval "$madeit5"
-						eval "$madeit6"
-						eval "$madeit7"
-						eval "$madeit8"
-						eval "$madeit9"
-
+						eval $madeit1
+						eval $madeit2
+						eval $madeit3
+						eval $madeit4
+						eval $madeit5
+						eval $madeit6
+						eval $madeit7
+						eval $madeit8
+						eval $madeit9
+						
 						my_count=$(( $my_count + 1 ))
 					fi
 				fi
@@ -409,25 +408,41 @@ _compile(){
 	if [ $my_count -gt 1 ]; then
 		while [ ${my_count2:=1} -lt $my_count ];
 		do
-			eval " madeit1=\"line1_$my_count2\" "
-			eval " madeit2=\"line2_$my_count2\" "
-			eval " madeit3=\"line3_$my_count2\" "
-			eval " madeit4=\"line4_$my_count2\" "
-			eval " madeit5=\"line5_$my_count2\" "
-			eval " madeit6=\"line6_$my_count2\" "
-			eval " madeit7=\"line7_$my_count2\" "
-			eval " madeit8=\"line8_$my_count2\" "
-			eval " madeit9=\"line9_$my_count2\" "
+			aab="line1_${my_count2}"
+			madeit1=${!aab}
+			aab="line2_${my_count2}"
+			madeit2=${!aab}
+			aab="line3_${my_count2}"
+			madeit3=${!aab}
+			aab="line4_${my_count2}"
+			madeit4=${!aab}
+			aab="line5_${my_count2}"
+			madeit5=${!aab}
+			aab="line6_${my_count2}"
+			madeit6=${!aab}
+			aab="line7_${my_count2}"
+			madeit7=${!aab}
+			aab="line8_${my_count2}"
+			madeit8=${!aab}
+			aab="line9_${my_count2}"
+			madeit9=${!aab}
+
+			if [ "$madeit2" = "normal" ];
+			then 
+				madeit2="no"; 
+			else
+				madeit2="yes";
+			fi
+			pq_include=$(cd "$madeit8" ; ./pg_config --includedir )
 
 			$( PATH="$madeit5:$PATH" ;
 				cd "$madeit6" ; 
 				./gprconfig --batch --config Ada,,default --config C -o "$madeit1/kov.cgpr" ; \
-				pq_include=$(cd "$madeit8" ; ./pg_config --includedir ); \
 				cd "$madeit7" ; \
 				./gprbuild -d --config="$madeit1/kov.cgpr" \
 				-Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 \
-				-Xdebug_information=$( if [ "$madeit2" = "normal" ]; then printf "no"; else printf "yes"; fi; ) \
-				 -P"$madeit1/apq-postgresql.gpr"  -I $pq_include -I $madeit9 
+				-Xdebug_information=$madeit2 \
+				 -P"$madeit1/apq-postgresql.gpr" -cargs -I $pq_include -I $madeit9 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))
