@@ -94,6 +94,9 @@ compile:
 configure:
 	@echo $(shell "$(atual_dir)/base.sh" "configure" "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_path)" "$(pg_config_path)" "$(gprconfig_path)" "$(gprbuild_path)" "$(build_with_debug_too)" )
 
+install:
+	@echo $(shell "$(atual_dir)/base.sh" "install" "$(oses)" "$(prefix)" )
+
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
 

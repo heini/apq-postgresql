@@ -121,13 +121,12 @@ doesn't matter. Enjoy! =]
 
 1.3.2) options for "install" target
 
-1.3.2.1) how choose System Operations for installing
+1.3.2.1) how choose one(1) System Operations for installing
 		Important:  _compiled_ lib(s) will be installed, 
 		otherwise, lib will be ignored during this phase
 1.3.2.1.2)	tag "oses="		separator ","
 		eg:	"make install oses=all "
-		Important: with "all" _the first one OS_ will be used for 
-install; the others will be ignored.
+		Important: _the first one OS_ configured will be used for install; the others will be ignored.
 		known values:( same of configure and compile oses= ) all,linux,mswindows,darwin,bsd,other
 		default value:( idem configure or compile oses= ) linux
 
@@ -147,7 +146,7 @@ install; the others will be ignored.
 				/prefix/lib/shared/debug
 1.3.3.4) .a		/prefix/lib/static
 				/prefix/lib/static/debug
-1.3.3.5) .gpr	/prefixlib/lib/gnat
+1.3.3.5) .gpr	/prefix/lib/gnat
 
 1.4) target clean
 	command "make clean"

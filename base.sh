@@ -496,10 +496,8 @@ _installe(){
 		printf "\n"
 		exit 1
 	fi
-	local mi_stop=0
-
+	
 	IFS=",$ifsbackup"
-
 
 	local sist_oses=
 	local libbuildtype=
@@ -526,7 +524,7 @@ _installe(){
 			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
 			
 			[ ! -d "$my_tmp3" ] && continue
-			[ "$libbuildtype" = "relocatable" || "$libbuildtype" = "dynamic"  ] && my_tmp6="shared" || my_tmp6="static"
+			[ "$libbuildtype" = "relocatable" -o "$libbuildtype" = "dynamic"  ] && my_tmp6="shared" || my_tmp6="static"
 
 			for debuga in $my_with_debug_too
 			do
@@ -543,11 +541,15 @@ _installe(){
 				install "$my_tmp4"/lib_c/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
 				install "$my_tmp4"/lib_dummy/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
 
-				$my_count=$(( $my_count + 1 ))
+				my_count=$(( $my_count + 1 ))
 
 			done # debuga
 		done # libbuildtype
 	done # sist_oses
+	if [ $my_count -ge 2 ]; then
+		install -d "$my_prefix/include"
+		install "$my_atual_dir"/src/* -t "$my_prefix/include"
+	fi
 
 	exit 0  # end :-)
 
