@@ -451,7 +451,7 @@ _compile(){
 			pq_include=$( "$madeit8"/pg_config --includedir )
 			
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
-			# using gnat and gpbuild from toolchain Act-San :-)
+			# using gnat and gprbuild from toolchain Act-San :-)
 			# remember ins this case add /usr/gnat/bin to your add_compiler_paths in configure target makefile 
 			# if you already made /usr/gnat/bin in your front path, just try add (e.g) /usr/bin to add_compiler_paths if it do not work =]
 			echo $(PATH="$my_path:$madeit5" ; $(cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./gprconfig.log ) && PATH="$my_path:$madeit5" && \
@@ -473,6 +473,88 @@ _compile(){
 } #end _compile
 
 
+_installe(){
+	if [ $# -ne 2 ]; then
+		printf 'compile "OSes" "prefix" '
+		printf "\n"
+		exit 1
+	fi
+	local ifsbackup="$IFS"
+	local IFS="$ifsbackup"
+
+	local my_atual_dir=$(pwd)
+	local my_path=$( echo $PATH )
+	local my_oses=$(_choose_so "$1" )
+	local my_libtypes=$(_choose_libtype "all" )
+	local my_with_debug_too=$(_choose_debug "yes" )
+	local made_dirs="$my_atual_dir/build"
+
+	local my_prefix=$2
+
+	if [ ! -d "$made_dirs" ]; then
+		printf ' "build" dir dont exist or dont is a directory '
+		printf "\n"
+		exit 1
+	fi
+	local mi_stop=0
+
+	IFS=",$ifsbackup"
+
+
+	local sist_oses=
+	local libbuildtype=
+	local debuga=
+	local my_tmp=
+	local my_tmp2=
+	local my_tmp3=
+	local my_tmp4=
+	local my_tmp5=
+	local my_tmp6=
+
+	local my_count=1
+			
+	for sist_oses in $my_oses
+	do
+		my_tmp2="$made_dirs"/$sist_oses
+
+		[ $my_count -ge 2 ] && break
+
+		[ ! -d "$my_tmp2" ] && continue
+		
+		for libbuildtype in $my_libtypes
+		do
+			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
+			
+			[ ! -d "$my_tmp3" ] && continue
+			[ "$libbuildtype" = "relocatable" || "$libbuildtype" = "dynamic"  ] && my_tmp6="shared" || my_tmp6="static"
+
+			for debuga in $my_with_debug_too
+			do
+				my_tmp4="$made_dirs"/$sist_oses/$libbuildtype/$debuga
+				
+				[ ! -d "$my_tmp4" ] && continue
+				[ "$debuga" = "normal" ] && my_tmp5="" || my_tmp5="$debuga"
+				
+				install -d "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
+
+				install -m0555 "$my_tmp4"/ali/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
+				install -m0555 "$my_tmp4"/ali_dummy/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
+				install "$my_tmp4"/lib/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
+				install "$my_tmp4"/lib_c/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
+				install "$my_tmp4"/lib_dummy/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
+
+				$my_count=$(( $my_count + 1 ))
+
+			done # debuga
+		done # libbuildtype
+	done # sist_oses
+
+	exit 0  # end :-)
+
+} #end _installe
+
+
+
 ####################################
 ######   operative part   ##########
 ####################################
@@ -482,7 +564,7 @@ case $my_commande in
 		;;
 	'compilling' )  [ $# -eq 1 ] && _compile "$1" || printf "compile need one\(1\) option\n" ; exit 1
 		;;
-	'installing' ) 
+	'installing' )  [ $# -eq 2 ] && _installe "$1" "$2" || printf "install need two\(2\) options\n" ; exit 1
 		;; 
 	'cleaning' ) 
 		;;
