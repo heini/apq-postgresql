@@ -277,7 +277,7 @@ do
 		
 			IFS=",$ifsbackup"
 
-			for support_dirs in obj lib ali obj_c lib_c ali_c obj_dummy lib_dummy ali_dummy
+			for support_dirs in obj lib ali obj_c lib_c ali_c
 			do
 				mkdir -p "$my_tmp"/$support_dirs
 			done # support_dirs
@@ -534,10 +534,8 @@ _installe(){
 				install -d "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
 
 				install -m0555 "$my_tmp4"/ali/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
-				install -m0555 "$my_tmp4"/ali_dummy/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
 				install "$my_tmp4"/lib/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
 				install "$my_tmp4"/lib_c/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
-				install "$my_tmp4"/lib_dummy/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
 
 				my_count=$(( $my_count + 1 ))
 
