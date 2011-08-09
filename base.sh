@@ -265,17 +265,16 @@ do
 
 			}>"$my_tmp/kov.def"
 
-			cat "$my_atual_dir/apq_postgresql_version_part1.gpr.in.in" > "$my_tmp/apq_postgresql_version.gpr.in"
-			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
-			printf  " $madeit3 " >> "$my_tmp/apq_postgresql_version.gpr.in" ;
-			printf  ' ); ' >> "$my_tmp/apq_postgresql_version.gpr.in" ;
-			cat "$my_atual_dir/apq_postgresql_version_part3.gpr.in.in" >> "$my_tmp/apq_postgresql_version.gpr.in"
+			cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"
+			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
+			printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
+			printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
+			cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"
 					
 
-			gnatprep "$my_tmp/apq_postgresql_version.gpr.in"  "$my_tmp/apq_postgresql_version.gpr"  "$my_tmp/kov.def"
+			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/kov.def"
 			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"
-			cp "$my_atual_dir/apq_postgresqlhelp.gpr"  "$my_tmp/"
-
+		
 			IFS=",$ifsbackup"
 
 			for support_dirs in obj lib ali obj_c lib_c ali_c obj_dummy lib_dummy ali_dummy

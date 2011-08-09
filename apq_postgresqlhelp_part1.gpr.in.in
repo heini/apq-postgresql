@@ -1,16 +1,16 @@
 ---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
 ---- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
----- this project contem some information ( version and others )
----- this will be imported where make sense this informations :-)
+---- this Building System permit "simultaneously" (if you want) :
+---- Make static and shared libs
+---- Cross-Compiling too ;-) enjoy! :-)
 
-project apq_postgresql_version is
+
+project apq_postgresqlhelp is
 
    version   := $version ;    --  eg.: "3.0.1"
 
    myhelpsource := ( ) & $myhelpsource ;
    mysource	:= ( ) & $mysource ;
-   mydummysource := ( ) & $mydummysource ;
    basedir	:= "" & $basedir ;
-
 
 
