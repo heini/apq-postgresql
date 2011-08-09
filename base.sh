@@ -340,7 +340,6 @@ _compile(){
 				
 				if [ -f "$my_tmp/kov.log" ] && \
 					[ $(wc -l < "$my_tmp/kov.log" ) -ge 6 ] && \
-					[ -f "$my_tmp/apq_postgresql_version.gpr" ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
