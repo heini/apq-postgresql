@@ -40,14 +40,6 @@ project Apq.postgresql is
    Debug_information : Debug_information_Type := external ("debug_information", "no");
    --
    Debug  := "";
-   
-	case static_or_dynamic is
-		when "dynamic" | "relocatable" =>
-			dir := "shared" 
-		when "static" =>
-			dir := "static"
-	end case;
-
    Debug_option_list_builder := ();  -- null string_list
    Debug_option_list_compiler := (); -- null string_list
 
