@@ -9,7 +9,7 @@
 #: Description: For It use makefile targets. See INSTALL file.
 
 if [ $# -eq 0 ]; then
-	printf "I need minimum of 1 options\n"
+	printf "not ok. I need minimum of 1 options\n"
 	exit 1;
 fi;
 
@@ -19,7 +19,7 @@ case ${1,,} in
 	"install" ) my_commande='installing' ;;
 	"clean" ) my_commande='cleaning' ;;
 	"distclean" ) my_commande='dist_cleaning' ;;
-	* ) printf "I dont known this command take 1 :-\)\n" ;
+	* ) printf "not ok. I dont known this command :-\)\n" ;
 		exit 1
 		;;
 esac;
@@ -161,7 +161,7 @@ _configure(){
 #:		"gprconfig_path"  "gprbuild_path"  "with_debug_too"
 
 if [ $# -ne 9 ]; then
-	printf ' You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
+	printf 'not ok. You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
 	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "with_debug_too" ' ; printf "\n" ;
 	
 	exit 1
@@ -218,7 +218,7 @@ do
 	madeit=" lib_system$at_count=\"-L$alibdirsystem\"  "
 	eval $madeit
 	at_count=$(( $at_count + 1 ))
-	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem" ; ###############
+	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem" ; 
 done
 IFS=",$ifsbackup"
 
@@ -285,14 +285,14 @@ do
 	done # libbuildtype
 done # sist_oses
 IFS="$ifsbackup"
-
+printf "ok. \n"
 exit 0;   # end ;-)
 
 } #end _configure
 
 _compile(){
 	if [ $# -ne 1 ]; then
-		printf 'compile "OSes" '
+		printf 'not ok. compile "OSes" '
 		printf "\n"
 		exit 1
 	fi
@@ -307,7 +307,7 @@ _compile(){
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ ! -d "$made_dirs" ]; then
-		printf ' "build" dir dont exist or dont is a directory '
+		printf 'not ok. "build" dir dont exist or dont is a directory '
 		printf "\n"
 		exit 1
 	fi
@@ -461,19 +461,20 @@ _compile(){
 		done
 
 	else
-		printf ' nothing to compile '
+		printf 'ok. nothing to compile '
 		printf "\n"
+		exit 0
 	fi
-
+	
+	printf "ok. \n"
 	exit 0  # end :-)
-
 
 } #end _compile
 
 
 _installe(){
 	if [ $# -ne 2 ]; then
-		printf 'compile "OSes" "prefix" '
+		printf 'not ok. compile "OSes" "prefix" '
 		printf "\n"
 		exit 1
 	fi
@@ -490,7 +491,7 @@ _installe(){
 	local my_prefix=$2
 
 	if [ ! -d "$made_dirs" ]; then
-		printf ' "build" dir dont exist or dont is a directory '
+		printf 'not ok. "build" dir dont exist or dont is a directory '
 		printf "\n"
 		exit 1
 	fi
@@ -548,7 +549,7 @@ _installe(){
 		install -d "$my_prefix/lib/gnat"
 		gnatprep "-Dprefix=\"$my_prefix\"" "$my_atual_dir"/gpr/apq-postgresql.gpr.in "$my_prefix/lib/gnat"/apq-postgresql.gpr
 	fi
-
+	printf "ok. \n"
 	exit 0  # end :-)
 
 } #end _installe
@@ -561,7 +562,7 @@ _clean(){
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ ! -d "$made_dirs" ]; then
-		printf ' "build" dir dont exist or dont is a directory '
+		printf 'not ok. "build" dir dont exist or dont is a directory '
 		printf "\n"
 		exit 1
 	fi
@@ -610,6 +611,8 @@ _clean(){
 			done # debuga
 		done # libbuildtype
 	done # sist_oses
+
+	printf "ok. \n"
 	exit 0
 
 } #end _clean
@@ -617,7 +620,12 @@ _clean(){
 _distclean(){
 	local my_atual_dir=$(pwd)	
 	local made_dirs="$my_atual_dir/build"
-	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf
+	if [ ! -d "$made_dirs" ]; then
+		printf 'not ok. "build" dir dont exist or dont is a directory '
+		printf "\n"
+		exit 1
+	fi
+	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf && printf "ok"; exit 0 || printf "not ok"; exit 1
 
 } #end _distclean
 
