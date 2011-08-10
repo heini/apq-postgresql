@@ -1,59 +1,66 @@
----- author Daniel Norte de Moraes <danielcheagle@gmail.com>
----- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
-----
+-- Build file for Aw_Lib.
+--
+-- author Marcelo Coraça de Freitas <marcelo.batera@gmail.com>
+--
+-- Repository information:
+-- $Date: 2008-02-25 19:47:48 -0300 (Seg, 25 Fev 2008) $
+-- $Revision: 234 $
+-- $Author: ogro $
+
+-- Date: 2011-05-23 11:56:57 -0300 (Seg, 23 May 2011)
+-- new build system :-)
+-- Author: Daniegle , Daniel Norte de Moraes <danielcheagle@gmail.com>
+-- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
 ---- this Building System permit "simultaneously" (if you want) :
----- Make static and shared libs
+---- Using static and shared libs
 ---- Cross-Compiling too ;-) enjoy! :-)
 ---- obs.: the  MakeFile permit you choose the correct libs for _each_ library you type make ! :-)
----- obs.: "make system_libs_patsh=<path_value>" can be used for it. (e.g cross-compiling
+---- obs.: "make --SYSTEM_LIBS=<path_value>" can be used for it. (e.g cross-compiling
 ----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
+---- _For using_ this project file you can:
+---- 1) just import it ' with "apq-postgresql.gpr" ' in your own my_project_file.gpr
+---- and  $(Builder) -Pmy_project_file.gpr -X<scenario_var_0>=<value> -X<scenario_var_n>=<value>
 
----- 	IMPORTANT!!!  You NEED INSTALL the gpr/apq-postgresql.gpr
-----                   and apq_postgresql_version in ONE(1) local Only if you want access all
-----                   compileds libs. the build system take care for you where are all them ;-)
-----                   just hit " make --PREFIX_GLOBAL_GPR=<path_value> install " ;
-----                  obs.: you 'can' alter --prefix_global_gpr if wou want :-)
-----                  obs.: BUT ONLY the 'last' install contains 'last' 'tracking' these libs files ;-)
+with "apq.gpr";
+with "./apq_postgresql_version.gpr";
 
-----    IMPORTANT!!!  You Can hit make and make install  any time you want. the build system e the global_gpr take
-----                   care for you where are the libs.
-----                   You will need however, in system specific manner, that
-----                    your program using the libs "as being run/executing" locate the libs for him :-)
-----                   We just (just? ;-) take care of _compilation_ :-)
-----
-----
-
-with "/usr/share/ada/adainclude/apq.gpr"; -- fixme with adequate apq.gpr :-)
-
-project Apq.postgresql is
+project APQ.PostgreSQL is
    -----------------------
    -- type declarations --
    -----------------------
-	prefix := $prefix
-
-   type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
+   type Static_Or_Dynamic_Type is ("dynamic", "static" , "relocatable");
    type Debug_information_Type is ("yes", "no");
-   type Os_Type is ("other", "mswindows", "linux" , "darwin" , "bsd" );
-   --
-   Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "static");
-   Os : Os_Type := external ("os", "linux");
+   type Os_Type is ("other", "mswindows", "gnu/linux" , "darwin" , "bsd" );
+   type Lib_Exist_Type is ( "" , "yes", "no");
+   type libs_installeds_Type is ( "" $libs_installeds_list );  -- pre-dummy  -- string_list
+   type lib_installed_prefixes_type is ( "" $prefixes_list );  -- string_list
+   type system_libs_type  is ("" $system_libs_list ); -- string_list
+
+   --------------------------------
+   -- var external declarations ---
+   --------------------------------
+   Static_Or_Dynamic : Static_Or_Dynamic_Type := external ("static_or_dynamic", "dynamic");
+   Os : Os_Type := external ("os", "gnu/linux");
+   Lib_Installed_Prefix : libs_installeds_prefixes_type := external ("lib_prefix", "");
    Debug_information : Debug_information_Type := external ("debug_information", "no");
-   --
-   Debug  := "";
-   
-	case static_or_dynamic is
-		when "dynamic" | "relocatable" =>
-			dir := "shared" 
-		when "static" =>
-			dir := "static"
-	end case;
+   system_lib : system_libs_type := external ("system_lib" , "" );
 
-   Debug_option_list_builder := ();  -- null string_list
-   Debug_option_list_compiler := (); -- null string_list
+   -------------------------------
+   -- var declarations -----------
+   -------------------------------
+   Lib_Exist_Type  : Lib_Exist_Type := "" ;
 
-   case debug_information is
+   -------------------------------
+   -- var debug's relations ship--
+   -------------------------------
+   Debug  := "debug_";
+   Debug_option_list_builder := (); -- string_list null
+   Debug_option_list_compiler := (); -- string_list null
+
+   case Debug_information is
+
       when "yes" =>
-         Debug := Debug & "debug";
+         Debug := Debug & "yes";  -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
          case os is
             when "other" => -- :0}
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
@@ -63,7 +70,7 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
-            when "linux" =>
+            when "gnu/linux" =>
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
@@ -75,13 +82,13 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
-            when others => ---- :0]
+            when other => -- :0]
                Debug_option_list_builder := Debug_option_list_builder & ( "-g" );
                Debug_option_list_compiler := Debug_option_list_compiler & ("-fstack-check", "-gnata" , "-gnato" , "-gnatE" ); -- fixme , if necessary :-)
 
          end case;  -- end yes/os
       when "no" =>
-         Debug := Debug & "";
+         Debug := Debug & "no"; -- this can be just one line; but this is for possible _clean_ and _easy_ (more or less) "Future" updating kkkkk ^_^!!!!
          case os is
             when "other" => -- :0}
                Debug_option_list_builder := Debug_option_list_builder & (  );
@@ -91,7 +98,7 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & (  );
                Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
-            when "linux" =>
+            when "gnu/linux" =>
                Debug_option_list_builder := Debug_option_list_builder & (  );
                Debug_option_list_compiler := Debug_option_list_compiler & (  ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
@@ -103,111 +110,100 @@ project Apq.postgresql is
                Debug_option_list_builder := Debug_option_list_builder & ( );
                Debug_option_list_compiler := Debug_option_list_compiler & ( ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
-            when others => -- :0]
+            when other => -- :0]
                Debug_option_list_builder := Debug_option_list_builder & (   );
                Debug_option_list_compiler := Debug_option_list_compiler & (   ); -- fixme , if necessary :-) --> insert some thing making sense in string_list form -> ()
 
          end case; -- end no/os
       when others =>
-		  null;
    end case; -- end Debug_information
+
 
    sufix1 := "";
    sufix2 := "";
-   export_dynamic := "--export-dynamic";
+   export-dynamic := "--export-dynamic";
    case static_or_dynamic is
       when "dynamic" | "relocatable" =>
          case os is
             when "other" =>
                sufix1 := "so.";
                sufix2 := "";
-               export_dynamic := "--export-dynamic";
+               export-dynamic := "--export-dynamic";
             when "mswindows" =>
                sufix1 := "so.";
                sufix2 := ".dll";
-               export_dynamic := "--export-dynamic";
-            when "linux" =>
+               export-dynamic := "--export-dynamic";
+            when "gnu/linux" =>
                sufix1 := "so.";
                sufix2 := "";
-               export_dynamic := "--export-dynamic";
+               export-dynamic := "--export-dynamic";
             when "darwin" => -- fix it ;-)
                sufix1 := "so.";
                sufix2 := ".lib";
-               export_dynamic := "--export-dynamic";
+               export-dynamic := "--export-dynamic";
             when "bsd" =>  -- just a stub here :-)
                sufix1 := "so.";
                sufix2 := ".idx";
-               export_dynamic := "--export-dynamic";
+               export-dynamic := "--export-dynamic";
             when others =>
                sufix1 := "so.";
                sufix2 := "";
-               export_dynamic := "";  -- fix it ;-)
+               export-dynamic := "";  -- fix it ;-)
          end case;
       when "static" =>
          case os is
             when "other" =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
+               export-dynamic := "";
             when "mswindows" =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
-            when "linux" =>
+               export-dynamic := "";
+            when "gnu/linux" =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
+               export-dynamic := "";
             when "darwin" =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
+               export-dynamic := "";
             when "bsd" =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
+               export-dynamic := "";
             when others =>
                sufix1 := "static.";
                sufix2 := "";
-               export_dynamic := "";
+               export-dynamic := "";
          end case;
       when others =>
-		  null;
    end case;
+
+
+
+   lib_installed  := "" ;
+   -- convention \"OsType\"////\"Static_Or_Dynamic_Type\"////\"Debug_" & "Debug_information_Type\"////\"prefix\"
 
    for Languages use ("Ada");
-   for Source_Dirs use () & ( prefix & "/include" ) ;
-   for Library_Name use "apq-postgresql" ;
-   case debug_information is
-	   when "yes" =>
-		   case static_or_dynamic is
-				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/shared/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/shared/debug/ali/" ;
-				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/static/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/static/debug/ali/" ;
-		   end case;
-	   when "no"  =>
-		   case static_or_dynamic is
-				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/shared/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/shared/ali/" ;
-				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/static/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/static/ali/" ;
-		   end case;
-   end case;
+   for Source_Dirs use () & apq_postgresql_version.include_path ;
 
+   for Library_Name use "apq-postgresql" ;
+   for Library_Dir use "" & apq_postgresql_version.lib_path & "/" & Static_Or_Dynamic & "/" & Os & "/lib/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
+   for Library_ALI_Dir use  "" & apq_postgresql_version.lib_path & "/" & Static_Or_Dynamic & "/" & Os & "/lib_ali/" & Debug "/" & apq_postgresql_version.version & "/" & Static_Or_Dynamic ;
    for Library_Kind use Static_Or_Dynamic;
+   for Library_Version use "libapq-postgresql." & sufix1 & apq_postgresql_version.version & sufix2 ;
    for Externally_Built use "true";
 
+
    package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn"  ) & Debug_option_list_compiler ;
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" ) & Debug_option_list_compiler ;
    end Compiler;
 
    package Builder  is
-      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn"  ) & Debug_option_list_builder ;
+      for Default_Switches ("ada") use ("-O2", "-gnat05", "-gnatn" ) & Debug_option_list_builder ;
    end Builder;
 
-end Apq.postgresql;
+
+end APQ.PostgreSQL;
 

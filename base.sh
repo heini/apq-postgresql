@@ -545,6 +545,8 @@ _installe(){
 	if [ $my_count -ge 2 ]; then
 		install -d "$my_prefix/include"
 		install "$my_atual_dir"/src/* -t "$my_prefix/include"
+		install -d "$my_prefix/lib/gnat"
+		gnatprep "-Dprefix=\"$my_prefix\"" "$my_atual_dir"/gpr/apq-postgresql.gpr.in "$my_prefix/lib/gnat"/apq-postgresql.gpr
 	fi
 
 	exit 0  # end :-)
