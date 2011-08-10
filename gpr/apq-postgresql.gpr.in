@@ -29,7 +29,7 @@ project Apq.postgresql is
    -----------------------
    -- type declarations --
    -----------------------
-	prefix := $prefix
+	prefix := $prefix ;
 
    type Static_Or_Dynamic_Type is ("dynamic", "static", "relocatable" );
    type Debug_information_Type is ("yes", "no");

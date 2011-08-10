@@ -97,6 +97,9 @@ configure:
 install:
 	@echo $(shell "$(atual_dir)/base.sh" "install" "$(oses)" "$(prefix)" )
 
+clean:
+	@echo $(shell "$(atual_dir)/base.sh" "clean" )
+
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
 

@@ -553,6 +553,64 @@ _installe(){
 
 } #end _installe
 
+_clean(){
+	local ifsbackup="$IFS"
+	local IFS="$ifsbackup"
+
+	local my_atual_dir=$(pwd)	
+	local made_dirs="$my_atual_dir/build"
+	local my_count=1
+	if [ ! -d "$made_dirs" ]; then
+		printf ' "build" dir dont exist or dont is a directory '
+		printf "\n"
+		exit 1
+	fi
+	local my_path=$( echo $PATH )
+	local my_oses=$(_choose_so "all" )
+	local my_libtypes=$(_choose_libtype "all" )
+	local my_with_debug_too=$(_choose_debug "yes" )
+	local sist_oses=
+	local libbuildtype=
+	local debuga=
+	local my_tmp=
+	local my_tmp2=
+	local my_tmp3=
+	local my_tmp4=
+	local my_tmp5=
+	local my_tmp6=
+
+
+	for sist_oses in $my_oses
+	do
+		my_tmp2="$made_dirs"/$sist_oses
+
+		[ ! -d "$my_tmp2" ] && continue
+		
+		for libbuildtype in $my_libtypes
+		do
+			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
+			
+			[ ! -d "$my_tmp3" ] && continue
+		
+			for debuga in $my_with_debug_too
+			do
+				my_tmp4="$made_dirs"/$sist_oses/$libbuildtype/$debuga
+				
+				[ ! -d "$my_tmp4" ] && continue
+				rm	"$my_tmp4"/ali/*
+				rm "$my_tmp4"/lib/*
+				rm "$my_tmp4"/lib_c/*
+				rm "$my_tmp4"/obj_c/*
+				rm "$my_tmp4"/obj/*
+
+				
+			done # debuga
+		done # libbuildtype
+	done # sist_oses
+	exit 0
+
+} #end _clean
+
 
 
 ####################################
@@ -566,7 +624,7 @@ case $my_commande in
 		;;
 	'installing' )  [ $# -eq 2 ] && _installe "$1" "$2" || printf "install need two\(2\) options\n" ; exit 1
 		;; 
-	'cleaning' ) 
+	'cleaning' )   $( _clean )
 		;;
 	'dist_cleaning' )  ;;
 	*  ) printf "I dont known this command :-\)\n" ;
