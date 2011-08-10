@@ -578,6 +578,8 @@ _clean(){
 	local my_tmp4=
 	local my_tmp5=
 	local my_tmp6=
+	
+	IFS=",$ifsbackup"
 
 
 	for sist_oses in $my_oses
@@ -597,11 +599,12 @@ _clean(){
 				my_tmp4="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 				
 				[ ! -d "$my_tmp4" ] && continue
-				rm	"$my_tmp4"/ali/*
-				rm "$my_tmp4"/lib/*
-				rm "$my_tmp4"/lib_c/*
-				rm "$my_tmp4"/obj_c/*
-				rm "$my_tmp4"/obj/*
+			
+				rm	$my_tmp4/ali/*
+				rm $my_tmp4/lib/*
+				rm $my_tmp4/lib_c/*
+				rm $my_tmp4/obj_c/*
+				rm $my_tmp4/obj/*
 
 				
 			done # debuga
@@ -624,7 +627,7 @@ case $my_commande in
 		;;
 	'installing' )  [ $# -eq 2 ] && _installe "$1" "$2" || printf "install need two\(2\) options\n" ; exit 1
 		;; 
-	'cleaning' )   $( _clean )
+	'cleaning' )   [ true ] && _clean
 		;;
 	'dist_cleaning' )  ;;
 	*  ) printf "I dont known this command :-\)\n" ;
