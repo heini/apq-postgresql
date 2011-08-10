@@ -614,6 +614,12 @@ _clean(){
 
 } #end _clean
 
+_distclean(){
+	local my_atual_dir=$(pwd)	
+	local made_dirs="$my_atual_dir/build"
+	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf
+
+} #end _distclean
 
 
 ####################################
@@ -629,7 +635,8 @@ case $my_commande in
 		;; 
 	'cleaning' )   [ true ] && _clean
 		;;
-	'dist_cleaning' )  ;;
+	'dist_cleaning' ) [ true ] && _distclean
+		;;
 	*  ) printf "I dont known this command :-\)\n" ;
 		printf "_${my_commande}_\n"
 		exit 1

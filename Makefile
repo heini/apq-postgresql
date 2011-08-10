@@ -100,6 +100,9 @@ install:
 clean:
 	@echo $(shell "$(atual_dir)/base.sh" "clean" )
 
+distclean:
+	@echo $(shell "$(atual_dir)/base.sh" "distclean" )
+
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done
 
