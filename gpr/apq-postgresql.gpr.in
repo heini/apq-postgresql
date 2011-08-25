@@ -23,7 +23,7 @@
 ----
 ----
 
-with "/usr/share/ada/adainclude/apq.gpr"; -- fixme with adequate apq.gpr :-)
+with "apq.gpr"; -- You can need set ADA_PROJECT_PATH :-)
 
 project Apq.postgresql is
    -----------------------

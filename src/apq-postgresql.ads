@@ -76,7 +76,7 @@ package APQ.PostgreSQL is
 	subtype PG_Date is APQ_Date;				-- For compatibility only (use APQ_Date instead)
 	subtype PG_Time is APQ_Time;				-- For compatibility only (use APQ_Time instead)
 	subtype PG_Timestamp is APQ_Timestamp;			-- For compatibility only (use APQ_Timestamp instead)
-	subtype PG_Timezone is APQ_Timezone;			-- For compatibility only (use APQ_Timestamp instead)
+	-- subtype PG_Timezone is APQ_Timezone;			-- For compatibility only (use APQ_Timestamp instead)
 	subtype PG_Bitstring is APQ_Bitstring;			-- For compatibility only (use APQ_Timestamp instead)
 
 	type Mode_Type is (
