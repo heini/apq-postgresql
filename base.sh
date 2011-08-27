@@ -209,7 +209,7 @@ _system_libs_paths=${_system_libs_paths:=/usr/lib}
 
 local at_count=
 local max_count=11
-# 10(ten) libs is a resonable value for now.
+# 10(ten) libs is a reasonable value for now.
 # if you need more , feel free to contact us and suggest changes. :-)
 IFS=";:$ifsbackup"
 for alibdirsystem in $_system_libs_paths
@@ -323,7 +323,6 @@ _compile(){
 
 	IFS=",$ifsbackup"
 
-
 	local sist_oses=
 	local libbuildtype=
 	local debuga=
@@ -336,7 +335,6 @@ _compile(){
 			for debuga in $my_with_debug_too
 			do
 				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
-				# IFS="$ifsbackup"
 				
 				if [ -f "$my_tmp/kov.log" ] && \
 					[ $(wc -l < "$my_tmp/kov.log" ) -ge 6 ] && \
@@ -356,7 +354,6 @@ _compile(){
 						read line8_pg_config_path
 						read line10_my_system_libs_paths
 					}<"$my_tmp/kov.log"
-					#  %[:space:]*
 
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
@@ -450,10 +447,10 @@ _compile(){
 			
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
 			# using gnat and gprbuild from toolchain Act-San :-)
-			# remember ins this case add /usr/gnat/bin to your add_compiler_paths in configure target makefile 
-			# if you already made /usr/gnat/bin in your front path, just try add (e.g) /usr/bin to add_compiler_paths if it do not work =]
-			echo $( $( PATH="$my_path:$madeit5" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./gprconfig.log ) && \
-				$(PATH="$my_path:$madeit5" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >> ./gprbuild.log ) 
+			# and with PATH="$madeit5:$my_path" ( now the default behavior) I made preference for your compiler, in your specified add_compiler_paths
+			# 
+			echo $( $( PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr >> ./gprconfig.log ) && \
+				$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >> ./gprbuild.log ) 
 			)
 			
 			my_count2=$(( $my_count2 + 1 ))
