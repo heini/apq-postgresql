@@ -82,19 +82,19 @@ doesn't matter. Enjoy! =]
 1.1.2.6.2)	tag "pg_config_path="	separator ? don't exist =]
 		eg:	"make configure pg_config_path=/usr/bin "
 		known values: well... in Debian Sid, now days, is /usr/bin But I will rely in you to discover the correct value ;-)
-		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
+		default value: first path from command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.7) how choose one(1) _PATH_ on which is the binary of gprconfig that "I Want"
 1.1.2.7.2)	tag "gprconfig_path="	separator ? don't exist =]
 		eg:	"make configure gprconfig_path=/usr/bin "
 		known values: I admit! I don't known... Because this I will rely in You Brave and Brighter Developer. Thank's :-)
-		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
+		default value: first path from command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.8) how choose one(1) _PATH_ on which is the binary of gprbuild that "I Want"
 1.1.2.8.2)	tag "gprbuild_path="	separator ? don't exist =]
 		eg:	"make configure gprbuild_path=/usr/bin "
 		know values: I don't known =]
-		default value: first command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
+		default value: first path from command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.9) how choose the type or type(s) of lib, about presence of debug information, "I Want"
 1.1.2.8.2)	tag "with_debug_too="	separator? don't exist :-)
