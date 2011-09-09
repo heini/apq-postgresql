@@ -1,10 +1,14 @@
-	Revision 1.0
-	Obs.: The new Build-System are _in _construction process_. not all targets exist now.
+	Revision 1.2
+
+	Authors: "Daniel Norte de Moraes" <danielcheagle@gmail.com> and
+	Authors: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+				
+	Obs.: The new Build-System are _in _construction process_. 
 	All options 'names' are in lowercase. Options 'values' are lowercase or is at your will ;-)
 but remember , now days, most systems are 'case sensitive'
 	And a prominente warning: how a _Developer_ don't use "spaces" in names et all ;-) _you_ will be 
 more happy if you follow this advice. :-)
-	Well, I opted by use most names and values self descriptives. most times the "plural" names 
+	Well, We opted by use most names and values self descriptives. most times the "plural" names 
 accept more que one value simultaneously and "singular" names accept
 just one value simultaneously.	
 	And for now, while building "The Build System", It is 'fairly quiet' about
@@ -97,7 +101,7 @@ doesn't matter. Enjoy! =]
 		default value: first path from command automatically discover (searching first in "add_compiler_paths" and after in "PATH") OR /usr/bin
 
 1.1.2.9) how choose the type or type(s) of lib, about presence of debug information, "I Want"
-1.1.2.8.2)	tag "with_debug_too="	separator? don't exist :-)
+1.1.2.8.2)	tag "build_with_debug_too="	separator? don't exist :-)
 		eg:	"make configure with_debug_too=yes "
 		known values: no,yes,onlydebug
 		default value: no
@@ -163,6 +167,18 @@ doesn't matter. Enjoy! =]
 2) mixing all things ( example real usage)
 
 2.1) example Basic use:
-make configure oses=linux 
+2.1.1) First add path where is apq.gpr in your ADA_PROJECT_PATH var. in my system the path
+		is /usr/local/lib/gnat :-)
+ADA_PROJECT_PATH="/usr/local/lib/gnat:$ADA_PROJECT_PATH"
+export ADA_PROJECT_PATH
+make configure oses=linux lib_build_types=static,dynamic  with_debug_too=yes
+--> ok.
+make compile oses=linux
+--> ok.
+make install oses=linux prefix=/usr/local
+--> ok.
+
+and read the inline text in installed apq-postgresql.gpr for a explanation how use in your program projects
+
 
 
