@@ -314,7 +314,7 @@ _compile(){
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.03
+#: version	: 1.04
 #: Description: If possible, compile will compile with gprbuild,
 #: Description:   libs already configured's by configure.
 #: Description: You don't need run this script manually.
@@ -347,7 +347,7 @@ _compile(){
 	if [ ! -d "$made_dirs" ]; then
 		{	printf ' "build" dir '
 			printf "don't exist or don't is a directory."
-			printf "\n not ok. \n"
+			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
@@ -558,7 +558,7 @@ _compile(){
 	else
 		{	printf " Nothing to compile. \n"
 			printf " Maybe 'oses' not yet (or erroneously) configured ? "
-			printf " Not ok. \n"
+			printf "\n\n Not ok. \n\n"
 		}>>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
