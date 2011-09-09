@@ -160,18 +160,29 @@ _configure(){
 #:		"system_libs_path1:system_libs_pathn"  "ssl_include_paths" "pg_config_path"  \
 #:		"gprconfig_path"  "gprbuild_path"  "with_debug_too"
 
+local my_atual_dir=$(pwd)
+
+# Silent Reporting, because apq_postgresql_error.log or  don't exist or don't is a regular file or is a link
+if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+	exit 1
+fi
+
 if [ $# -ne 9 ]; then
-	printf 'not ok. You dont need use it by hand. read INSTALL for more info and direction.' ; printf "\n" ;
-	printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "build_with_debug_too" ' ; printf "\n" ;
+	{	printf 'not ok. You dont need use it by hand. read INSTALL for more info and direction.'
+		printf "\n"
+		printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "build_with_debug_too" '
+		printf "\n"
+	}>"$my_atual_dir/apq_postgresql_error.log"
 	
 	exit 1
 fi;
+# remove old content from apq_postgresql_error.log
+printf "" > "$my_atual_dir/apq_postgresql_error.log"
 
 local ifsbackup="$IFS"
 local IFS="$ifsbackup"
 
 local my_version=$(cat version)
-local my_atual_dir=$(pwd)
 local my_oses=$(_choose_so "$1" )
 local my_libtypes=$(_choose_libtype "$2" )
 
@@ -265,28 +276,35 @@ do
 
 			}>"$my_tmp/kov.def"
 
-			cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"
+			cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
 			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
 			printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
 			printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
-			cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
 					
 
-			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/kov.def"
-			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"
+			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/kov.def"  2>>"$my_atual_dir/apq_postgresql_error.log"
+			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"  2>>"$my_atual_dir/apq_postgresql_error.log"
 		
 			IFS=",$ifsbackup"
 
 			for support_dirs in obj lib ali obj_c lib_c ali_c
 			do
-				mkdir -p "$my_tmp"/$support_dirs
+				mkdir -p "$my_tmp"/$support_dirs  2>>"$my_atual_dir/apq_postgresql_error.log"
 			done # support_dirs
 		done # debuga
 	done # libbuildtype
 done # sist_oses
 IFS="$ifsbackup"
-printf "ok. \n"
-exit 0;   # end ;-)
+	#not ok
+	if [ -s  "$my_atual_dir/apq_postgresql_error.log" ]; then
+		printf "\nthere is a chance an error occurred.\nsee the above messages and correct if necessary.\n not ok. \n " >> "$my_atual_dir/apq_postgresql_error.log"
+		exit 1
+	else 
+		#ok
+		printf "\n ok. \n " >> "$my_atual_dir/apq_postgresql_error.log"
+		exit 0;   # end ;-)
+	fi
 
 } #end _configure
 
@@ -300,6 +318,14 @@ _compile(){
 	local IFS="$ifsbackup"
 
 	local my_atual_dir=$(pwd)
+
+	# Silent Reporting, because apq_postgresql_error.log or  don't exist or don't is a regular file or is a link
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+		exit 1
+	fi
+	# remove old content from apq_postgresql_error.log
+	printf "" > "$my_atual_dir/apq_postgresql_error.log"
+
 	local my_path=$( echo $PATH )
 	local my_oses=$(_choose_so "$1" )
 	local my_libtypes=$(_choose_libtype "all" )
@@ -307,8 +333,10 @@ _compile(){
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ ! -d "$made_dirs" ]; then
-		printf 'not ok. "build" dir dont exist or dont is a directory '
-		printf "\n"
+		{	printf ' "build" dir '
+			printf "don't exist or don't is a directory."
+			printf "\n not ok. \n"
+		}>> "$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
 	
@@ -330,8 +358,7 @@ _compile(){
 
 	local erro_msg_gprconfig_part=
 	local erro_msg_gprbuild_part=
-	# remove old content from apq_postgresql_error.log
-	printf "" > "$my_atual_dir/apq_postgresql_error.log"
+
 			
 	for sist_oses in $my_oses
 	do
@@ -462,7 +489,6 @@ _compile(){
 				[ "$madeit2" == "yes" ] && erro_msg_gprconfig_part="debug" || erro_msg_gprconfig_part="normal"
 				printf "gprconfig: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_gprconfig_part\taborting matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
-				# echo "oi"
 				continue
 			fi
 
@@ -471,7 +497,6 @@ _compile(){
 			[ "$madeit2" == "yes" ] && erro_msg_gprbuild_part="debug" || erro_msg_gprbuild_part="normal"
 				printf "gprbuild: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
-				# echo "oi2"
 				continue
 			fi
 			
