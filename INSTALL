@@ -137,14 +137,14 @@ doesn't matter. Enjoy! =]
 
 1.3.3) where it will install
 1.3.3.1) src+include /prefix/include/apq-postgresql
-1.3.3.2) .ali	/prefix/lib/os/shared/ali
-				/prefix/lib/os/shared/debug/ali
-				/prefix/lib/os/static/ali
-				/prefix/lib/os/static/debug/ali
-1.3.3.3) .so	/prefix/lib/os/shared
-				/prefix/lib/os/shared/debug
-1.3.3.4) .a		/prefix/lib/os/static
-				/prefix/lib/os/static/debug
+1.3.3.2) .ali	/prefix/lib/apq-postgresql/os/shared/ali
+				/prefix/lib/apq-postgresql/os/shared/debug/ali
+				/prefix/lib/apq-postgresql/os/static/ali
+				/prefix/lib/apq-postgresql/os/static/debug/ali
+1.3.3.3) .so	/prefix/lib/apq-postgresql/os/shared
+				/prefix/lib/apq-postgresql/os/shared/debug
+1.3.3.4) .a		/prefix/lib/apq-postgresql/os/static
+				/prefix/lib/apq-postgresql/os/static/debug
 1.3.3.5) .gpr	/prefix/lib/gnat
 
 1.4) target clean

@@ -114,20 +114,20 @@ project Apq.postgresql is
 	   when "yes" =>
 		   case static_or_dynamic is
 				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/" & Os & "/shared/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/shared/debug/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/apq-postgresql/" & Os & "/shared/debug/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/apq-postgresql/" & Os & "/shared/debug/ali/" ;
 				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/" & Os & "/static/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/static/debug/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/apq-postgresql/" & Os & "/static/debug/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/apq-postgresql/" & Os & "/static/debug/ali/" ;
 		   end case;
 	   when "no"  =>
 		   case static_or_dynamic is
 				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/" & Os & "/shared/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/shared/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/apq-postgresql/" & Os & "/shared/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/apq-postgresql/" & Os & "/shared/ali/" ;
 				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/" & Os & "/static/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/static/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/apq-postgresql/" & Os & "/static/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/apq-postgresql/" & Os & "/static/ali/" ;
 		   end case;
    end case;
 
