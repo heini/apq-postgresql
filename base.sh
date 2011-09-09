@@ -511,8 +511,6 @@ _installe(){
 	do
 		my_tmp2="$made_dirs"/$sist_oses
 
-		[ $my_count -ge 2 ] && break
-
 		[ ! -d "$my_tmp2" ] && continue
 		
 		for libbuildtype in $my_libtypes
@@ -529,11 +527,11 @@ _installe(){
 				[ ! -d "$my_tmp4" ] && continue
 				[ "$debuga" = "normal" ] && my_tmp5="" || my_tmp5="$debuga"
 				
-				install -d "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
+				install -d "$my_prefix/lib/$my_oses/$my_tmp6/$my_tmp5/ali"
 
-				install -m0555 "$my_tmp4"/ali/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/ali"
-				install "$my_tmp4"/lib/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
-				install "$my_tmp4"/lib_c/* -t "$my_prefix/lib/$my_tmp6/$my_tmp5/"
+				install -m0555 "$my_tmp4"/ali/* -t "$my_prefix/lib/$my_oses/$my_tmp6/$my_tmp5/ali"
+				install "$my_tmp4"/lib/* -t "$my_prefix/lib/$my_oses/$my_tmp6/$my_tmp5/"
+				install "$my_tmp4"/lib_c/* -t "$my_prefix/lib/$my_oses/$my_tmp6/$my_tmp5/"
 
 				my_count=$(( $my_count + 1 ))
 

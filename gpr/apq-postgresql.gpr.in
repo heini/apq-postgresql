@@ -2,8 +2,10 @@
 ---- tested in Debian Sid, Gcc 4.6 , gnat 4.6 , gprbuild 2011-1 :-)
 ----
 ---- this project file permit "simultaneously" :
----- choose compile with (static or shared) and ( normal or debug) and (system operations)  libs
----- Cross-Compiling too ;-) enjoy! :-)
+---- choose compile with (static or shared) and ( normal or debug) and (system operations)  libs.
+--
+-- this permit cross-compiling too :-)
+---- 
 
 ----    IMPORTANT!!!  You Can hit and compile you program just passing for your
 --			program project file these three(3) environment variables:
@@ -21,6 +23,8 @@
 ----                   You will need however, in system specific manner,  a way for
 ----                    your program using the libs "as being run/executing" locate the libs for him :-)
 ----                   We just (just? ;-) take care of _compilation_ :-)
+----       p.s.: You can use gnat-gps. gnat-gps will permit you choose in a Gui , the enviroment variables on-the-fly :-)
+----  Enjoy!!! :-)
 
 with "apq.gpr"; -- You can need set ADA_PROJECT_PATH
 
@@ -110,20 +114,20 @@ project Apq.postgresql is
 	   when "yes" =>
 		   case static_or_dynamic is
 				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/shared/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/shared/debug/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/" & Os & "/shared/debug/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/shared/debug/ali/" ;
 				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/static/debug/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/static/debug/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/" & Os & "/static/debug/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/static/debug/ali/" ;
 		   end case;
 	   when "no"  =>
 		   case static_or_dynamic is
 				when "dynamic" | "relocatable" =>
-					for Library_Dir use "" & prefix & "/lib/shared/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/shared/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/" & Os & "/shared/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/shared/ali/" ;
 				when "static" =>
-					for Library_Dir use "" & prefix & "/lib/static/"  ;
-					for Library_ALI_Dir use  "" & prefix & "/lib/static/ali/" ;
+					for Library_Dir use "" & prefix & "/lib/" & Os & "/static/"  ;
+					for Library_ALI_Dir use  "" & prefix & "/lib/" & Os & "/static/ali/" ;
 		   end case;
    end case;
 
