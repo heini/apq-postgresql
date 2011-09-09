@@ -485,8 +485,10 @@ _compile(){
 			aab="line10_${my_count2}"
 			madeit10=${!aab}
 
+			my_hold_tmp1="$madeit2"
+
 			if [ "$madeit2" = "normal" ];
-			then 
+			then
 				madeit2="no"; 
 			else
 				madeit2="yes";
@@ -494,10 +496,12 @@ _compile(){
 
 			pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/pg_config_error.log" )
 			if [ -s  "$madeit1/pg_config_error.log" ]; then
-				[ "$madeit2" == "yes" ] && erro_msg_pg_config_part="debug" || erro_msg_pg_config_part="normal"
-				printf "pg_config: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_pg_config_part\taborting matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
+				erro_msg_pg_config_part="$my_hold_tmp1"
+				printf "pg_config:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_pg_config_part\t:Aborting matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
+			else
+				printf "pg_config:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
@@ -506,18 +510,22 @@ _compile(){
 			# 
 			$( PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr > ./gprconfig.log 2> ./gprconfig_error.log )
 			if [ -s  "$madeit1/gprconfig_error.log" ]; then
-				[ "$madeit2" == "yes" ] && erro_msg_gprconfig_part="debug" || erro_msg_gprconfig_part="normal"
-				printf "gprconfig: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_gprconfig_part\taborting matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
+				erro_msg_gprconfig_part="$my_hold_tmp1"
+				printf "gprconfig:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprconfig_part\t:Aborting matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
+			else
+				printf "gprconfig:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 
 			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 > ./gprbuild.log  2> ./gprbuild_error.log )
 			if [ -s  "$madeit1/gprbuild_error.log" ]; then
-			[ "$madeit2" == "yes" ] && erro_msg_gprbuild_part="debug" || erro_msg_gprbuild_part="normal"
-				printf "gprbuild: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
+				erro_msg_gprbuild_part="$my_hold_tmp1"
+				printf " gprbuild:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
+			else
+				printf " gprbuild:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Ok\n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			
 			my_count2=$(( $my_count2 + 1 ))
@@ -525,16 +533,19 @@ _compile(){
 
 		done
 		# ok
-		if [ -z "$erro_msg_gprconfig_part" ] && [ -z "$erro_msg_gprbuild_part" ]; then
+		if [ -z "$erro_msg_gprconfig_part" ] && [ -z "$erro_msg_gprbuild_part" ] && [ -z "$erro_msg_pg_config_part" ]; then
 			printf "\n ok. \n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			exit 0
 		else
 		# not ok
+			if [ -n "$erro_msg_pg_config_part" ]; then
+				printf "pg_config error log: verify matched pg_config_error.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+			fi
 			if [ -n "$erro_msg_gprconfig_part" ]; then
-				printf "gprconfig error log: verify gprconfig_error.log and gprconfig.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+				printf "gprconfig error log: verify matched's gprconfig_error.log and gprconfig.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			if [ -n "$erro_msg_gprbuild_part" ]; then
-				printf "gprbuild error log: verify gprbuild_error.log and gprbuild.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+				printf "gprbuild error log: verify matched's gprbuild_error.log and gprbuild.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			if [ "$my_count3" -ge 1 ]; then
 				printf "\n not ok. but one or more things worked\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
