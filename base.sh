@@ -3,7 +3,7 @@
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.0
+#: version	: 1.2
 #: Description: base scripts and functions for configuring,compiling and installing.
 #: Description: You don't need run this script manually.
 #: Description: For It use makefile targets. See INSTALL file.
@@ -153,7 +153,7 @@ _configure(){
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.01
+#: version	: 1.03
 #: Description: made configuration for posterior compiling by gprbuild.
 #: Description: You don't need run this script manually.
 #: Options	:  "OSes" "libtypes,libtypes_n" "compiler_path1:compiler_pathn"  \
@@ -229,7 +229,8 @@ do
 	madeit=" lib_system$at_count=\"-L$alibdirsystem\"  "
 	eval $madeit
 	at_count=$(( $at_count + 1 ))
-	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem" ; 
+	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem"
+
 done
 IFS=",$ifsbackup"
 
@@ -309,22 +310,33 @@ IFS="$ifsbackup"
 } #end _configure
 
 _compile(){
-	if [ $# -ne 1 ]; then
-		printf 'not ok. compile "OSes" '
-		printf "\n"
-		exit 1
-	fi
-	local ifsbackup="$IFS"
-	local IFS="$ifsbackup"
+#: title	: compile
+#: date		: 2011-jul-09
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.03
+#: Description: If possible, compile will compile with gprbuild,
+#: Description:   libs already configured's by configure.
+#: Description: You don't need run this script manually.
+#: Options	:  "OSes"
 
 	local my_atual_dir=$(pwd)
-
-	# Silent Reporting, because apq_postgresql_error.log or  don't exist or don't is a regular file or is a link
+	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
 	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
 		exit 1
 	fi
 	# remove old content from apq_postgresql_error.log
 	printf "" > "$my_atual_dir/apq_postgresql_error.log"
+
+	if [ $# -ne 1 ]; then
+		{	printf 'usage: compile "OSes" '
+			printf "\n\n not ok. \n"
+		}>"$my_atual_dir/apq_postgresql_error.log"
+		exit 1
+	fi
+	local ifsbackup="$IFS"
+	local IFS="$ifsbackup"
+	
 
 	local my_path=$( echo $PATH )
 	local my_oses=$(_choose_so "$1" )
@@ -358,6 +370,7 @@ _compile(){
 
 	local erro_msg_gprconfig_part=
 	local erro_msg_gprbuild_part=
+	local erro_msg_pg_config_part=
 
 			
 	for sist_oses in $my_oses
@@ -478,8 +491,15 @@ _compile(){
 			else
 				madeit2="yes";
 			fi
-			pq_include=$( "$madeit8"/pg_config --includedir )
-			
+
+			pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/pg_config_error.log" )
+			if [ -s  "$madeit1/pg_config_error.log" ]; then
+				[ "$madeit2" == "yes" ] && erro_msg_pg_config_part="debug" || erro_msg_pg_config_part="normal"
+				printf "pg_config: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_pg_config_part\taborting matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
+				my_count2=$(( $my_count2 + 1 ))
+				continue
+			fi
+
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
 			# using gnat and gprbuild from toolchain Act-San :-)
 			# and with PATH="$madeit5:$my_path" ( now the default behavior) I made preference for your compiler, in your specified add_compiler_paths
