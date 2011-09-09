@@ -466,7 +466,7 @@ _compile(){
 				continue
 			fi
 
-			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild2 -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 > ./gprbuild.log  2> ./gprbuild_error.log )
+			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 > ./gprbuild.log  2> ./gprbuild_error.log )
 			if [ -s  "$madeit1/gprbuild_error.log" ]; then
 			[ "$madeit2" == "yes" ] && erro_msg_gprbuild_part="debug" || erro_msg_gprbuild_part="normal"
 				printf "gprbuild: not ok: lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
