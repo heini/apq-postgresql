@@ -137,7 +137,7 @@ doesn't matter. Enjoy! =]
 		default value: /usr/local
 
 1.3.3) where it will install
-1.3.3.1) src+include /prefix/include
+1.3.3.1) src+include /prefix/include/apq-postgresql
 1.3.3.2) .ali	/prefix/lib/shared/ali
 				/prefix/lib/shared/debug/ali
 				/prefix/lib/static/ali
@@ -163,6 +163,7 @@ doesn't matter. Enjoy! =]
 
 2) mixing all things ( example real usage)
 
- "for be done" :-)
+2.1) example Basic use:
+make configure oses=linux 
 
 

@@ -1,30 +1,28 @@
 ---- author Daniel Norte de Moraes <danielcheagle@gmail.com>
----- tested in Debian Sid, Gcc 4.6 , gnat 4.4.6 , gprbuild 1.3.0-2 :-)
+---- tested in Debian Sid, Gcc 4.6 , gnat 4.6 , gprbuild 2011-1 :-)
 ----
----- this Building System permit "simultaneously" (if you want) :
----- Make static and shared libs
+---- this project file permit "simultaneously" :
+---- choose compile with (static or shared) and ( normal or debug) and (system operations)  libs
 ---- Cross-Compiling too ;-) enjoy! :-)
----- obs.: the  MakeFile permit you choose the correct libs for _each_ library you type make ! :-)
----- obs.: "make system_libs_patsh=<path_value>" can be used for it. (e.g cross-compiling
-----       or just change the base lib , in per compiling base. For The Braves and Sagacious ^_^!!!
 
----- 	IMPORTANT!!!  You NEED INSTALL the gpr/apq-postgresql.gpr
-----                   and apq_postgresql_version in ONE(1) local Only if you want access all
-----                   compileds libs. the build system take care for you where are all them ;-)
-----                   just hit " make --PREFIX_GLOBAL_GPR=<path_value> install " ;
-----                  obs.: you 'can' alter --prefix_global_gpr if wou want :-)
-----                  obs.: BUT ONLY the 'last' install contains 'last' 'tracking' these libs files ;-)
-
-----    IMPORTANT!!!  You Can hit make and make install  any time you want. the build system e the global_gpr take
-----                   care for you where are the libs.
-----                   You will need however, in system specific manner, that
+----    IMPORTANT!!!  You Can hit and compile you program just passing for your
+--			program project file these three(3) environment variables:
+--			 "Static_Or_Dynamic" , "Os" and "Debug_information". this is made
+--			 by the "-Xvariable=value" (without double quotes)
+--			eg: if your program import apq-postgresql.gpr in your my_program.gpr made 
+--
+--			gnatmake -Pmy_program.gpr -Xstatic_or_dynamic=dynamic -XOs=mswindows -Xdebug_information=yes
+--
+--			to compile your program with lib shared+debug+mswindows. if the combination 
+--			don't exist, usually the compiler/linker will hit
+--			a error message. these combination was determined by the time the libs was compiled and installed.
+--			of course you can use "gprbuil" instead og gnatmake :-)
+--		    the gpr file will take  care for you where are the libs.
+----                   You will need however, in system specific manner,  a way for
 ----                    your program using the libs "as being run/executing" locate the libs for him :-)
 ----                   We just (just? ;-) take care of _compilation_ :-)
-----
-----
 
-with "apq.gpr"; -- You can need set ADA_PROJECT_PATH :-)
-
+with "apq.gpr"; -- You can need set ADA_PROJECT_PATH
 
 project Apq.postgresql is
    -----------------------
@@ -105,70 +103,8 @@ project Apq.postgresql is
 		  null;
    end case; -- end Debug_information
 
-   sufix1 := "";
-   sufix2 := "";
-   export_dynamic := "--export-dynamic";
-   case static_or_dynamic is
-      when "dynamic" | "relocatable" =>
-         case os is
-            when "other" =>
-               sufix1 := "so.";
-               sufix2 := "";
-               export_dynamic := "--export-dynamic";
-            when "mswindows" =>
-               sufix1 := "so.";
-               sufix2 := ".dll";
-               export_dynamic := "--export-dynamic";
-            when "linux" =>
-               sufix1 := "so.";
-               sufix2 := "";
-               export_dynamic := "--export-dynamic";
-            when "darwin" => -- fix it ;-)
-               sufix1 := "so.";
-               sufix2 := ".lib";
-               export_dynamic := "--export-dynamic";
-            when "bsd" =>  -- just a stub here :-)
-               sufix1 := "so.";
-               sufix2 := ".idx";
-               export_dynamic := "--export-dynamic";
-            when others =>
-               sufix1 := "so.";
-               sufix2 := "";
-               export_dynamic := "";  -- fix it ;-)
-         end case;
-      when "static" =>
-         case os is
-            when "other" =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-            when "mswindows" =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-            when "linux" =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-            when "darwin" =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-            when "bsd" =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-            when others =>
-               sufix1 := "static.";
-               sufix2 := "";
-               export_dynamic := "";
-         end case;
-      when others =>
-		  null;
-   end case;
-
    for Languages use ("Ada");
-   for Source_Dirs use () & ( prefix & "/include" ) ;
+   for Source_Dirs use () & ( prefix & "/include/apq-postgresql" ) ;
    for Library_Name use "apq-postgresql" ;
    case debug_information is
 	   when "yes" =>
