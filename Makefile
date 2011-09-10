@@ -105,7 +105,8 @@ clean:
 	@cat  "$(atual_dir)/apq_postgresql_error.log"
 
 distclean:
-	@echo $(shell "$(atual_dir)/base.sh" "distclean" )
+	@echo $(shell "$(atual_dir)/base.sh" "distclean" ) > /dev/null
+	@cat "$(atual_dir)/apq_postgresql_error.log"
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done

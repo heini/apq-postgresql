@@ -100,7 +100,7 @@ _choose_debug(){
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
 #: version	: 1.0
-#: Description: choose the type of lib, related about debug information
+#: Description: choose the type of lib, related about debug information.
 #: Options	:  "with_debug_too"
 
 local _with_debug_too=$1
@@ -127,7 +127,7 @@ _discover_acmd_path(){
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
 #: version	: 1.0
-#: Description:  Discover automatically a _PATH_ for a command OR use a default
+#: Description:  Discover automatically a _PATH_ for a command OR use a default.
 #: Options	: "cmd" "add_these_path(s)" "or_default_path"
 # need more sanitization
 #
@@ -168,7 +168,8 @@ if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq
 fi
 
 if [ $# -ne 9 ]; then
-	{	printf 'not ok. You dont need use it by hand. read INSTALL for more info and direction.'
+	{	printf "\n"
+		printf 'not ok. You dont need use it by hand. read INSTALL for more info and direction.'
 		printf "\n"
 		printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "build_with_debug_too" '
 		printf "\n"
@@ -329,7 +330,8 @@ _compile(){
 	printf "" > "$my_atual_dir/apq_postgresql_error.log"
 
 	if [ $# -ne 1 ]; then
-		{	printf 'usage: compile "OSes" '
+		{	printf "\n"
+			printf 'usage: compile "OSes" '
 			printf "\n\n not ok. \n"
 		}>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
@@ -345,7 +347,8 @@ _compile(){
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ ! -d "$made_dirs" ]; then
-		{	printf ' "build" dir '
+		{	printf "\n"
+			printf ' "build" dir '
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
@@ -573,8 +576,7 @@ _installe(){
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
 #: version	: 1.04
-#: Description: If possible, compile will compile with gprbuild,
-#: Description:   libs already configured's by configure.
+#: Description: If possible, install libs and includes from os(es) in prefix,
 #: Description: You don't need run this script manually.
 #: Options	:  "OSes" "prefix"
 
@@ -587,7 +589,8 @@ _installe(){
 	printf "" > "$my_atual_dir/apq_postgresql_error.log"
 
 	if [ $# -ne 2 ]; then
-		{	printf 'usage: installe "OSes" "prefix" '
+		{	printf "\n"
+			printf 'usage: installe "OSes" "prefix" '
 			printf "\n\n not ok. \n"
 		}>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
@@ -604,7 +607,8 @@ _installe(){
 	local my_prefix=$2
 
 	if [ ! -d "$made_dirs" ]; then
-		{	printf ' "build" dir '
+		{	printf "\n"
+			printf ' "build" dir '
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
@@ -747,8 +751,7 @@ _clean(){
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
 #: version	: 1.04
-#: Description: If possible, compile will compile with gprbuild,
-#: Description:   libs already configured's by configure.
+#: Description: If possible, clean temporary files.
 #: Description: You don't need run this script manually.
 #: Options	:  none
 
@@ -766,7 +769,8 @@ _clean(){
 	local made_dirs="$my_atual_dir/build"
 	local my_count=1
 	if [ ! -d "$made_dirs" ]; then
-		{	printf ' "build" dir '
+		{	printf "\n"
+			printf ' "build" dir '
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
@@ -824,14 +828,34 @@ _clean(){
 } #end _clean
 
 _distclean(){
-	local my_atual_dir=$(pwd)	
-	local made_dirs="$my_atual_dir/build"
-	if [ ! -d "$made_dirs" ]; then
-		printf 'not ok. "build" dir dont exist or dont is a directory '
-		printf "\n"
+#: title	: distclean
+#: date		: 2011-jul-09
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.04
+#: Description: Deleta all temporary and cached organization and configuration files;
+#: Description:   for that, just delete temporary dir "build"
+#: Description: You don't need run this script manually.
+#: Options	:  none
+
+	local my_atual_dir=$(pwd)
+	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
 		exit 1
 	fi
-	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf && printf "ok"; exit 0 || printf "not ok"; exit 1
+	# remove old content from apq_postgresql_error.log
+	printf "" > "$my_atual_dir/apq_postgresql_error.log"
+	
+	local made_dirs="$my_atual_dir/build"
+	if [ ! -d "$made_dirs" ]; then
+		{	printf "\n"
+			printf ' "build" dir '
+			printf "don't exist or don't is a directory."
+			printf "\n\n not ok. \n\n"
+		}>> "$my_atual_dir/apq_postgresql_error.log"
+		exit 1
+	fi
+	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf && printf "\n\n ok \n\n" >> "$my_atual_dir/apq_postgresql_error.log"; exit 0 || printf "\n\n not ok \n\n">> "$my_atual_dir/apq_postgresql_error.log"; exit 1
 
 } #end _distclean
 
