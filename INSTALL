@@ -11,8 +11,6 @@ more happy if you follow this advice. :-)
 	Well, We opted by use most names and values self descriptives. most times the "plural" names 
 accept more que one value simultaneously and "singular" names accept
 just one value simultaneously.	
-	For now, only distclean target remain more silent about success and failures. :-) 
-remenber that is "just for now". :-)
 
 1) makefile targets
 1.1) configure
