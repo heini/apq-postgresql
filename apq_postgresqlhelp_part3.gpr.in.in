@@ -140,8 +140,4 @@
       for Default_Switches ("C") use ("-O2"  ) & Debug_option_list_builder ;
    end Builder;
 
-
-
-
-
 end apq_postgresqlhelp;

@@ -243,7 +243,7 @@ do
 		for debuga in $my_with_debug_too
 		do
 			my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
-			mkdir -p "$my_tmp"
+			mkdir -p "$my_tmp/logged"
 
 			IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
@@ -254,7 +254,7 @@ do
 				printf	"$my_gprbuild_path  \n"
 				printf	"${my_pg_config_path}  \n"
 				printf	"${my_system_libs_paths}  \n"
-			}>"$my_tmp/kov.log"
+			}>"$my_tmp/logged/kov.log"
 
 			local madeit3=
 			local at_count_tmp=
@@ -275,16 +275,16 @@ do
 				done ;
 				printf "\n"
 
-			}>"$my_tmp/kov.def"
+			}>"$my_tmp/logged/kov.def"
 
 			cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
-			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
-			printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
-			printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in" ;
+			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
 			cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
 					
 
-			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/kov.def"  2>>"$my_atual_dir/apq_postgresql_error.log"
+			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/logged/kov.def"  2>>"$my_atual_dir/apq_postgresql_error.log"
 			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"  2>>"$my_atual_dir/apq_postgresql_error.log"
 		
 			IFS=",$ifsbackup"
@@ -381,8 +381,8 @@ _compile(){
 			do
 				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
 				
-				if [ -f "$my_tmp/kov.log" ] && \
-					[ $(wc -l < "$my_tmp/kov.log" ) -ge 6 ] && \
+				if [ -f "$my_tmp/logged/kov.log" ] && \
+					[ $(wc -l < "$my_tmp/logged/kov.log" ) -ge 6 ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
@@ -398,7 +398,7 @@ _compile(){
 						read line7_gprbuild_path
 						read line8_pg_config_path
 						read line10_my_system_libs_paths
-					}<"$my_tmp/kov.log"
+					}<"$my_tmp/logged/kov.log"
 
 					if	[ -n "$line2_debuga" ] &&  [ -n "$line3_libtype" ] &&  [ -n "$line4_os" ] && \
 						[ -n "$line5_compile_paths" ] &&  [ -n "$line6_gprconfig_path" ] &&  [ -n "$line7_gprbuild_path" ] && \
@@ -494,8 +494,8 @@ _compile(){
 				madeit2="yes";
 			fi
 
-			pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/pg_config_error.log" )
-			if [ -s  "$madeit1/pg_config_error.log" ]; then
+			pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/logged/pg_config_error.log" )
+			if [ -s  "$madeit1/logged/pg_config_error.log" ]; then
 				erro_msg_pg_config_part="$my_hold_tmp1"
 				printf "pg_config:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_pg_config_part\t:Aborting matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
@@ -508,8 +508,8 @@ _compile(){
 			# using gnat and gprbuild from toolchain Act-San :-)
 			# and with PATH="$madeit5:$my_path" ( now the default behavior) I made preference for your compiler, in your specified add_compiler_paths
 			# 
-			$( PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr > ./gprconfig.log 2> ./gprconfig_error.log )
-			if [ -s  "$madeit1/gprconfig_error.log" ]; then
+			$( PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr > ./logged/gprconfig.log 2> ./logged/gprconfig_error.log )
+			if [ -s  "$madeit1/logged/gprconfig_error.log" ]; then
 				erro_msg_gprconfig_part="$my_hold_tmp1"
 				printf "gprconfig:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprconfig_part\t:Aborting matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
@@ -518,8 +518,8 @@ _compile(){
 				printf "gprconfig:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 
-			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 > ./gprbuild.log  2> ./gprbuild_error.log )
-			if [ -s  "$madeit1/gprbuild_error.log" ]; then
+			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >"./logged/gprbuild.log"  2>"./logged/gprbuild_error.log" )
+			if [ -s  "$madeit1/logged/gprbuild_error.log" ]; then
 				erro_msg_gprbuild_part="$my_hold_tmp1"
 				printf " gprbuild:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
@@ -539,13 +539,13 @@ _compile(){
 		else
 		# not ok
 			if [ -n "$erro_msg_pg_config_part" ]; then
-				printf "pg_config error log: verify matched pg_config_error.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+				printf "pg_config error log: verify matched pg_config_error.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			if [ -n "$erro_msg_gprconfig_part" ]; then
-				printf "gprconfig error log: verify matched's gprconfig_error.log and gprconfig.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+				printf "gprconfig error log: verify matched's gprconfig_error.log and gprconfig.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			if [ -n "$erro_msg_gprbuild_part" ]; then
-				printf "gprbuild error log: verify matched's gprbuild_error.log and gprbuild.log\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+				printf "gprbuild error log: verify matched's gprbuild_error.log and gprbuild.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			if [ "$my_count3" -ge 1 ]; then
 				printf "\n not ok. but one or more things worked\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
@@ -568,15 +568,33 @@ _compile(){
 
 
 _installe(){
+#: title	: installe
+#: date		: 2011-jul-09
+#: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
+#: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
+#: version	: 1.04
+#: Description: If possible, compile will compile with gprbuild,
+#: Description:   libs already configured's by configure.
+#: Description: You don't need run this script manually.
+#: Options	:  "OSes" "prefix"
+
+	local my_atual_dir=$(pwd)
+	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+		exit 1
+	fi
+	# remove old content from apq_postgresql_error.log
+	printf "" > "$my_atual_dir/apq_postgresql_error.log"
+
 	if [ $# -ne 2 ]; then
-		printf 'not ok. compile "OSes" "prefix" '
-		printf "\n"
+		{	printf 'usage: installe "OSes" "prefix" '
+			printf "\n\n not ok. \n"
+		}>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
 	local ifsbackup="$IFS"
 	local IFS="$ifsbackup"
 
-	local my_atual_dir=$(pwd)
 	local my_path=$( echo $PATH )
 	local my_oses=$(_choose_so "$1" )
 	local my_libtypes=$(_choose_libtype "all" )
@@ -586,8 +604,10 @@ _installe(){
 	local my_prefix=$2
 
 	if [ ! -d "$made_dirs" ]; then
-		printf 'not ok. "build" dir dont exist or dont is a directory '
-		printf "\n"
+		{	printf ' "build" dir '
+			printf "don't exist or don't is a directory."
+			printf "\n\n not ok. \n\n"
+		}>> "$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
 	
