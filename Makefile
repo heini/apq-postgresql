@@ -97,10 +97,12 @@ configure:
 	@cat "$(atual_dir)/apq_postgresql_error.log"
 
 install:
-	@echo $(shell "$(atual_dir)/base.sh" "install" "$(oses)" "$(prefix)" )
+	@echo $(shell "$(atual_dir)/base.sh" "install" "$(oses)" "$(prefix)" ) > /dev/null
+	@cat "$(atual_dir)/apq_postgresql_error.log"
 
 clean:
-	@echo $(shell "$(atual_dir)/base.sh" "clean" )
+	@echo $(shell "$(atual_dir)/base.sh" "clean" ) > /dev/null
+	@cat  "$(atual_dir)/apq_postgresql_error.log"
 
 distclean:
 	@echo $(shell "$(atual_dir)/base.sh" "distclean" )
