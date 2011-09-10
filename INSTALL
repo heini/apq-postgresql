@@ -1,4 +1,4 @@
-	Revision 1.2
+	Revision 1.3
 
 	Authors: "Daniel Norte de Moraes" <danielcheagle@gmail.com> and
 	Authors: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
@@ -11,8 +11,8 @@ more happy if you follow this advice. :-)
 	Well, We opted by use most names and values self descriptives. most times the "plural" names 
 accept more que one value simultaneously and "singular" names accept
 just one value simultaneously.	
-	And for now, while building "The Build System", It is 'fairly quiet' about
-	successes and failures. but this is only for now :-). keep it in mind. :-)
+	For now, only distclean target remain more silent about success and failures. :-) 
+remenber that is "just for now". :-)
 
 1) makefile targets
 1.1) configure
@@ -191,9 +191,38 @@ doesn't matter. Enjoy! =]
  --> ok.
  --> 
  make install oses=linux prefix=/usr/local
---> ok.
+ --> install:	Ok	:static	linux	normal	:Created directory! 
+ --> install ali:	Ok	:static	linux	normal	:Installed .ali files! 
+ --> install lib:	Ok	:static	linux	normal	:Installed lib files! 
+ --> install lib_c:	Ok	:static	linux	normal	:Installed 'c/c++' counterpart lib files! 
+ --> install:	Ok	:static	linux	debug	:Created directory! 
+ --> install ali:	Ok	:static	linux	debug	:Installed .ali files! 
+ --> install lib:	Ok	:static	linux	debug	:Installed lib files! 
+ --> install lib_c:	Ok	:static	linux	debug	:Installed 'c/c++' counterpart lib files! 
+ --> install:	Ok	:dynamic	linux	normal	:Created directory! 
+ --> install ali:	Ok	:dynamic	linux	normal	:Installed .ali files! 
+ --> install lib:	Ok	:dynamic	linux	normal	:Installed lib files! 
+ --> install lib_c:	Ok	:dynamic	linux	normal	:Installed 'c/c++' counterpart lib files! 
+ --> install:	Ok	:dynamic	linux	debug	:Created directory! 
+ --> install ali:	Ok	:dynamic	linux	debug	:Installed .ali files! 
+ --> install lib:	Ok	:dynamic	linux	debug	:Installed lib files! 
+ --> install lib_c:	Ok	:dynamic	linux	debug	:Installed 'c/c++' counterpart lib files! 
+ --> install includes:	Ok	:Created directory! 
+ --> install includes:	Ok	:Installed includes! 
+ --> install gpr(s):	Ok	:Created directory! 
+ --> install gpr(s):	Ok	:Installed GPR(s)! 
+ --> 
+ --> 
+ -->  Install libs now success finished. 
+ -->  Read the inline text in file /usr/local/lib/gnat/apq-postgresql.gpr 
+ --> for hints and example usage :-)
+ --> 
+ --> ok.
+
 
 and read the inline text in installed apq-postgresql.gpr for a explanation how use in your program projects
 
+2.1) more advance use:
+  "To be Done" :-)
 
 
