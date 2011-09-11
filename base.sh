@@ -265,7 +265,6 @@ do
 			{	printf	"version:=\"$my_version\"  \n"
 				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
 				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
-				printf	"mydummysource:=\"$my_atual_dir/src_dummy/\"  \n"
 				printf	"basedir:=\"$my_atual_dir/build\"  \n"	
 				while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
 				do
@@ -304,7 +303,7 @@ IFS="$ifsbackup"
 		exit 1
 	else 
 		#ok
-		printf "\n ok. \n " >> "$my_atual_dir/apq_postgresql_error.log"
+		printf "\n ok. \n\n" >> "$my_atual_dir/apq_postgresql_error.log"
 		exit 0;   # end ;-)
 	fi
 
@@ -738,7 +737,7 @@ _installe(){
 	else
 		{	printf "nothing was installed. \n"
 			printf "maybe a wrong 'oses' ? or a not already compiled libs for install ? "
-			printf "not ok."
+			printf "not ok.\n\n"
 		}>>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
