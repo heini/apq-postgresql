@@ -133,11 +133,11 @@
    for Externally_Built use "false";
 
    package Compiler is
-      for Default_Switches ("C") use ("-O2" ) & Debug_option_list_compiler ;
+      for Default_Switches ("C") use ("-O2" , "-fPIC") & Debug_option_list_compiler ;
    end Compiler;
 
    package Builder  is
-      for Default_Switches ("C") use ("-O2"  ) & Debug_option_list_builder ;
+      for Default_Switches ("C") use ("-O2" , "-fPIC" ) & Debug_option_list_builder ;
    end Builder;
 
 end apq_postgresqlhelp;
