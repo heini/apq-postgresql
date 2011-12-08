@@ -724,14 +724,15 @@ _installe(){
 		done # libbuildtype
 	done # sist_oses
 	if [ $my_count -ge 2 ]; then
-		install -d "$my_prefix/include/apq-postgresql"  2>"$made_dirs/install_src_error.log"
+		install -d "$my_prefix/include/apq-postgresql/src_c"  2>"$made_dirs/install_src_error.log"
 		if [ -s  "$made_dirs/install_src_error.log" ]; then
 			my_made_install="hi"
 			printf "install includes:\tnot ok\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 		else
 			printf "install includes:\tOk\t:Created directory! \n" >> "$my_atual_dir/apq_postgresql_error.log"
 		fi
-		install "$my_atual_dir"/src/* -t "$my_prefix/include/apq-postgresql"  2>"$made_dirs/install_src_error.log"
+		install "$my_atual_dir/src"/* -t "$my_prefix/include/apq-postgresql"  2>"$made_dirs/install_src_error.log"
+                install "$my_atual_dir/src-c"/* -t "$my_prefix/include/apq-postgresql/src_c"  2>>"$made_dirs/install_src_error.log"
 		if [ -s  "$made_dirs/install_src_error.log" ]; then
 			my_made_install="hi"
 			printf "install includes:\tnot ok\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
@@ -747,7 +748,9 @@ _installe(){
 			printf "install gpr(s):\tOk\t:Created directory! \n" >> "$my_atual_dir/apq_postgresql_error.log"
 		fi
 		gnatprep "-Dprefix=\"$my_prefix\"" "$my_atual_dir"/gpr/apq-postgresql.gpr.in "$my_prefix/lib/gnat"/apq-postgresql.gpr  2>"$made_dirs/install_gpr_error.log"
-		if [ -s  "$made_dirs/install_gpr_error.log" ]; then
+		gnatprep "-Dprefix=\"$my_prefix\"" "$my_atual_dir"/gpr/apq_postgresqlhelp.gpr.in "$my_prefix/lib/gnat"/apq_postgresqlhelp.gpr  2>>"$made_dirs/install_gpr_error.log"
+
+                if [ -s  "$made_dirs/install_gpr_error.log" ]; then
 			my_made_install="hi"
 			printf "install gpr(s):\tnot ok\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 		else
