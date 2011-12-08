@@ -14,6 +14,11 @@
 # New and clean update for the Build System.
 # Added cross-compiling and static and shared simultaneos generation
 #
+# 08 December 2011 10:53:00 GMT-3
+# Build-system: backporting improvements from apq-mysql;
+#  better optimizing (now is time to this :-) and
+#  better error reporting for automate tools.
+#
 #
 # IMPORTANT: for the guys making comercial software,
 #consider altering the parameters of _gprconfig_ if necessary,
@@ -40,6 +45,15 @@
 			system_libs_paths=/usr/source:/usr/local:/lib/got \
 			build_with_debug_too=yes
 
+	OK = $(shell \
+		 oper="" ; \
+		 temporary=$(shell cat ok.log) ; \
+		 case "$$temporary" in \
+		 	( *fal* ) oper="false" ;; \
+			( *tru* ) oper="true" ;; \
+		esac; \
+		echo "$$oper" ; )
+
 ifndef ($(prefix))
 	prefix=/usr/local
 endif
@@ -56,14 +70,14 @@ ifndef ($(build_with_debug_too))	# yes no onlydebug
 	build_with_debug_too:=no
 endif
 
-### add_compiler_paths is considered first when searching automatically for commands; 
+### add_compiler_paths is considered first when searching automatically for commands;
 ### commands gprbuild, pg_config and gprconfig is a example of this behavior :-)
 ifndef ($(add_compiler_paths))
 	add_compiler_paths:=/usr/bin
 endif
 
-ifndef ($(system_libs_paths))		# path1:path2:pathn   
-									# max 10 paths. for paths separator use ; or : 
+ifndef ($(system_libs_paths))		# path1:path2:pathn
+									# max 10 paths. for paths separator use ; or :
 	system_libs_paths:=/usr/lib
 endif
 
@@ -91,22 +105,27 @@ endif
 compile:
 	@echo $(shell "$(atual_dir)/base.sh" "compile" "$(oses)" ) > /dev/nul
 	@cat "$(atual_dir)/apq_postgresql_error.log"
+	@$(OK)
 
 configure:
 	@echo $(shell "$(atual_dir)/base.sh" "configure" "$(oses)" "$(lib_build_types)" "$(add_compiler_paths)" "$(system_libs_paths)" "$(ssl_include_path)" "$(pg_config_path)" "$(gprconfig_path)" "$(gprbuild_path)" "$(build_with_debug_too)" )  > /dev/nul
 	@cat "$(atual_dir)/apq_postgresql_error.log"
+	@$(OK)
 
 install:
 	@echo $(shell "$(atual_dir)/base.sh" "install" "$(oses)" "$(prefix)" ) > /dev/null
 	@cat "$(atual_dir)/apq_postgresql_error.log"
+	@$(OK)
 
 clean:
 	@echo $(shell "$(atual_dir)/base.sh" "clean" ) > /dev/null
 	@cat  "$(atual_dir)/apq_postgresql_error.log"
+	@$(OK)
 
 distclean:
 	@echo $(shell "$(atual_dir)/base.sh" "distclean" ) > /dev/null
 	@cat "$(atual_dir)/apq_postgresql_error.log"
+	@$(OK)
 
 docs:
 	@for docdir in $(DOCS_DIRS); do make -C $$docdir; done

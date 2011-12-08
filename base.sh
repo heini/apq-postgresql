@@ -3,7 +3,7 @@
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.2
+#: version	: 1.2.2
 #: Description: base scripts and functions for configuring,compiling and installing.
 #: Description: You don't need run this script manually.
 #: Description: For It use makefile targets. See INSTALL file.
@@ -13,7 +13,7 @@ if [ $# -eq 0 ]; then
 	exit 1;
 fi;
 
-case ${1,,} in  
+case ${1,,} in
 	"configure" ) my_commande='configuring' ;;
 	"compile" ) my_commande='compilling' ;;
 	"install" ) my_commande='installing' ;;
@@ -45,25 +45,27 @@ _choose_so(){
 #: Description: sanitize list of Systems Operations separated by ","
 #: Options	:  "OSes"
 
-local _oses=$1
-_oses=${_oses:=linux}
-_oses=${_oses,,}
+local IFS="$global_ifs_bk"
+
+local _oses="$1"
+_oses="${_oses:=linux}"
+_oses="${_oses,,}"
 local my_oses=
 local a=
 for a in linux mswindows darwin bsd other
 do
-	case $_oses in
-		*all*) my_oses=linux,mswindows,darwin,bsd,other
+	case "$_oses" in
+		*all*) my_oses="linux,mswindows,darwin,bsd,other"
 			break
 			;;
-		*"$a"*) my_oses=${my_oses:+${my_oses},}$a
+		*"$a"*) my_oses="${my_oses:+${my_oses},}$a"
 			;;
 	esac
 done
-my_oses=${my_oses:=linux}
-printf $my_oses
+my_oses="${my_oses:=linux}"
+printf "$my_oses"
 
-} # end 
+} # end
 
 _choose_libtype(){
 #: title	: _choose_libtype
@@ -74,25 +76,27 @@ _choose_libtype(){
 #: Description: sanitize list of lib types separated by ","
 #: Options	: "libtype,libtype_n"
 
-local _libtypes=$1
-_libtypes=${_libtypes:=dynamic,static}
-_libtypes=${_libtypes,,}
+local IFS="$global_ifs_bk"
+
+local _libtypes="$1"
+_libtypes="${_libtypes:=dynamic,static}"
+_libtypes="${_libtypes,,}"
 local my_libtypes=
 local a=
 for a in static dynamic relocatable
 do
-	case $_libtypes in
-		*all*) my_libtypes=static,dynamic,relocatable
+	case "$_libtypes" in
+		*all*) my_libtypes="static,dynamic,relocatable"
 			break
 			;;
-		*"$a"*) my_libtypes=${my_libtypes:+${my_libtypes},}$a
+		*"$a"*) my_libtypes="${my_libtypes:+${my_libtypes},}$a"
 			;;
 	esac
 done
-my_libtypes=${my_libtypes:=dynamic,static}
-printf $my_libtypes
+my_libtypes="${my_libtypes:=dynamic,static}"
+printf "$my_libtypes"
 
-} # end 
+} # end
 
 _choose_debug(){
 #: title	: _choose_debug
@@ -103,21 +107,23 @@ _choose_debug(){
 #: Description: choose the type of lib, related about debug information.
 #: Options	:  "with_debug_too"
 
-local _with_debug_too=$1
-_with_debug_too=${_with_debug_too:=no}
-_with_debug_too=${_with_debug_too,,}
+local IFS="$global_ifs_bk"
+
+local _with_debug_too="$1"
+_with_debug_too="${_with_debug_too:=no}"
+_with_debug_too="${_with_debug_too,,}"
 local my_with_debug_too=
 
-case $_with_debug_too in
-	*onlydebug* )	my_with_debug_too=debug
+case "$_with_debug_too" in
+	*onlydebug* )	my_with_debug_too="debug"
 		;;
-	*yes* )	  my_with_debug_too=normal,debug
+	*yes* )	  my_with_debug_too="normal,debug"
 		;;
-	*no* )	  my_with_debug_too=normal
+	*no* )	  my_with_debug_too="normal"
 		;;
 esac
-my_with_debug_too=${my_with_debug_too:=normal}
-printf $my_with_debug_too
+my_with_debug_too="${my_with_debug_too:=normal}"
+printf "$my_with_debug_too"
 
 } # end
 
@@ -131,15 +137,17 @@ _discover_acmd_path(){
 #: Options	: "cmd" "add_these_path(s)" "or_default_path"
 # need more sanitization
 #
+local IFS="$global_ifs_bk"
+
 local cmdo="$1"
 local these_paths="$2"
 local default_path="$3"
 local path_backup="$PATH"
-case $cmdo in
-	*[\)\({}$]* )  printf '/usr/bin/boo' ; exit 1
+case "$cmdo" in
+	( *[\)\(\{\}\$]* )  printf '/usr/bin/boo' ; exit 1
 		;;
 esac
-local my_path="$(PATH="$these_paths:$path_backup"; which "$cmdo" || printf "$default_path/stub" )"
+local my_path=$(PATH="$these_paths:$path_backup"; which "$cmdo" || printf "$default_path/stub" )
 printf "$(dirname $my_path )"
 
 } #end
@@ -163,7 +171,7 @@ _configure(){
 local my_atual_dir=$(pwd)
 
 # Silent Reporting, because apq_postgresql_error.log or  don't exist or don't is a regular file or is a link
-if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir/ok.log" ]; then
 	exit 1
 fi
 
@@ -174,7 +182,8 @@ if [ $# -ne 9 ]; then
 		printf 'configura "OSes" "libtype,libtype_n" "compiler_path1:compiler_path_n" "system_libs_path1:system_libs_paths_n"  "ssl_include_path" "pg_config_path"  "gprconfig_path"  "gprbuild_path"  "build_with_debug_too" '
 		printf "\n"
 	}>"$my_atual_dir/apq_postgresql_error.log"
-	
+
+        printf 'false'>"$my_atual_dir/ok.log"
 	exit 1
 fi;
 # remove old content from apq_postgresql_error.log
@@ -183,7 +192,7 @@ printf "" > "$my_atual_dir/apq_postgresql_error.log"
 local ifsbackup="$IFS"
 local IFS="$ifsbackup"
 
-local my_version=$(cat version)
+local my_version="$(cat version)"
 local my_oses=$(_choose_so "$1" )
 local my_libtypes=$(_choose_libtype "$2" )
 
@@ -206,24 +215,25 @@ local my_with_debug_too=$(_choose_debug "$9" )
 # need more sanitization
 _pg_config_path=${_pg_config_path:=$(_discover_acmd_path "pg_config" "$my_compiler_paths" "/usr/bin" )}
 #_pg_config_path=${_pg_config_path//[''``]/""}
-my_pg_config_path=$_pg_config_path
+my_pg_config_path="$_pg_config_path"
 
 _gprconfig_path=${_gprconfig_path:=$(_discover_acmd_path "gprconfig" "$my_compiler_paths" "/usr/bin" )}
-my_gprconfig_path=$_gprconfig_path
+my_gprconfig_path="$_gprconfig_path"
 
 _gprbuild_path=${_gprbuild_path:=$(_discover_acmd_path "gprbuild" "$my_compiler_paths" "/usr/bin" )}
-my_gprbuild_path=$_gprbuild_path
+my_gprbuild_path="$_gprbuild_path"
 
-_ssl_include_path=${_ssl_include_path:=/usr/lib/openssl}
-my_ssl_include_path=${_ssl_include_path}
+_ssl_include_path=${_ssl_include_path:="/usr/lib/openssl"}
+my_ssl_include_path="$_ssl_include_path"
 
-_system_libs_paths=${_system_libs_paths:=/usr/lib}
+_system_libs_paths=${_system_libs_paths:="/usr/lib"}
 
-local at_count=
-local max_count=11
+local at_count="1"
+local max_count="11"
 # 10(ten) libs is a reasonable value for now.
 # if you need more , feel free to contact us and suggest changes. :-)
 IFS=";:$ifsbackup"
+
 for alibdirsystem in $_system_libs_paths
 do
 	[ ${at_count:=1} -ge ${max_count:=11} ] && break;
@@ -233,7 +243,62 @@ do
 	my_system_libs_paths="${my_system_libs_paths:+${my_system_libs_paths}:}$alibdirsystem"
 
 done
+
+#########################################################
+
+	IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
+
+	local kov_log=$(
+		echo "$my_ssl_include_path"
+		echo "$my_compiler_paths"
+		echo "$my_gprconfig_path"
+		echo "$my_gprbuild_path"
+		echo "$my_pg_config_path"
+		echo "$my_system_libs_paths"
+		printf "\n"
+	)
+
+	local madeit3=
+	local at_count_tmp="1"
+	local madeit2=
+	local at_count_tmp="1"
+        local kov_def2=
+
+	local kov_def1=$(
+		echo "version:=\"$my_version\"  "
+                echo "myhelpsource:=\"$my_atual_dir/src-c/\"  "
+		echo "mysource:=\"$my_atual_dir/src/\"  "
+		echo "basedir:=\"$my_atual_dir/build\"  "
+	)
+	while [ "$at_count_tmp" -lt ${at_count:=11} ];
+	do
+		madeit2="lib_system$at_count_tmp"
+		madeit3="${madeit3:+${madeit3},} \$$madeit2 "
+		kov_def2="${kov_def2:+${kov_def2}\n}${madeit2}:=\"${!madeit2}\""
+		at_count_tmp=$(( $at_count_tmp + 1 ))
+	done
+
+	local kov_def=$(
+		echo "$kov_def1"
+		echo "$kov_def2"
+	)
+	kov_def1=
+	kov_def2=
+
+	local apq_postgresqlhelp_gpr_in=$(
+		cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" 2>>"$my_atual_dir/apq_postgresql_error.log"
+		printf  '   system_libs  := ( ) & ( '
+		printf  " $madeit3 "
+		printf  ' ); '
+		cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
+	)
+
+###############################################
 IFS=",$ifsbackup"
+
+local sist_oses=
+local libbuildtype=
+local debuga=
 
 local made_dirs="$my_atual_dir/build"
 
@@ -243,55 +308,61 @@ do
 	do
 		for debuga in $my_with_debug_too
 		do
-			my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
+			my_tmp="$made_dirs/$sist_oses/$libbuildtype/$debuga"
 			mkdir -p "$my_tmp/logged"
 
 			IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
 			#min two spaces before "\n" because quotes
-			{	printf	"$my_ssl_include_path  \n"
-				printf	"$my_compiler_paths  \n"
-				printf	"$my_gprconfig_path  \n"
-				printf	"$my_gprbuild_path  \n"
-				printf	"${my_pg_config_path}  \n"
-				printf	"${my_system_libs_paths}  \n"
-			}>"$my_tmp/logged/kov.log"
+			#{	printf	"$my_ssl_include_path  \n"
+			#	printf	"$my_compiler_paths  \n"
+			#	printf	"$my_gprconfig_path  \n"
+			#	printf	"$my_gprbuild_path  \n"
+			#	printf	"${my_pg_config_path}  \n"
+			#	printf	"${my_system_libs_paths}  \n"
+			#}>"$my_tmp/logged/kov.log"
+
+                        printf "$kov_log\n" > "$my_tmp/logged/kov.log"  2>>"$my_atual_dir/apq_postgresql_error.log"
 
 			local madeit3=
 			local at_count_tmp=
 			local madeit2=
 
 				#min two spaces before "\n" because quotes
-			{	printf	"version:=\"$my_version\"  \n"
-				printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
-				printf	"mysource:=\"$my_atual_dir/src/\"  \n"
-				printf	"basedir:=\"$my_atual_dir/build\"  \n"	
-				while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
-				do
-					madeit2="lib_system$at_count_tmp" ;
-					madeit3="${madeit3:+${madeit3},} \$$madeit2 " ;
-					printf  "${madeit2}:=\"${!madeit2}\"  \n" ;				
-					at_count_tmp=$(( $at_count_tmp + 1 )) ;
-				done ;
-				printf "\n"
+			#{	printf	"version:=\"$my_version\"  \n"
+			#	printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
+			#	printf	"mysource:=\"$my_atual_dir/src/\"  \n"
+			#	printf	"basedir:=\"$my_atual_dir/build\"  \n"
+			#	while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
+			#	do
+			#		madeit2="lib_system$at_count_tmp" ;
+			#		madeit3="${madeit3:+${madeit3},} \$$madeit2 " ;
+			#		printf  "${madeit2}:=\"${!madeit2}\"  \n" ;
+			#		at_count_tmp=$(( $at_count_tmp + 1 )) ;
+			#	done ;
+			#	printf "\n"
 
-			}>"$my_tmp/logged/kov.def"
+			# }>"$my_tmp/logged/kov.def"
 
-			cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
-			printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
-					
+                        printf "$kov_def\n" > "$my_tmp/logged/kov.def" 2>>"$my_atual_dir/apq_postgresql_error.log"
+
+			#cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
+			#printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			#printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			#printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
+			#cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
+
+                        echo "$apq_postgresqlhelp_gpr_in" > "$my_tmp/apq_postgresqlhelp.gpr.in" 2>>"$my_atual_dir/apq_postgresql_error.log"
 
 			gnatprep "$my_tmp/apq_postgresqlhelp.gpr.in"  "$my_tmp/apq_postgresqlhelp.gpr"  "$my_tmp/logged/kov.def"  2>>"$my_atual_dir/apq_postgresql_error.log"
-			cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"  2>>"$my_atual_dir/apq_postgresql_error.log"
-		
+
+                        cp "$my_atual_dir/apq-postgresql.gpr"  "$my_tmp/"  2>>"$my_atual_dir/apq_postgresql_error.log"
+
 			IFS=",$ifsbackup"
 
 			for support_dirs in obj lib ali obj_c lib_c ali_c
 			do
-				mkdir -p "$my_tmp"/$support_dirs  2>>"$my_atual_dir/apq_postgresql_error.log"
+				mkdir -p "$my_tmp/$support_dirs"  2>>"$my_atual_dir/apq_postgresql_error.log"
 			done # support_dirs
 		done # debuga
 	done # libbuildtype
@@ -300,12 +371,14 @@ IFS="$ifsbackup"
 	#not ok
 	if [ -s  "$my_atual_dir/apq_postgresql_error.log" ]; then
 		printf "\nthere is a chance an error occurred.\nsee the above messages and correct if necessary.\n not ok. \n " >> "$my_atual_dir/apq_postgresql_error.log"
-		exit 1
-	else 
-		#ok
-		printf "\n ok. \n\n" >> "$my_atual_dir/apq_postgresql_error.log"
-		exit 0;   # end ;-)
+		printf 'false' > "$my_atual_dir/ok.log"
+                exit 1
 	fi
+	#ok
+	printf "\n ok. \n\n" >> "$my_atual_dir/apq_postgresql_error.log"
+        printf 'true' > "$my_atual_dir/ok.log" ;
+	exit 0;   # end ;-)
+
 
 } #end _configure
 
@@ -337,7 +410,7 @@ _compile(){
 	fi
 	local ifsbackup="$IFS"
 	local IFS="$ifsbackup"
-	
+
 
 	local my_path=$( echo $PATH )
 	local my_oses=$(_choose_so "$1" )
@@ -353,7 +426,7 @@ _compile(){
 		}>> "$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
-	
+
 	local line1_my_tmp=
 	local line2_debuga=
 	local line3_libtype=
@@ -374,7 +447,7 @@ _compile(){
 	local erro_msg_gprbuild_part=
 	local erro_msg_pg_config_part=
 
-			
+
 	for sist_oses in $my_oses
 	do
 		for libbuildtype in $my_libtypes
@@ -382,18 +455,18 @@ _compile(){
 			for debuga in $my_with_debug_too
 			do
 				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
-				
+
 				if [ -f "$my_tmp/logged/kov.log" ] && \
 					[ $(wc -l < "$my_tmp/logged/kov.log" ) -ge 6 ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
-					
+
 						line1_my_tmp="$my_tmp"
 						line2_debuga="$debuga"
 						line3_libtype="$libbuildtype"
 						line4_os="$sist_oses"
-				
+
 					{	read line9_ssl_include_path
 						read line5_compile_paths
 						read line6_gprconfig_path
@@ -423,7 +496,7 @@ _compile(){
 							[ -d "$line8_pg_config_path" ] && break
 							line8_pg_config_path=$(dirname "$line8_pg_config_path" )
 						done
-						
+
 						while true;
 						do
 							[ -d "$line9_ssl_include_path" ] && break
@@ -452,17 +525,17 @@ _compile(){
 						eval $madeit8
 						eval $madeit9
 						eval $madeit10
-						
+
 						my_count=$(( $my_count + 1 ))
 					fi
 				fi
 			done # debuga
 		done # libbuildtype
 	done # sist_oses
-	
+
 	local my_count3=0
 	local my_hold_tmp1=
-		
+
 	if [ $my_count -gt 1 ]; then
 		while [ ${my_count2:=1} -lt $my_count ];
 		do
@@ -491,7 +564,7 @@ _compile(){
 
 			if [ "$madeit2" = "normal" ];
 			then
-				madeit2="no"; 
+				madeit2="no";
 			else
 				madeit2="yes";
 			fi
@@ -509,7 +582,7 @@ _compile(){
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
 			# using gnat and gprbuild from toolchain Act-San :-)
 			# and with PATH="$madeit5:$my_path" ( now the default behavior) I made preference for your compiler, in your specified add_compiler_paths
-			# 
+			#
 			$( PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit6"/gprconfig --batch --config=ada --config=c --config=c++ -o ./kov.cgpr > ./logged/gprconfig.log 2> ./logged/gprconfig_error.log )
 			if [ -s  "$madeit1/logged/gprconfig_error.log" ]; then
 				erro_msg_gprconfig_part="$my_hold_tmp1"
@@ -529,7 +602,7 @@ _compile(){
 			else
 				printf " gprbuild:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Ok\n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
-			
+
 			my_count2=$(( $my_count2 + 1 ))
 			my_count3=$(( $my_count3 + 1 ))
 
@@ -551,12 +624,12 @@ _compile(){
 			fi
 			if [ "$my_count3" -ge 1 ]; then
 				printf "\n not ok. but one or more things worked\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			else 
+			else
 				printf "\n not ok.\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
 			exit 1
 		fi
-		
+
 	else
 		{	printf " Nothing to compile. \n"
 			printf " Maybe 'oses' not yet (or erroneously) configured ? "
@@ -613,7 +686,7 @@ _installe(){
 		}>> "$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
-	
+
 	IFS=",$ifsbackup"
 
 	local sist_oses=
@@ -634,18 +707,18 @@ _installe(){
 		my_tmp2="$made_dirs"/$sist_oses
 
 		[ ! -d "$my_tmp2" ] && continue
-		
+
 		for libbuildtype in $my_libtypes
 		do
 			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
-			
+
 			[ ! -d "$my_tmp3" ] && continue
 			[ "$libbuildtype" = "relocatable" -o "$libbuildtype" = "dynamic"  ] && my_tmp6="shared" || my_tmp6="static"
 
 			for debuga in $my_with_debug_too
 			do
 				my_tmp4="$made_dirs"/$sist_oses/$libbuildtype/$debuga
-				
+
 				[ ! -d "$my_tmp4" ] && continue
 				[ "$debuga" = "normal" ] && my_tmp5="" || my_tmp5="$debuga"
 
@@ -673,7 +746,7 @@ _installe(){
 				else
 					printf "install lib:\tOk\t:$libbuildtype\t$sist_oses\t$debuga\t:Installed lib files! \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				fi
-				
+
 				# using "cp -a" to getrid from transforming symlinks in normal links
 				cp -a "$my_tmp4"/lib_c/*  "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/"  2>"$my_tmp4/logged/install_error.log"
 				if [ -s  "$my_tmp4/logged/install_error.log" ]; then
@@ -741,7 +814,7 @@ _installe(){
 		}>>"$my_atual_dir/apq_postgresql_error.log"
 		exit 1
 	fi
-	
+
 } #end _installe
 
 _clean(){
@@ -788,7 +861,7 @@ _clean(){
 	local my_tmp4=
 	local my_tmp5=
 	local my_tmp6=
-	
+
 	IFS=",$ifsbackup"
 
 
@@ -797,26 +870,26 @@ _clean(){
 		my_tmp2="$made_dirs"/$sist_oses
 
 		[ ! -d "$my_tmp2" ] && continue
-		
+
 		for libbuildtype in $my_libtypes
 		do
 			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
-			
+
 			[ ! -d "$my_tmp3" ] && continue
-		
+
 			for debuga in $my_with_debug_too
 			do
 				my_tmp4="$made_dirs"/$sist_oses/$libbuildtype/$debuga
-				
+
 				[ ! -d "$my_tmp4" ] && continue
-			
+
 				rm	$my_tmp4/ali/*	2>/dev/null
 				rm $my_tmp4/lib/*	2>/dev/null
 				rm $my_tmp4/lib_c/*	2>/dev/null
 				rm $my_tmp4/obj_c/*	2>/dev/null
 				rm $my_tmp4/obj/*	2>/dev/null
 
-				
+
 			done # debuga
 		done # libbuildtype
 	done # sist_oses
@@ -844,7 +917,7 @@ _distclean(){
 	fi
 	# remove old content from apq_postgresql_error.log
 	printf "" > "$my_atual_dir/apq_postgresql_error.log"
-	
+
 	local made_dirs="$my_atual_dir/build"
 	if [ ! -d "$made_dirs" ]; then
 		{	printf "\n"
@@ -869,7 +942,7 @@ case $my_commande in
 	'compilling' )  [ $# -eq 1 ] && _compile "$1" || printf "compile need one\(1\) option\n" ; exit 1
 		;;
 	'installing' )  [ $# -eq 2 ] && _installe "$1" "$2" || printf "install need two\(2\) options\n" ; exit 1
-		;; 
+		;;
 	'cleaning' )   [ true ] && _clean
 		;;
 	'dist_cleaning' ) [ true ] && _distclean
