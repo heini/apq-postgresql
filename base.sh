@@ -244,8 +244,6 @@ do
 
 done
 
-#########################################################
-
 	IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
 	local kov_log=$(
@@ -293,7 +291,6 @@ done
 		cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
 	)
 
-###############################################
 IFS=",$ifsbackup"
 
 local sist_oses=
@@ -313,44 +310,9 @@ do
 
 			IFS="$ifsbackup"  # the min one blank line below here _is necessary_ , otherwise IFS will affect _only_ next command_ ;-)
 
-			#min two spaces before "\n" because quotes
-			#{	printf	"$my_ssl_include_path  \n"
-			#	printf	"$my_compiler_paths  \n"
-			#	printf	"$my_gprconfig_path  \n"
-			#	printf	"$my_gprbuild_path  \n"
-			#	printf	"${my_pg_config_path}  \n"
-			#	printf	"${my_system_libs_paths}  \n"
-			#}>"$my_tmp/logged/kov.log"
-
+			# because use of vars, I added a "\n" :-) in
                         printf "$kov_log\n" > "$my_tmp/logged/kov.log"  2>>"$my_atual_dir/apq_postgresql_error.log"
-
-			local madeit3=
-			local at_count_tmp=
-			local madeit2=
-
-				#min two spaces before "\n" because quotes
-			#{	printf	"version:=\"$my_version\"  \n"
-			#	printf	"myhelpsource:=\"$my_atual_dir/src-c/\"  \n"
-			#	printf	"mysource:=\"$my_atual_dir/src/\"  \n"
-			#	printf	"basedir:=\"$my_atual_dir/build\"  \n"
-			#	while [ ${at_count_tmp:=1} -lt ${at_count:=11} ]
-			#	do
-			#		madeit2="lib_system$at_count_tmp" ;
-			#		madeit3="${madeit3:+${madeit3},} \$$madeit2 " ;
-			#		printf  "${madeit2}:=\"${!madeit2}\"  \n" ;
-			#		at_count_tmp=$(( $at_count_tmp + 1 )) ;
-			#	done ;
-			#	printf "\n"
-
-			# }>"$my_tmp/logged/kov.def"
-
-                        printf "$kov_def\n" > "$my_tmp/logged/kov.def" 2>>"$my_atual_dir/apq_postgresql_error.log"
-
-			#cat "$my_atual_dir/apq_postgresqlhelp_part1.gpr.in.in" > "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
-			#printf  '   system_libs  := ( ) & ( ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			#printf  " $madeit3 " >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			#printf  ' ); ' >> "$my_tmp/apq_postgresqlhelp.gpr.in"
-			#cat "$my_atual_dir/apq_postgresqlhelp_part3.gpr.in.in" >> "$my_tmp/apq_postgresqlhelp.gpr.in"  2>>"$my_atual_dir/apq_postgresql_error.log"
+			printf "$kov_def\n" > "$my_tmp/logged/kov.def" 2>>"$my_atual_dir/apq_postgresql_error.log"
 
                         echo "$apq_postgresqlhelp_gpr_in" > "$my_tmp/apq_postgresqlhelp.gpr.in" 2>>"$my_atual_dir/apq_postgresql_error.log"
 
