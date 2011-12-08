@@ -357,7 +357,7 @@ _compile(){
 
 	local my_atual_dir=$(pwd)
 	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
-	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir/ok.log" ]; then
 		exit 1
 	fi
 	# remove old content from apq_postgresql_error.log
@@ -368,24 +368,27 @@ _compile(){
 			printf 'usage: compile "OSes" '
 			printf "\n\n not ok. \n"
 		}>"$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
 	local ifsbackup="$IFS"
 	local IFS="$ifsbackup"
 
 
-	local my_path=$( echo $PATH )
+	local my_path="$PATH"
 	local my_oses=$(_choose_so "$1" )
 	local my_libtypes=$(_choose_libtype "all" )
 	local my_with_debug_too=$(_choose_debug "yes" )
 	local made_dirs="$my_atual_dir/build"
-	local my_count=1
+	local my_count="1"
+
 	if [ ! -d "$made_dirs" ]; then
 		{	printf "\n"
 			printf ' "build" dir '
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
 
@@ -397,18 +400,27 @@ _compile(){
 	local line6_gprconfig_path=
 	local line7_gprbuild_path=
 	local line8_pg_config_path=
+        local my_tmp=
+        local erro_msg_gprconfig_part=
+	local erro_msg_gprbuild_part=
+	local erro_msg_pg_config_part=
+	local madeit1=
+	local madeit2=
+	local madeit3=
+	local madeit4=
+	local madeit5=
+	local madeit6=
+	local madeit7=
+	local madeit8=
+	local madeit9=
+	local madeit10=
+	local aab=
 
 	IFS=",$ifsbackup"
 
 	local sist_oses=
 	local libbuildtype=
 	local debuga=
-	local my_tmp=
-
-	local erro_msg_gprconfig_part=
-	local erro_msg_gprbuild_part=
-	local erro_msg_pg_config_part=
-
 
 	for sist_oses in $my_oses
 	do
@@ -416,10 +428,10 @@ _compile(){
 		do
 			for debuga in $my_with_debug_too
 			do
-				my_tmp="$made_dirs"/$sist_oses/$libbuildtype/$debuga
+				my_tmp="$made_dirs/$sist_oses/$libbuildtype/$debuga"
 
 				if [ -f "$my_tmp/logged/kov.log" ] && \
-					[ $(wc -l < "$my_tmp/logged/kov.log" ) -ge 6 ] && \
+					[ $(sed -n -e '$=' "$my_tmp/logged/kov.log" ) -ge 6 ] && \
 					[ -f "$my_tmp/apq-postgresql.gpr" ] && \
 					[ -f "$my_tmp/apq_postgresqlhelp.gpr" ];
 				then
@@ -465,7 +477,7 @@ _compile(){
 							line9_ssl_include_path=$(dirname "$line9_ssl_include_path" )
 						done
 
-						my_count=${my_count:=1}
+						#my_count=${my_count:=1}
 						madeit1=" line1_$my_count=\"$my_tmp\" "
 						madeit2=" line2_$my_count=\"$debuga\" "
 						madeit3=" line3_$my_count=\"$libbuildtype\" "
@@ -477,16 +489,16 @@ _compile(){
 						madeit9=" line9_$my_count=\"$line9_ssl_include_path\" "
 						madeit10=" line10_$my_count=\"$line10_my_system_libs_paths\" "
 
-						eval $madeit1
-						eval $madeit2
-						eval $madeit3
-						eval $madeit4
-						eval $madeit5
-						eval $madeit6
-						eval $madeit7
-						eval $madeit8
-						eval $madeit9
-						eval $madeit10
+						eval " $madeit1 "
+						eval " $madeit2 "
+						eval " $madeit3 "
+						eval " $madeit4 "
+						eval " $madeit5 "
+						eval " $madeit6 "
+						eval " $madeit7 "
+						eval " $madeit8 "
+						eval " $madeit9 "
+						eval " $madeit10 "
 
 						my_count=$(( $my_count + 1 ))
 					fi
@@ -495,51 +507,54 @@ _compile(){
 		done # libbuildtype
 	done # sist_oses
 
-	local my_count3=0
-	local my_hold_tmp1=
+        IFS="$ifsbackup"
 
-	if [ $my_count -gt 1 ]; then
-		while [ ${my_count2:=1} -lt $my_count ];
+	local my_count3="0"
+	local my_hold_tmp1=
+	local my_count2="1"
+
+	if [ "$my_count" -gt 1 ]; then
+		while [ "$my_count2" -lt "$my_count" ];
 		do
 			aab="line1_${my_count2}"
-			madeit1=${!aab}
+			madeit1="${!aab}"
 			aab="line2_${my_count2}"
-			madeit2=${!aab}
+			madeit2="${!aab}"
 			aab="line3_${my_count2}"
-			madeit3=${!aab}
+			madeit3="${!aab}"
 			aab="line4_${my_count2}"
-			madeit4=${!aab}
+			madeit4="${!aab}"
 			aab="line5_${my_count2}"
-			madeit5=${!aab}
+			madeit5="${!aab}"
 			aab="line6_${my_count2}"
-			madeit6=${!aab}
+			madeit6="${!aab}"
 			aab="line7_${my_count2}"
-			madeit7=${!aab}
+			madeit7="${!aab}"
 			aab="line8_${my_count2}"
-			madeit8=${!aab}
+			madeit8="${!aab}"
 			aab="line9_${my_count2}"
-			madeit9=${!aab}
+			madeit9="${!aab}"
 			aab="line10_${my_count2}"
-			madeit10=${!aab}
+			madeit10="${!aab}"
 
 			my_hold_tmp1="$madeit2"
+			madeit2="yes"
 
-			if [ "$madeit2" = "normal" ];
+			if [ "$my_hold_tmp1" = "normal" ];
 			then
-				madeit2="no";
-			else
-				madeit2="yes";
+				madeit2="no"
 			fi
 
-			pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/logged/pg_config_error.log" )
+			local pq_include=$( "$madeit8"/pg_config --includedir 2> "$madeit1/logged/pg_config_error.log" )
 			if [ -s  "$madeit1/logged/pg_config_error.log" ]; then
 				erro_msg_pg_config_part="$my_hold_tmp1"
 				printf "pg_config:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_pg_config_part\t:Aborting matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
-			else
-				printf "pg_config:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
+
+                        printf "pg_config:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched's gprconfig & gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
+
 
 			# a explanation: with PATH="$my_path:$madeit5" I made preference for gcc and g++ for native compilers in system. this solve problems with multi-arch in Debian sid
 			# using gnat and gprbuild from toolchain Act-San :-)
@@ -551,19 +566,17 @@ _compile(){
 				printf "gprconfig:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprconfig_part\t:Aborting matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
-			else
-				printf "gprconfig:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
+			printf "gprconfig:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Trying matched gprbuild... \n" >> "$my_atual_dir/apq_postgresql_error.log"
 
-			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I $pq_include -I $madeit9 >"./logged/gprbuild.log"  2>"./logged/gprbuild_error.log" )
+			$(PATH="$madeit5:$my_path" && cd "$madeit1" && "$madeit7"/gprbuild -d -f --config=./kov.cgpr -Xstatic_or_dynamic=$madeit3 -Xos=$madeit4 -Xdebug_information=$madeit2  -P./apq-postgresql.gpr -cargs -I "$madeit10" -I "$pq_include" -I $madeit9 >"./logged/gprbuild.log"  2>"./logged/gprbuild_error.log" )
 			if [ -s  "$madeit1/logged/gprbuild_error.log" ]; then
 				erro_msg_gprbuild_part="$my_hold_tmp1"
 				printf " gprbuild:\tnot ok\t:lib\t$madeit3\t$madeit4\t$erro_msg_gprbuild_part\n" >> "$my_atual_dir/apq_postgresql_error.log"
 				my_count2=$(( $my_count2 + 1 ))
 				continue
-			else
-				printf " gprbuild:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Ok\n" >> "$my_atual_dir/apq_postgresql_error.log"
 			fi
+			printf " gprbuild:\tOk\t:lib\t$madeit3\t$madeit4\t$my_hold_tmp1\t:Ok\n" >> "$my_atual_dir/apq_postgresql_error.log"
 
 			my_count2=$(( $my_count2 + 1 ))
 			my_count3=$(( $my_count3 + 1 ))
@@ -572,33 +585,36 @@ _compile(){
 		# ok
 		if [ -z "$erro_msg_gprconfig_part" ] && [ -z "$erro_msg_gprbuild_part" ] && [ -z "$erro_msg_pg_config_part" ]; then
 			printf "\n ok. \n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+                        printf 'true' > "$my_atual_dir/ok.log"
 			exit 0
-		else
-		# not ok
-			if [ -n "$erro_msg_pg_config_part" ]; then
-				printf "pg_config error log: verify matched pg_config_error.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			fi
-			if [ -n "$erro_msg_gprconfig_part" ]; then
-				printf "gprconfig error log: verify matched's gprconfig_error.log and gprconfig.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			fi
-			if [ -n "$erro_msg_gprbuild_part" ]; then
-				printf "gprbuild error log: verify matched's gprbuild_error.log and gprbuild.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			fi
-			if [ "$my_count3" -ge 1 ]; then
-				printf "\n not ok. but one or more things worked\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			else
-				printf "\n not ok.\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
-			fi
-			exit 1
 		fi
+		# not ok
+		if [ -n "$erro_msg_pg_config_part" ]; then
+			printf "pg_config error log: verify matched pg_config_error.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+		fi
+		if [ -n "$erro_msg_gprconfig_part" ]; then
+			printf "gprconfig error log: verify matched's gprconfig_error.log and gprconfig.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+		fi
+		if [ -n "$erro_msg_gprbuild_part" ]; then
+			printf "gprbuild error log: verify matched's gprbuild_error.log and gprbuild.log, in 'logged' subdir\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+		fi
+		if [ "$my_count3" -ge 1 ]; then
+			printf "\n not ok. but one or more things worked\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+		else
+			printf "\n not ok.\n\n"  >> "$my_atual_dir/apq_postgresql_error.log"
+		fi
+                printf 'false' > "$my_atual_dir/ok.log"
+		exit 1
 
-	else
+
+	fi
 		{	printf " Nothing to compile. \n"
 			printf " Maybe 'oses' not yet (or erroneously) configured ? "
 			printf "\n\n Not ok. \n\n"
 		}>>"$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
-	fi
+
 
 
 } #end _compile
@@ -615,8 +631,10 @@ _installe(){
 #: Options	:  "OSes" "prefix"
 
 	local my_atual_dir=$(pwd)
+        local made_dirs="$my_atual_dir/build"
+
 	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
-	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir/ok.log" ]; then
 		exit 1
 	fi
 	# remove old content from apq_postgresql_error.log
@@ -627,27 +645,29 @@ _installe(){
 			printf 'usage: installe "OSes" "prefix" '
 			printf "\n\n not ok. \n"
 		}>"$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
-	local ifsbackup="$IFS"
-	local IFS="$ifsbackup"
 
-	local my_path=$( echo $PATH )
-	local my_oses=$(_choose_so "$1" )
-	local my_libtypes=$(_choose_libtype "all" )
-	local my_with_debug_too=$(_choose_debug "yes" )
-	local made_dirs="$my_atual_dir/build"
-
-	local my_prefix=$2
-
-	if [ ! -d "$made_dirs" ]; then
+        if [ ! -d "$made_dirs" ]; then
 		{	printf "\n"
 			printf ' "build" dir '
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
+
+	local ifsbackup="$IFS"
+	local IFS="$ifsbackup"
+
+	local my_path="$PATH"
+	local my_oses=$(_choose_so "$1" )
+	local my_libtypes=$(_choose_libtype "all" )
+	local my_with_debug_too=$(_choose_debug "yes" )
+
+	local my_prefix="$2"
 
 	IFS=",$ifsbackup"
 
@@ -663,16 +683,18 @@ _installe(){
 
 	local my_count=1
 	local my_made_install=
-# > "$my_atual_dir/apq_postgresql_error.log"
+        local madeit1=
+	local madeit2=
+
 	for sist_oses in $my_oses
 	do
-		my_tmp2="$made_dirs"/$sist_oses
+		my_tmp2="$made_dirs/$sist_oses"
 
 		[ ! -d "$my_tmp2" ] && continue
 
 		for libbuildtype in $my_libtypes
 		do
-			my_tmp3="$made_dirs"/$sist_oses/$libbuildtype
+			my_tmp3="$made_dirs/$sist_oses/$libbuildtype"
 
 			[ ! -d "$my_tmp3" ] && continue
 			[ "$libbuildtype" = "relocatable" -o "$libbuildtype" = "dynamic"  ] && my_tmp6="shared" || my_tmp6="static"
@@ -692,7 +714,7 @@ _installe(){
 					printf "install:\tOk\t:$libbuildtype\t$sist_oses\t$debuga\t:Created directory! \n" >> "$my_atual_dir/apq_postgresql_error.log"
 				fi
 
-				install -m0555 "$my_tmp4"/ali/* -t "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/ali"  2>"$my_tmp4/logged/install_error.log"
+				install -m0555 "$my_tmp4/ali"/*  "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/ali"  2>"$my_tmp4/logged/install_error.log"
 				if [ -s  "$my_tmp4/logged/install_error.log" ]; then
 					my_made_install="$debuga"
 					printf "install ali:\tnot ok\t:$libbuildtype\t$sist_oses\t$my_made_install\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
@@ -701,7 +723,7 @@ _installe(){
 				fi
 
 				# using "cp -a" to getrid from transforming symlinks in normal links
-				cp -a "$my_tmp4"/lib/* "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/"  2>"$my_tmp4/logged/install_error.log"
+				cp -a "$my_tmp4/lib"/* "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/"  2>"$my_tmp4/logged/install_error.log"
 				if [ -s  "$my_tmp4/logged/install_error.log" ]; then
 					my_made_install="$debuga"
 					printf "install lib:\tnot ok\t:$libbuildtype\t$sist_oses\t$my_made_install\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
@@ -710,7 +732,7 @@ _installe(){
 				fi
 
 				# using "cp -a" to getrid from transforming symlinks in normal links
-				cp -a "$my_tmp4"/lib_c/*  "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/"  2>"$my_tmp4/logged/install_error.log"
+				cp -a "$my_tmp4/lib_c"/*  "$my_prefix/lib/apq-postgresql/$sist_oses/$my_tmp6/$my_tmp5/"  2>"$my_tmp4/logged/install_error.log"
 				if [ -s  "$my_tmp4/logged/install_error.log" ]; then
 					my_made_install="$debuga"
 					printf "install lib_c:\tnot ok\t:$libbuildtype\t$sist_oses\t$my_made_install\t: ... \n" >> "$my_atual_dir/apq_postgresql_error.log"
@@ -723,7 +745,16 @@ _installe(){
 			done # debuga
 		done # libbuildtype
 	done # sist_oses
-	if [ $my_count -ge 2 ]; then
+
+	if [ $my_count -lt 2 ]; then
+        	{	printf "nothing was installed. \n"
+			printf "maybe a wrong 'oses' ? or a not already compiled libs for install ? "
+			printf "not ok.\n\n"
+		}>>"$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
+		exit 1
+        fi
+
 		install -d "$my_prefix/include/apq-postgresql/src_c"  2>"$made_dirs/install_src_error.log"
 		if [ -s  "$made_dirs/install_src_error.log" ]; then
 			my_made_install="hi"
@@ -756,29 +787,24 @@ _installe(){
 		else
 			printf "install gpr(s):\tOk\t:Installed GPR(s)! \n" >> "$my_atual_dir/apq_postgresql_error.log"
 		fi
-		#
+		#ok
 		if [ -z "$my_made_install" ]; then
 			{	printf "\n\n Install libs now success finished. \n"
 				printf " Read the inline text in file $my_prefix/lib/gnat/apq-postgresql.gpr \n"
 				printf " for hints and example usage :-)\n"
 				printf "\n ok. \n\n"
 			}>>"$my_atual_dir/apq_postgresql_error.log"
+                        printf 'true' > "$my_atual_dir/ok.log"
 			exit 0
-		else
-			{	printf "\n\n there were some errors during this install process \n"
-				printf " read the install_*error.logs \n"
-				printf " for hints to fixes these errors :-)\n"
-				printf "\n not ok. \n\n"
-			}>>"$my_atual_dir/apq_postgresql_error.log"
-			exit 1
 		fi
-	else
-		{	printf "nothing was installed. \n"
-			printf "maybe a wrong 'oses' ? or a not already compiled libs for install ? "
-			printf "not ok.\n\n"
+                #mostly ok
+		{	printf "\n\n there were some errors during this install process \n"
+			printf " read the install_*error.logs \n"
+			printf " for hints to fixes these errors :-)\n"
+			printf "\n not ok. \n\n"
 		}>>"$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
-	fi
 
 } #end _installe
 
@@ -794,7 +820,7 @@ _clean(){
 
 	local my_atual_dir=$(pwd)
 	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
-	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/ok.log ]; then
 		exit 1
 	fi
 	# remove old content from apq_postgresql_error.log
@@ -811,6 +837,7 @@ _clean(){
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
 	local my_path=$( echo $PATH )
@@ -848,7 +875,7 @@ _clean(){
 
 				[ ! -d "$my_tmp4" ] && continue
 
-				rm	$my_tmp4/ali/*	2>/dev/null
+				rm $my_tmp4/ali/*	2>/dev/null
 				rm $my_tmp4/lib/*	2>/dev/null
 				rm $my_tmp4/lib_c/*	2>/dev/null
 				rm $my_tmp4/obj_c/*	2>/dev/null
@@ -860,6 +887,7 @@ _clean(){
 	done # sist_oses
 
 	printf "\n\n ok. \n" >> "$my_atual_dir/apq_postgresql_error.log"
+        printf 'true' > "$my_atual_dir/ok.log"
 	exit 0
 
 } #end _clean
@@ -869,7 +897,7 @@ _distclean(){
 #: date		: 2011-jul-09
 #: Authors	: "Daniel Norte de Moraes" <danielcheagle@gmail.com>
 #: Authors	: "Marcelo Coraça de Freitas" <marcelo.batera@gmail.com>
-#: version	: 1.04
+#: version	: 1.05
 #: Description: Deleta all temporary and cached organization and configuration files;
 #: Description:   for that, just delete temporary dir "build"
 #: Description: You don't need run this script manually.
@@ -877,7 +905,7 @@ _distclean(){
 
 	local my_atual_dir=$(pwd)
 	# Silent Reporting, because apq_postgresql_error.log or don't exist or don't is a regular file or is a link
-	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ]; then
+	if [ ! -f "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/apq_postgresql_error.log ] || [ -L "$my_atual_dir"/ok.log ]; then
 		exit 1
 	fi
 	# remove old content from apq_postgresql_error.log
@@ -890,9 +918,10 @@ _distclean(){
 			printf "don't exist or don't is a directory."
 			printf "\n\n not ok. \n\n"
 		}>> "$my_atual_dir/apq_postgresql_error.log"
+                printf 'false' > "$my_atual_dir/ok.log"
 		exit 1
 	fi
-	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf && printf "\n\n ok \n\n" >> "$my_atual_dir/apq_postgresql_error.log"; exit 0 || printf "\n\n not ok \n\n">> "$my_atual_dir/apq_postgresql_error.log"; exit 1
+	[ -d "$made_dirs" ] && [ ! -L "$made_dirs" ] && rm $made_dirs -rf && printf "\n\n ok \n\n" >> "$my_atual_dir/apq_postgresql_error.log"; printf 'true' > "$my_atual_dir/ok.log"; exit 0 || printf "\n\n not ok \n\n">> "$my_atual_dir/apq_postgresql_error.log"; printf 'false' > "$my_atual_dir/ok.log"; exit 1
 
 } #end _distclean
 
