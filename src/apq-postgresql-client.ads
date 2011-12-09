@@ -45,6 +45,7 @@ with Ada.Calendar;
 with Ada.Strings.Bounded;
 with Ada.Strings.Unbounded;
 with Interfaces.C_Streams;
+with Ada.Containers.Doubly_Linked_Lists;
 
 package APQ.PostgreSQL.Client is
 
