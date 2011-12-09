@@ -1,3 +1,5 @@
+with "apq.gpr";
+
 project Buildsystem_Apq_Postgresql is
 
    for Languages use ("Ada", "C", "Makefile", "Project File", "Shell");

@@ -482,6 +482,25 @@ package body APQ.PostgreSQL.Client is
    end Notice_Message;
    --
    --
+   function "="( Left :root_option_record2; right : root_option_record2) return boolean
+   is
+      pragma Optimize(time);
+
+      lkey_s : string :=
+	ada.Strings.fixed.Trim( ada.Characters.Handling.To_Lower(
+	  ada.Strings.Unbounded.To_String( left.key_u)) ,
+	  ada.Strings.Both );
+      rkey_s : string :=
+	ada.Strings.fixed.Trim( ada.Characters.Handling.To_Lower(
+	  ada.Strings.Unbounded.To_String( right.key_u)) ,
+	  ada.Strings.Both );
+   begin
+      if lkey_s = rkey_s then
+	 return true;
+      end if;
+      return false;
+   end "=";
+
    function quote_string( qkv : string ) return String
    is
       use ada.Strings;
@@ -505,83 +524,53 @@ package body APQ.PostgreSQL.Client is
    begin
       return ada.Strings.Unbounded.To_Unbounded_String(String'(quote_string(qkv)));
    end quote_string;
-
-   --
-   procedure grow_key (C  : in out Connection_Type) is
-      -- used internally to grow the key name and respective val size so add_keyname_val() works;
-      -- not alter c.keyname_val_cache_uptodate here :-) because It don't yet insert new "real" change
-      -- in c.keyname_val_cache :-)
-      pragma optimize(time);
-
-   begin
-      if C.keycount <= 0 and c.keyalloc <= 0 then
-
-         C.keyalloc := 32; -- this suffice for now :-)
-
-         C.keyname := new String_Ptr_Array(1..C.keyalloc);
-         C.keyval  := new String_Ptr_Array(1..C.keyalloc);
-
-         C.keyname_Caseless  := new Boolean_Array(1..C.keyalloc);
-         C.keyval_Caseless   := new Boolean_Array(1..C.keyalloc);
-
-      elsif C.keycount >= C.keyalloc then
-         declare
-            New_keyAlloc : Natural := C.keyAlloc + 64;
-            New_Array_keyname : String_Ptr_Array_Access := new String_Ptr_Array(1..New_keyAlloc);
-            New_Array_keyval  : String_Ptr_Array_Access := new String_Ptr_Array(1..New_keyAlloc);
-
-            New_Case_keyname  : Boolean_Array_Access    := new Boolean_Array(1..New_keyAlloc);
-            New_Case_keyval   : Boolean_Array_Access    := new Boolean_Array(1..New_keyAlloc);
-
-         begin
-            New_Array_keyname(1..C.keyalloc) := C.keyname.all;
-            New_Array_keyval(1..C.keyalloc) := C.keyval.all;
-
-            New_Case_keyname(1..C.keyalloc) := C.keyname_Caseless.all;
-            New_Case_keyval(1..C.keyalloc)  := C.keyval_Caseless.all;
-
-            Free(C.keyname);
-            Free(C.keyval);
-            Free(C.keyname_Caseless);
-            Free(C.keyval_Caseless);
-
-            C.keyAlloc := New_keyAlloc;
-
-            C.keyname := New_Array_keyname;
-            C.keyval := New_Array_keyval;
-
-            C.keyname_Caseless := New_Case_keyname;
-            C.keyval_Caseless := New_Case_keyval;
-
-         end;
-      end if;
-   end grow_key;--
    --
    function cache_key_nameval_uptodate( C : Connection_Type) --
                                        return boolean
    is
    begin
       return c.keyname_val_cache_uptodate;
-      -- fixme: proper exception/error handler  :-)
    end cache_key_nameval_uptodate;
 
    --
    procedure cache_key_nameval_create( C : in out Connection_Type; force : boolean := false)--
    is
       pragma optimize(time);
-
       use ada.strings.Unbounded;
       use ada.strings.Fixed;
       use ada.Strings;
       use Ada.Characters.Handling;
+
+      use apq.postgresql.client.options_list2;
+      --
       tmp_ub_cache : Unbounded_String := To_Unbounded_String(160); -- pre-allocate :-)
       tmp_eq : Unbounded_String := to_Unbounded_String(" = '");
       tmp_ap : Unbounded_String := to_Unbounded_String("' ");
-      a : natural := c.keycount; -- number of keyname's and keyval's
+      --
+      procedure process(position : cursor) is
+	 val_tmp : root_option_record2 := element(position);
+      begin
+	 if val_tmp.is_valid = false then return; end if; --bahiii! :-)
+	 if c.SQL_Case = Preserve_Case then
+	    tmp_ub_cache := tmp_ub_cache & val_tmp.key_u & tmp_eq &
+	      trim(Unbounded_String'(quote_string(string'(To_String(val_tmp.value_u)))),ada.Strings.Both)
+	      & tmp_ap ;
+	 else
+	    if c.SQL_Case = Lower_Case then
+	       tmp_ub_cache := tmp_ub_cache & To_Unbounded_String( To_Lower(string'(to_string(val_tmp.key_u)))) & tmp_eq &
+		 trim(Unbounded_String'(quote_string(To_Lower(string'(To_String(val_tmp.value_u))))),ada.Strings.both) & tmp_ap;
+	    else
+	       tmp_ub_cache := tmp_ub_cache & To_Unbounded_String(To_Upper(string'(to_string(val_tmp.key_u)))) & tmp_eq &
+		 trim(Unbounded_String'(quote_string(To_Upper(string'(To_String(val_tmp.value_u))))),ada.Strings.both) & tmp_ap;
+	    end if;
+	 end if;
+
+      end process;
 
    begin
       if cache_key_nameval_uptodate( C ) and force = false then return; end if; -- bahiii :-)
-      Free_Ptr(c.keyname_val_cache);
+      c.keyname_val_cache := To_Unbounded_String("");
+
       if c.Port_Format = UNIX_Port then
          tmp_ub_cache := to_Unbounded_String("host")
            & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Host_Name)))),ada.Strings.both) & tmp_ap
@@ -595,6 +584,7 @@ package body APQ.PostgreSQL.Client is
       else
          raise program_error;
       end if;
+
       tmp_ub_cache := tmp_ub_cache
         & to_Unbounded_String("dbname") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.DB_Name)))),ada.Strings.both) & tmp_ap
         & to_Unbounded_String("user") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.User_Name)))),ada.Strings.both) & tmp_ap
@@ -604,95 +594,58 @@ package body APQ.PostgreSQL.Client is
          & to_Unbounded_String("options") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Options)))), both) & tmp_ap ;
       end if;
 
-      if a > 0 then --  a = c.keycount
-         for b in 1 .. a loop -- a = number of keyword names val par duuh :-)
-                                -- fixme if necessary: ? keyname need quoting  ? :-)
-                                -- I belive It not :-) but the Brighter user are encoraged to join and participate :-)
-            if c.keyname_Caseless(b) or c.keyname_default_case = Preserve_Case then
-               tmp_ub_cache := tmp_ub_cache & To_Unbounded_String(string'(to_string(c.keyname(b)))) & tmp_eq ;
-            else
-               if c.keyname_default_case = Lower_Case then
-                  tmp_ub_cache := tmp_ub_cache & To_Unbounded_String( To_Lower(string'(to_string(c.keyname(b))))) & tmp_eq ;
-               else
-                  tmp_ub_cache := tmp_ub_cache & To_Unbounded_String(To_Upper(string'(to_string(c.keyname(b))))) & tmp_eq ;
-               end if;
-            end if;
-            if c.keyval_Caseless(b) or c.keyval_default_case = Preserve_Case then
-               tmp_ub_cache := tmp_ub_cache & trim(Unbounded_String'(quote_string(string'(To_String(C.keyval(b))))),ada.Strings.both) & tmp_ap ;
-            else
-               if c.keyname_default_case = Lower_Case then
-                  tmp_ub_cache := tmp_ub_cache & trim(Unbounded_String'(quote_string(To_Lower(string'(To_String(C.keyval(b)))))),ada.Strings.both) & tmp_ap;
-               else
-                  tmp_ub_cache := tmp_ub_cache & trim(Unbounded_String'(quote_string(To_Upper(string'(To_String(C.keyval(b)))))),ada.Strings.both) & tmp_ap;
-               end if;
-            end if;
-
-         end loop;
+      if not (c.key_name_list.Is_Empty ) then
+	 c.key_name_list.Iterate(process'Access);
       end if;
-      declare
-         cache_tmp_str : string := ada.strings.Fixed.trim(ada.Strings.Unbounded.to_string(tmp_ub_cache),both);
-         cache_tmp_len : natural := cache_tmp_str'length;
-      begin
-         C.keyname_val_cache := new string(1..cache_tmp_len);
-         c.keyname_val_cache.all(1..cache_tmp_len) := cache_tmp_str;
-         c.keyname_val_cache_uptodate := true;
-      end;
+
+      c.keyname_val_cache := tmp_ub_cache;
+
+      tmp_ub_cache := To_Unbounded_String("");
+
    end cache_key_nameval_create;--
    --
-   procedure clear_all_key_nameval(C : in out Connection_Type; add_more_this_alloc : natural := 0)
+   procedure clear_all_key_nameval(C : in out Connection_Type )
    is
       pragma optimize(time);
-
-      ckcount : natural := c.keycount;
-      ckalloc : natural := c.keyalloc;
-      len     : natural := ckalloc;
-
    begin
-      if ckcount = 0 and add_more_this_alloc = 0 and ckalloc /= 0 then
-         return;  -- bahiii :-)
+      if not ( c.key_name_list.is_empty ) then
+	    c.key_name_list.clear;
       end if;
+      c.keyname_val_cache := ada.Strings.Unbounded.To_Unbounded_String("");
+      c.keyname_val_cache_uptodate := true;
 
-      pragma assert( add_more_this_alloc > 200 ); -- uau ! :-)
-
-      ckcount := ckcount + add_more_this_alloc;
-      if ckcount >= ckalloc then
-         ckalloc := ckcount + 32 ;
-         len := ckalloc;
-      end if;
-
-      declare
-         New_Array_keyname : String_Ptr_Array_Access := new String_Ptr_Array(1..len);
-         New_Array_keyval  : String_Ptr_Array_Access := new String_Ptr_Array(1..len);
-
-         New_Case_keyname  : Boolean_Array_Access    := new Boolean_Array(1..len);
-         New_Case_keyval   : Boolean_Array_Access    := new Boolean_Array(1..len);
-
-      begin
-         Free(C.keyname);
-         Free(C.keyval);
-         Free(C.keyname_Caseless);
-         Free(C.keyval_Caseless);
-
-         C.keycount := 0;
-
-         C.keyname := New_Array_keyname;
-         C.keyval := New_Array_keyval;
-
-         C.keyname_Caseless := New_Case_keyname;
-         C.keyval_Caseless := New_Case_keyval;
-
-         C.keyname_val_cache_uptodate := false;
-
-         C.keyalloc := len;
-
-      end ;
    end clear_all_key_nameval;
+
+   procedure key_nameval( L : in out options_list2.list ;
+			 val : root_option_record2;
+			 clear : boolean := false
+			)
+   is
+      use options_list2;
+      mi_cursor : options_list2.cursor := no_element;
+   begin
+      if clear then
+	 if not ( L.is_empty ) then
+	    L.clear;
+	 end if;
+      end if;
+      if L.is_empty then
+	 L.append(val);
+	 return;
+      end if;
+      mi_cursor := L.find(val);
+      if mi_cursor = No_Element then
+	 L.append(val);
+	 return;
+      end if;
+      L.replace_element(mi_cursor, val);
+
+   end key_nameval;
 
 
    procedure add_key_nameval( C : in out Connection_Type;
                              kname, kval : string := "";
-                             knamecasele, kvalcasele : boolean := true;
-                            clear : boolean := false )
+                             clear : boolean := false )
    is
       pragma optimize(time);
       use ada.strings;
@@ -700,111 +653,44 @@ package body APQ.PostgreSQL.Client is
 
       tmp_kname : string  := string'(trim(kname,both));
       tmp_kval  : string  := string'(trim(kval,both));
-      tkm       : natural := tmp_kname'Length;
-      tkv       : natural := tmp_kval'Length;
-      ckc       : natural := 0;
+
    begin
-      if clear then
-         clear_all_key_nameval(C);
-      end if;
       if tmp_kname = "" then return; end if; -- bahiii :-)
-      grow_key(C);
-      C.keycount := C.keycount + 1;
-      ckc := C.keycount;
-      C.keyname(ckc) := new String(1..tkm);
-      C.keyname(ckc).all(1..tkm) := tmp_kname;
-      C.keyname_Caseless(ckc) := knamecasele;
-      if tmp_kval = "" then
-         C.keyval(ckc) := null;
-      else
-         C.keyval(ckc) := new String(1..tkv);
-         C.keyval(ckc).all(1..tkv) := tmp_kval;
-      end if;
-      C.keyval_Caseless(ckc)       := kvalcasele;
+      declare
+	 val_tmp : root_option_record2 :=
+	   root_option_record2'(is_valid => true,
+			 key_u    => ada.Strings.Unbounded.To_Unbounded_String(tmp_kname),
+			 value_u  => ada.Strings.Unbounded.To_Unbounded_String(tmp_kval)
+			);
+      begin
+	 key_nameval(L     => c.key_name_list,
+	      val   => val_tmp ,
+	      clear => clear);
+      end;
       C.keyname_val_cache_uptodate := false;
 
    end add_key_nameval;
 
-
-
-   function get_keyname_default_case( C : Connection_Type) return SQL_Case_Type--
-   is
-   begin
-      return c.keyname_default_case;
-      -- fixme: proper exception/error handler  :-)
-   end get_keyname_default_case;
-
-   function get_keyval_default_case( C : Connection_Type) return SQL_Case_Type--
-   is
-   begin
-      return c.keyval_default_case;
-      -- fixme: proper exception/error handler  :-)
-   end get_keyval_default_case;
-
-   procedure set_keyname_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type)--
-   is
-   begin
-      c.keyname_default_case := sqlcase;
-
-      -- fixme: are there necessity to invalidate
-      -- the keyname_val_cache ? if yes, uncomment the line below :-)
-      -- C.keyname_val_cache_uptodate := false;
-   end set_keyname_default_case;
-
-   procedure set_keyval_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type)
-   is
-   begin
-      c.keyval_default_case := sqlcase;
-      -- fixme: are there necessity to invalidate
-      -- the keyname_val_cache ? if yes, uncomment the line below :-)
-      -- C.keyname_val_cache_uptodate := false;
-   end set_keyval_default_case;
-   --
+ --
    procedure clone_clone_pg(To : in out Connection_Type; From : Connection_Type )
    is
       pragma optimize(time);
-
-      keyalloc_from : natural := from.keyalloc;
-      keycount_from : natural := from.keycount;
-      keyalloc_to   : natural := to.keyalloc;
-      keycount_to   : natural := to.keycount;
+      use apq.postgresql.client.options_list2;
+      --
+      procedure add(position : cursor) is
+      begin
+	 to.key_name_list.append(element(position));
+      end add;
 
    begin
-      if keycount_from = 0 or keyalloc_from = 0 then
-         clear_all_key_nameval(To);
-         return; -- bahiii :-)
+      clear_all_key_nameval(to);
+
+      if not ( from.key_name_list.is_empty ) then
+	    from.key_name_list.iterate(add'Access);
       end if;
 
-      if keycount_from >= keyalloc_to then
-         clear_all_key_nameval(to , add_more_this_alloc => (keycount_from - keyalloc_to) + 1 );
-      else
-         clear_all_key_nameval(to);
-      end if;
-      declare
-         len        : natural := keycount_from;
-         New_Array_keyname : String_Ptr_Array_Access := new String_Ptr_Array(1..len);
-         New_Array_keyval  : String_Ptr_Array_Access := new String_Ptr_Array(1..len);
+      to.keyname_val_cache_uptodate := false;
 
-         New_Case_keyname  : Boolean_Array_Access    := new Boolean_Array(1..len);
-         New_Case_keyval   : Boolean_Array_Access    := new Boolean_Array(1..len);
-
-      begin
-         New_Array_keyname.all := from.keyname.all;
-         New_Array_keyval.all  := from.keyval.all;
-         New_Case_keyname.all  := from.keyname_Caseless.all;
-         New_Case_keyval.all  := from.keyval_Caseless.all;
-
-         to.keyname(1..len) := New_Array_keyname.all;
-         to.keyval(1..len) := New_Array_keyval.all;
-
-         to.keyname_Caseless(1..len) := New_Case_keyname.all;
-         to.keyval_Caseless(1..len) := New_Case_keyval.all;
-
-         to.keyname_val_cache_uptodate := false;
-
-         to.keycount := len;
-
-      end ;
    end clone_clone_pg;
 
    --
@@ -833,7 +719,7 @@ package body APQ.PostgreSQL.Client is
 
          function PQconnectdb(coni : chars_ptr ) return PG_Conn;
          pragma import(C,PQconnectdb,"PQconnectdb");
-         coni_str : string := C.keyname_val_cache.all;
+         coni_str : string := ada.Strings.Unbounded.To_String(C.keyname_val_cache);
          C_conni : chars_ptr := New_String(Str => coni_str );
       begin
          C.Connection := PQconnectdb( C_conni); -- blocking call :-)
@@ -940,7 +826,7 @@ package body APQ.PostgreSQL.Client is
 
    is
    begin
-      return To_String(c.keyname_val_cache);
+      return ada.Strings.Unbounded.To_String(c.keyname_val_cache);
    end verifica_conninfo_cache;
 
 

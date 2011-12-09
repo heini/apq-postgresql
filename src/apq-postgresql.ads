@@ -36,6 +36,8 @@
 -- This is the base package for the PostreSQL driver for APQ.                --
 -------------------------------------------------------------------------------
 
+with ada.Strings.Unbounded;
+
 package APQ.PostgreSQL is
 	pragma linker_options("-lpq");
 
@@ -91,9 +93,19 @@ package APQ.PostgreSQL is
 		);
 	for Mode_Type'Size use 32;
 
+   type root_option_record2 is private;
+
 private
 
-	type PQOid_Type is mod 2 ** 32;			-- Currently PostgreSQL uses unsigned int for Oid
+   type root_option_record2 is tagged
+      record
+	 is_valid : boolean := false;
+	 key_u    : ada.Strings.Unbounded.Unbounded_String := ada.Strings.Unbounded.To_Unbounded_String("");
+	 value_u  : ada.Strings.Unbounded.Unbounded_String := ada.Strings.Unbounded.To_Unbounded_String("");
+      end record;
+
+
+   type PQOid_Type is mod 2 ** 32;			-- Currently PostgreSQL uses unsigned int for Oid
 
 	Null_Row_ID : constant Row_ID_Type := 0;	-- Value representing no OID
 

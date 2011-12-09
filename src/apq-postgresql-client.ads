@@ -105,24 +105,17 @@ package APQ.PostgreSQL.Client is
 	function Error_Message(C : Connection_Type) return String;
    function Notice_Message(C : Connection_Type) return String;
    --
+   function "="( Left :root_option_record2; right : root_option_record2) return boolean;
+   package options_list2 is new Ada.Containers.Doubly_Linked_Lists( root_option_record2 , "=" );
+
    function quote_string( qkv : string ) return ada.Strings.Unbounded.Unbounded_String;
    function quote_string( qkv : string ) return String;
-   procedure grow_key( C : in out Connection_Type); --
 
    function  cache_key_nameval_uptodate( C : Connection_Type) return boolean;--
    pragma inline(cache_key_nameval_uptodate);
    -- if force = true, re-create it even if already uptodate;
    -- if force = false,(automatic,normal daily use) re-create only if necessary/not-uptodate
    procedure cache_key_nameval_create( C : in out Connection_Type; force : boolean := false);
-
-   function get_keyname_default_case( C : Connection_Type) return SQL_Case_Type;--
-   function get_keyval_default_case( C : Connection_Type) return SQL_Case_Type;--
-   procedure set_keyname_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type);--
-   procedure set_keyval_default_case( C : in out Connection_Type; sqlcase: SQL_Case_Type);--
-   pragma inline(get_keyname_default_case);
-   pragma inline(get_keyval_default_case);
-   pragma inline(set_keyname_default_case);
-   pragma inline(set_keyval_default_case);
 
    -- add keyword and his respective value for the connection string.
    -- if clear = false, just append keyword and value to list of keywords and values
@@ -136,20 +129,15 @@ package APQ.PostgreSQL.Client is
    -- remember to include the libs was needed
    procedure add_key_nameval( C : in out Connection_Type;
                              kname,kval : string := "";
-                             knamecasele, kvalcasele : boolean := true;
                              clear : boolean := false);
 
-   procedure clear_all_key_nameval(C : in out Connection_Type; add_more_this_alloc : natural := 0);
+   procedure clear_all_key_nameval(C : in out Connection_Type );
 
    procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True);
 
    procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class);
 
    function verifica_conninfo_cache( C : Connection_Type) return string;
-
-
-
-
 
 	-- Open trace output file
 	procedure Open_DB_Trace(C : in out Connection_Type; Filename : String; Mode : Trace_Mode_Type := Trace_APQ);
@@ -257,8 +245,6 @@ private
 	type PG_Conn is new System.Address;
 	Null_Connection : PG_Conn := PG_Conn(System.Null_Address);
 
-
-
 	---------------------
 	-- CONNECTION_TYPE --
 	---------------------
@@ -271,33 +257,21 @@ private
          Notice        : String_Ptr;			-- Last notice message if any
          Notify_Proc   : Notify_Proc_Type;		-- Notify procedure or NULL
          ----
-         keyname : String_Ptr_Array_Access; -- see http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
-         keyval  : String_Ptr_Array_Access; -- or see http://www.postgresql.org/docs/9.0/static/libpq-connect.html
-                                            -- or yet more uptodate url,for example of keyname(s) e theirs possible keyvals :-)
-         keycount : natural := 0;
-         keyalloc : natural := 0;
+         -- see http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
+         -- or see http://www.postgresql.org/docs/9.0/static/libpq-connect.html
+					    -- or yet more uptodate url,for example of keyname(s) e theirs possible keyvals :-)
+	key_name_list : options_list2.List;
 
-         keyval_Caseless   : Boolean_Array_Access;
-         keyname_Caseless  : Boolean_Array_Access;
-
-         keyname_val_cache : String_Ptr;       -- for bypass "the recreate it" ,
+	 keyname_val_cache : ada.Strings.Unbounded.Unbounded_String :=
+	   ada.Strings.Unbounded.To_Unbounded_String("");   -- for bypass "the recreate it" ,
          keyname_val_cache_uptodate : boolean := false; -- if keyname_val_cache_uptodate = true (True)
-
-         keyname_default_case : SQL_Case_Type := Lower_Case;
-         keyval_default_case  : SQL_Case_Type := Preserve_Case;
-         ----
-
       end record;
-
-
 
 	procedure Initialize(C : in out Connection_Type);
 	procedure Finalize(C : in out Connection_Type);
 	function Internal_Connection(C : Connection_Type) return PG_Conn;
 
 	function Query_Factory( C: in Connection_Type ) return Root_Query_Type'Class;
-
-
 
 	type PQ_Result is new System.Address;
 	Null_Result : PQ_Result := PQ_Result(System.Null_Address);
@@ -346,12 +320,6 @@ private
 	Buf_Size_Default : constant Natural := 5 * 1024;
 
 	Standard_Error_Notify : constant Notify_Proc_Type := Notify_on_Standard_Error'Access;
-
-
-
-
-
-
 
 	pragma Inline(Is_Connected);
 	pragma Inline(In_Abort_State);
