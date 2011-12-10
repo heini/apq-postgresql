@@ -1,0 +1,6 @@
+22jul2010 19h00 GMT-3  Daniel Norte de Moraes
+
+I'll document , with examples, the new options 
+and a guide to use apq-postgresl with ssl, included
+the use of more que one certificates/servers/keys in
+ a same program !! Enjoy!! :-)

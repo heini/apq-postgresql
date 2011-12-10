@@ -36,6 +36,7 @@ with Ada.Unchecked_Conversion;
 with Ada.Characters.Latin_1;
 with Ada.Characters.Handling;
 with Ada.Strings.Fixed;
+with ada.strings.maps;
 with Ada.IO_Exceptions;
 with System;
 with System.Address_To_Access_Conversions;
@@ -50,7 +51,6 @@ package body APQ.PostgreSQL.Client is
 	Seek_Set : constant Interfaces.C.int := 0;
 	Seek_Cur : constant Interfaces.C.int := 1;
 	Seek_End : constant Interfaces.C.int := 2;
-
 	No_Date : Ada.Calendar.Time;
 
 	type PQ_Status_Type is (
@@ -60,7 +60,9 @@ package body APQ.PostgreSQL.Client is
 		Connection_Made,		-- Connection OK; waiting to send.
 		Connection_Awaiting_Response,	-- Waiting for a response
 		Connection_Auth_OK,		-- Received authentication
-		Connection_Setenv		-- Negotiating environment.
+                         Connection_Setenv,		-- Negotiating environment.
+                         Connection_ssl_startup,
+                         Connection_needed
 	);
 
 	for PQ_Status_Type use (
@@ -70,8 +72,12 @@ package body APQ.PostgreSQL.Client is
 		3,	-- CONNECTION_MADE
 		4,	-- CONNECTION_AWAITING_RESPONSE
 		5,	-- CONNECTION_AUTH_OK
-		6	-- CONNECTION_SETENV
-	);
+                6,	-- CONNECTION_SETENV
+                7,        -- Connection_ssl_startup
+                8         -- Connection_needed
+
+                        );
+   pragma convention(C,PQ_Status_Type);
 
 
 	------------------------------
@@ -228,59 +234,63 @@ package body APQ.PostgreSQL.Client is
 
 
 
-	procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String) is
+   procedure Set_DB_Name(C : in out Connection_Type; DB_Name : String) is
 
-		procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
-			Q : Query_Type;
-		begin
-			begin
-				Prepare(Q,To_Case("USE " & DB_Name,C.SQL_Case));
-				Execute(Q,C);
-			exception
-				when SQL_Error =>
-					Raise_Exception(APQ.Use_Error'Identity,
-						"PG03: Unable to select database " & DB_Name & ". (Use_Database)");
-			end;
-		end Use_Database;
+      procedure Use_Database(C : in out Connection_Type; DB_Name : String) is
+         Q : Query_Type;
+      begin
+         begin
+            Prepare(Q,To_Case("USE " & DB_Name,C.SQL_Case));
+            Execute(Q,C);
+         exception
+            when SQL_Error =>
+               Raise_Exception(APQ.Use_Error'Identity,
+                               "PG03: Unable to select database " & DB_Name & ". (Use_Database)");
+         end;
+      end Use_Database;
 
-	begin
-		if not Is_Connected(C) then
-			-- Modify context to connect to this database when we connect
-			Set_DB_Name(Root_Connection_Type(C),DB_Name);
-		else
-			-- Use this database now
-			Use_Database(C,DB_Name);
-			-- Update context info if no exception thrown above
-			Set_DB_Name(Root_Connection_Type(C),DB_Name);
-		end if;
-	end Set_DB_Name;
+   begin
+      if not Is_Connected(C) then
+         -- Modify context to connect to this database when we connect
+         Set_DB_Name(Root_Connection_Type(C),DB_Name);
+      else
+         -- Use this database now
+         Use_Database(C,DB_Name);
+         -- Update context info if no exception thrown above
+         Set_DB_Name(Root_Connection_Type(C),DB_Name);
+      end if;
 
+      C.keyname_val_cache_uptodate := false;
 
-
-	procedure Set_Options(C : in out Connection_Type; Options : String) is
-	begin
-		Replace_String(C.Options,Set_Options.Options);
-	end Set_Options;
+   end Set_DB_Name;
 
 
 
-	function Options(C : Connection_Type) return String is
-	begin
-		if not Is_Connected(C) then
-			if C.Options /= null then
-				return C.Options.all;
-			end if;
-		else
-			declare
-				use Interfaces.C.Strings;
-				function PQoptions(PGconn : PG_Conn) return chars_ptr;
-				pragma Import(C,PQoptions,"PQoptions");
-			begin
-				return Value_Of(PQoptions(C.Connection));
-			end;
-		end if;
-		return "";
-	end Options;
+   procedure Set_Options(C : in out Connection_Type; Options : String) is
+   begin
+      Replace_String(C.Options,Set_Options.Options);
+      C.keyname_val_cache_uptodate := false;
+   end Set_Options;
+
+
+
+   function Options(C : Connection_Type) return String is
+   begin
+      if not Is_Connected(C) then
+         if C.Options /= null then
+            return C.Options.all;
+         end if;
+      else
+         declare
+            use Interfaces.C.Strings;
+            function PQoptions(PGconn : PG_Conn) return chars_ptr;
+            pragma Import(C,PQoptions,"PQoptions");
+         begin
+            return Value_Of(PQoptions(C.Connection));
+         end;
+      end if;
+      return "";
+   end Options;
 
 
 
@@ -301,8 +311,8 @@ package body APQ.PostgreSQL.Client is
 	-- Connection_Notify is called by notices.c as
 	-- a callback from the libpq interface.
 	--------------------------------------------------
-	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr);
-	pragma Export(C,Connection_Notify,"Connection_Notify");
+--  	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr);
+--  	pragma Export(C,Connection_Notify,"Connection_Notify");
 
 
 	procedure Connection_Notify(C_Addr : System.Address; Msg_Ptr : Interfaces.C.Strings.chars_ptr) is
@@ -351,167 +361,6 @@ package body APQ.PostgreSQL.Client is
 			return PQstatus(C.Connection);
 		end if;
 	end PQ_Status;
-
-
-
-	procedure Connect(C : in out Connection_Type; Check_Connection : Boolean := True) is
-		procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
-		pragma import(C,Notice_Install,"notice_install");
-		function PQsetdbLogin(pghost, pgport, pgoptions, pgtty, dbname, login, pwd : System.Address) return PG_Conn;
-		pragma import(C,PQsetdbLogin,"PQsetdbLogin");
-
-		use Interfaces.C.Strings;
-
-		C_Host :	char_array_access;
-		A_Host :	System.Address := System.Null_Address;
-		C_Options :	char_array_access;
-		A_Options :	System.Address := System.Null_Address;
-		C_Tty :		char_array_access;
-		A_Tty :		System.Address := System.Null_Address;
-		C_Dbname :	char_array_access;
-		A_Dbname :	System.Address := System.Null_Address;
-		C_Login :	char_array_access;
-		A_Login :	System.Address := System.Null_Address;
-		C_Pwd :		char_array_access;
-		A_Pwd :		System.Address := System.Null_Address;
-
-	begin
-
-		if Check_Connection and then Is_Connected(C) then
-			Raise_Exception(Already_Connected'Identity,
-				"PG07: Already connected (Connect).");
-		end if;
-
-		C_String(C.Host_Name,C_Host,A_Host);
-		C_String(C.Options,C_Options,A_Options);
-		C_String(null,C_Tty,A_Tty);
-		C_String(C.DB_Name,C_Dbname,A_Dbname);
-		C_String(C.User_Name,C_Login,A_Login);
-		C_String(C.User_Password,C_Pwd,A_Pwd);
-		
-		if C.Port_Format = IP_Port then
-			declare
-				C_Port :	char_array := To_C(Port_Integer'Image(C.Port_Number));
-				A_Port :	System.Address := C_Port'Address;
-			begin
-				-- Use application specified port #
-				C.Connection := PQsetdbLogin(A_Host,A_Port,A_Options,A_Tty,A_Dbname,A_Login,A_Pwd);
-			end;
-		elsif C.Port_Format = UNIX_Port then
-			declare
-				C_Port :	char_array_access;
-				A_Port :	System.Address := System.Null_Address;
-			begin
-				C_String(C.Port_Name,C_Port,A_Port);
-				C.Connection := PQsetdbLogin(A_Host,A_Port,A_Options,A_Tty,A_Dbname,A_Login,A_Pwd);
-			end;
-		else
-			raise Program_Error;
-		end if;
-
-		if C_Host /= null then
-			Free(C_Host);
-		end if;
-		if C_Options /= null then
-			Free(C_Options);
-		end if;
-		if C_Tty /= null then
-			Free(C_Tty);
-		end if;
-		if C_Dbname /= null then
-			Free(C_Dbname);
-		end if;
-		if C_Login /= null then
-			Free(C_Login);
-		end if;
-		if C_Pwd /= null then
-			Free(C_Pwd);
-		end if;
-
-		Free_Ptr(C.Error_Message);
-
-		if PQ_Status(C) /= Connection_OK then
-			declare
-				procedure PQfinish(C : PG_Conn);
-				pragma Import(C,PQfinish,"PQfinish");
-				Msg : String := Strip_NL(Error_Message(C));
-			begin
-				PQfinish(C.Connection);
-				C.Connection := Null_Connection;
-				C.Error_Message := new String(1..Msg'Length);
-				C.Error_Message.all := Msg;
-				Raise_Exception(Not_Connected'Identity,
-					"PG08: Failed to connect to database server (Connect).");
-			end;
-		end if;
-
-		Notice_Install(C.Connection,C'Address);	-- Install Connection_Notify handler
-
-		------------------------------
-		-- SET PGDATESTYLE TO ISO;
-		--
-		-- This is necessary for all of the
-		-- APQ date handling routines to
-		-- function correctly. This implies
-		-- that all APQ applications programs
-		-- should use the ISO date format.
-		------------------------------
-		declare
-			SQL : Query_Type;
-		begin
-			Prepare(SQL,"SET DATESTYLE TO ISO");
-			Execute(SQL,C);
-		exception
-			when Ex : others =>
-				Disconnect(C);
-				Reraise_Occurrence(Ex);
-		end;
-
-	end Connect;
-
-
-
-	procedure Connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class) is
-		type Info_Func is access function(C : Connection_Type) return String;
-
-		procedure Clone(S : in out String_Ptr; Get_Info : Info_Func) is
-			Info : String := Get_Info(Connection_Type(Same_As));
-		begin
-			if Info'Length > 0 then
-				S	:= new String(1..Info'Length);
-				S.all	:= Info;
-			else
-				null;
-				pragma assert(S = null);
-			end if;
-		end Clone;
-	begin
-		Reset(C);
-
-		Clone(C.Host_Name,Host_Name'Access);
-
-		C.Port_Format := Same_As.Port_Format;
-		if C.Port_Format = IP_Port then
-			C.Port_Number := Port(Same_As);	  -- IP_Port
-		else
-			Clone(C.Port_Name,Port'Access);	  -- UNIX_Port
-		end if;
-
-		Clone(C.DB_Name,DB_Name'Access);
-		Clone(C.User_Name,User'Access);
-		Clone(C.User_Password,Password'Access);
-		Clone(C.Options,Options'Access);
-
-		C.Rollback_Finalize	:= Same_As.Rollback_Finalize;
-		C.Notify_Proc		:= Connection_Type(Same_As).Notify_Proc;
-
-		Connect(C);		-- Connect to database before worrying about trace facilities
-
-		-- TRACE FILE & TRACE SETTINGS ARE NOT CLONED
-
-	end Connect;
-
-
 
 	procedure Disconnect(C : in out Connection_Type) is
 		procedure Notice_Uninstall(C : PG_Conn);
@@ -583,17 +432,20 @@ package body APQ.PostgreSQL.Client is
 
 		end if;
 
-		if C.Connection = Null_Connection then
-			Free_Ptr(C.Host_Name);
-			Free_Ptr(C.Host_Address);
-			Free_Ptr(C.DB_Name);
-			Free_Ptr(C.User_Name);
-			Free_Ptr(C.User_Password);
-			Free_Ptr(C.Options);
-			Free_Ptr(C.Error_Message);
-			Free_Ptr(C.Notice);
-		end if;
-	end Internal_Reset;
+      if C.Connection = Null_Connection then
+         Free_Ptr(C.Host_Name);
+         Free_Ptr(C.Host_Address);
+         Free_Ptr(C.DB_Name);
+         Free_Ptr(C.User_Name);
+         Free_Ptr(C.User_Password);
+         Free_Ptr(C.Options);
+         Free_Ptr(C.Error_Message);
+         Free_Ptr(C.Notice);
+         --
+         clear_all_key_nameval(c);
+
+      end if;
+   end Internal_Reset;
 
 
 
@@ -627,7 +479,347 @@ package body APQ.PostgreSQL.Client is
 			return C.Notice.all;
 		end if;
 		return "";
-	end Notice_Message;
+   end Notice_Message;
+   --
+   --
+   function "="( Left :root_option_record2; right : root_option_record2) return boolean
+   is
+      pragma Optimize(time);
+
+      lkey_s : string :=
+	ada.Strings.fixed.Trim( ada.Characters.Handling.To_Lower(
+	  ada.Strings.Unbounded.To_String( left.key_u)) ,
+	  ada.Strings.Both );
+      rkey_s : string :=
+	ada.Strings.fixed.Trim( ada.Characters.Handling.To_Lower(
+	  ada.Strings.Unbounded.To_String( right.key_u)) ,
+	  ada.Strings.Both );
+   begin
+      if lkey_s = rkey_s then
+	 return true;
+      end if;
+      return false;
+   end "=";
+
+   function quote_string( qkv : string ) return String
+   is
+      use ada.Strings;
+      use ada.Strings.Fixed;
+
+      function PQescapeString(to, from : System.Address; length : size_t) return size_t;
+      pragma Import(C,PQescapeString,"PQescapeString");
+      src : string := trim ( qkv , both );
+      C_Length : size_t := src'Length * 2 + 1;
+      C_From   : char_array := To_C(src);
+      C_To     : char_array(0..C_Length-1);
+      R_Length : size_t := PQescapeString(C_To'Address,C_From'Address,C_Length);
+      -- viva!!! :-)
+   begin
+      return To_Ada(C_To);
+   end quote_string;
+   ----
+
+   function quote_string( qkv : string ) return ada.Strings.Unbounded.Unbounded_String
+   is
+   begin
+      return ada.Strings.Unbounded.To_Unbounded_String(String'(quote_string(qkv)));
+   end quote_string;
+   --
+   function cache_key_nameval_uptodate( C : Connection_Type) --
+                                       return boolean
+   is
+   begin
+      return c.keyname_val_cache_uptodate;
+   end cache_key_nameval_uptodate;
+
+   --
+   procedure cache_key_nameval_create( C : in out Connection_Type; force : boolean := false)--
+   is
+      pragma optimize(time);
+      use ada.strings.Unbounded;
+      use ada.strings.Fixed;
+      use ada.Strings;
+      use Ada.Characters.Handling;
+
+      use apq.postgresql.client.options_list2;
+      --
+      tmp_ub_cache : Unbounded_String := To_Unbounded_String(160); -- pre-allocate :-)
+      tmp_eq : Unbounded_String := to_Unbounded_String(" = '");
+      tmp_ap : Unbounded_String := to_Unbounded_String("' ");
+      --
+      procedure process(position : cursor) is
+	 val_tmp : root_option_record2 := element(position);
+      begin
+	 if val_tmp.is_valid = false then return; end if; --bahiii! :-)
+
+	 tmp_ub_cache := tmp_ub_cache & val_tmp.key_u & tmp_eq &
+	   trim(Unbounded_String'(quote_string(string'(To_String(val_tmp.value_u)))),ada.Strings.Both)
+	   & tmp_ap ;
+
+      end process;
+
+   begin
+      if cache_key_nameval_uptodate( C ) and force = false then return; end if; -- bahiii :-)
+      c.keyname_val_cache := To_Unbounded_String("");
+
+      if c.Port_Format = UNIX_Port then
+         tmp_ub_cache := to_Unbounded_String("host")
+           & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Host_Name)))),ada.Strings.both) & tmp_ap
+           & to_Unbounded_String("port")
+           & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Port_Name)))),ada.Strings.both) & tmp_ap ;
+        elsif c.Port_Format = IP_Port then
+         tmp_ub_cache := to_Unbounded_String("hostaddr")
+           & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Host_Address)))),ada.Strings.both) & tmp_ap
+           & to_Unbounded_String("port")
+           & tmp_eq & trim(to_Unbounded_String(string'(Port_Integer'image(c.Port_Number))),ada.Strings.both) & tmp_ap;
+      else
+         raise program_error;
+      end if;
+
+      tmp_ub_cache := tmp_ub_cache
+        & to_Unbounded_String("dbname") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.DB_Name)))),ada.Strings.both) & tmp_ap
+        & to_Unbounded_String("user") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.User_Name)))),ada.Strings.both) & tmp_ap
+        & to_Unbounded_String("password") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.User_Password)))),ada.Strings.both) & tmp_ap;
+      if trim(string'(To_String(C.Options)), ada.Strings.Both) /= "" then
+         tmp_ub_cache := tmp_ub_cache
+         & to_Unbounded_String("options") & tmp_eq & trim(Unbounded_String'(quote_string(string'(To_String(C.Options)))), both) & tmp_ap ;
+      end if;
+
+      if not (c.key_name_list.Is_Empty ) then
+	 c.key_name_list.Iterate(process'Access);
+      end if;
+
+      c.keyname_val_cache := tmp_ub_cache;
+
+      tmp_ub_cache := To_Unbounded_String("");
+
+   end cache_key_nameval_create;--
+   --
+   procedure clear_all_key_nameval(C : in out Connection_Type )
+   is
+      pragma optimize(time);
+   begin
+      if not ( c.key_name_list.is_empty ) then
+	    c.key_name_list.clear;
+      end if;
+      c.keyname_val_cache := ada.Strings.Unbounded.To_Unbounded_String("");
+      c.keyname_val_cache_uptodate := false;
+
+   end clear_all_key_nameval;
+
+   procedure key_nameval( L : in out options_list2.list ;
+			 val : root_option_record2;
+			 clear : boolean := false
+			)
+   is
+      use options_list2;
+      mi_cursor : options_list2.cursor := no_element;
+   begin
+      if clear then
+	 if not ( L.is_empty ) then
+	    L.clear;
+	 end if;
+      end if;
+      if L.is_empty then
+	 L.append(val);
+	 return;
+      end if;
+      mi_cursor := L.find(val);
+      if mi_cursor = No_Element then
+	 L.append(val);
+	 return;
+      end if;
+      L.replace_element(mi_cursor, val);
+
+   end key_nameval;
+
+
+   procedure add_key_nameval( C : in out Connection_Type;
+                             kname, kval : string := "";
+                             clear : boolean := false )
+   is
+      pragma optimize(time);
+      use ada.strings;
+      use ada.Strings.Fixed;
+
+      tmp_kname : string  := string'(trim(kname,both));
+      tmp_kval  : string  := string'(trim(kval,both));
+
+   begin
+      if tmp_kname = "" then return; end if; -- bahiii :-)
+      declare
+	 val_tmp : root_option_record2 :=
+	   root_option_record2'(is_valid => true,
+			 key_u    => ada.Strings.Unbounded.To_Unbounded_String(tmp_kname),
+			 value_u  => ada.Strings.Unbounded.To_Unbounded_String(tmp_kval)
+			);
+      begin
+	 key_nameval(L     => c.key_name_list,
+	      val   => val_tmp ,
+	      clear => clear);
+      end;
+      C.keyname_val_cache_uptodate := false;
+
+   end add_key_nameval;
+
+ --
+   procedure clone_clone_pg(To : in out Connection_Type; From : Connection_Type )
+   is
+      pragma optimize(time);
+      use apq.postgresql.client.options_list2;
+      --
+      procedure add(position : cursor) is
+      begin
+	 to.key_name_list.append(element(position));
+      end add;
+
+   begin
+      clear_all_key_nameval(to);
+
+      if not ( from.key_name_list.is_empty ) then
+	    from.key_name_list.iterate(add'Access);
+      end if;
+
+      to.keyname_val_cache_uptodate := false;
+
+   end clone_clone_pg;
+
+   --
+   procedure connect(C : in out Connection_Type; Check_Connection : Boolean := True)
+   is
+      pragma optimize(time);
+
+      use Interfaces.C.Strings;
+
+   begin
+      if Check_Connection and then Is_Connected(C) then
+         Raise_Exception(Already_Connected'Identity,
+                         "PG07: Already connected (Connect).");
+      end if;
+
+      cache_key_nameval_create(C); -- don't worry :-) "re-create" accours only if not uptodate :-)
+                                   -- This procedure can be executed manually if you desire :-)
+                                   -- "for example": the "Connection_type" var was created  and configured
+                                   -- much before the  connection with the DataBase server :-) take place
+                                   -- then the "Connection_type" already uptodate
+                                   -- ( well... uptodate if really uptodate ;-)
+                                   -- this will speedy up the things a little :-)
+      declare
+         procedure Notice_Install(Conn : PG_Conn; ada_obj_ptr : System.Address);
+         pragma import(C,Notice_Install,"notice_install");
+
+         function PQconnectdb(coni : chars_ptr ) return PG_Conn;
+         pragma import(C,PQconnectdb,"PQconnectdb");
+         coni_str : string := ada.Strings.Unbounded.To_String(C.keyname_val_cache);
+         C_conni : chars_ptr := New_String(Str => coni_str );
+      begin
+         C.Connection := PQconnectdb( C_conni); -- blocking call :-)
+         Free_Ptr(C.Error_Message);
+
+         if PQ_Status(C) /= Connection_OK then  -- if the connecting in a non-blocking fashion,
+            -- there are more option of status needing verification :-)
+            -- it Don't the case here
+            declare
+               procedure PQfinish(C : PG_Conn);
+               pragma Import(C,PQfinish,"PQfinish");
+               Msg : String := Strip_NL(Error_Message(C));
+            begin
+               PQfinish(C.Connection);
+               C.Connection := Null_Connection;
+               C.Error_Message := new String(1..Msg'Length);
+               C.Error_Message.all := Msg;
+               Raise_Exception(Not_Connected'Identity,
+                               "PG08: Failed to connect to database server (Connect). error was: " &
+                               msg ); -- more descriptive about 'what failed' :-)
+            end;
+         end if;
+
+         Notice_Install(C.Connection,C'Address);	-- Install Connection_Notify handler
+
+         ------------------------------
+         -- SET PGDATESTYLE TO ISO;
+         --
+         -- This is necessary for all of the
+         -- APQ date handling routines to
+         -- function correctly. This implies
+         -- that all APQ applications programs
+         -- should use the ISO date format.
+         ------------------------------
+         declare
+            SQL : Query_Type;
+         begin
+            Prepare(SQL,"SET DATESTYLE TO ISO");
+            Execute(SQL,C);
+         exception
+            when Ex : others =>
+               Disconnect(C);
+               Reraise_Occurrence(Ex);
+         end;
+      end;
+
+   end connect;
+
+   procedure connect(C : in out Connection_Type; Same_As : Root_Connection_Type'Class)
+   is
+      pragma optimize(time);
+
+      type Info_Func is access function(C : Connection_Type) return String;
+
+      procedure Clone(S : in out String_Ptr; Get_Info : Info_Func) is
+         Info : String := Get_Info(Connection_Type(Same_As));
+      begin
+         if Info'Length > 0 then
+            S	:= new String(1..Info'Length);
+            S.all	:= Info;
+         else
+            null;
+            pragma assert(S = null);
+         end if;
+      end Clone;
+      blo : boolean := true;
+      tmpex : natural := 2;
+   begin
+      Reset(C);
+
+      Clone(C.Host_Name,Host_Name'Access);
+
+      C.Port_Format := Same_As.Port_Format;
+      if C.Port_Format = IP_Port then
+         C.Port_Number := Port(Same_As);	  -- IP_Port
+      else
+         Clone(C.Port_Name,Port'Access);	  -- UNIX_Port
+      end if;
+
+      Clone(C.DB_Name,DB_Name'Access);
+      Clone(C.User_Name,User'Access);
+      Clone(C.User_Password,Password'Access);
+      Clone(C.Options,Options'Access);
+
+      C.Rollback_Finalize	:= Same_As.Rollback_Finalize;
+      C.Notify_Proc		:= Connection_Type(Same_As).Notify_Proc;
+      -- I believe if "Same_As" var is defacto a "Connection_Type" as "C" var,
+      -- there are need for copy  key's name and val from "Same_As" ,
+      -- because in this keys and vals
+      -- maybe are key's how sslmode , gsspi etc, that are defacto needs for connecting "C"
+
+      if Same_As.Engine_Of = Engine_PostgreSQL then
+         clone_clone_pg(C , Connection_Type(Same_as));
+      end if;
+
+     connect(C);	-- Connect to database before worrying about trace facilities
+
+      -- TRACE FILE & TRACE SETTINGS ARE NOT CLONED
+
+   end connect;
+
+   function verifica_conninfo_cache( C : Connection_Type) return string -- for debug purpose :-P
+                                                                        -- in the spirit there are an get_password(c) yet...
+
+   is
+   begin
+      return ada.Strings.Unbounded.To_String(c.keyname_val_cache);
+   end verifica_conninfo_cache;
+
 
 
 
@@ -843,7 +1035,7 @@ package body APQ.PostgreSQL.Client is
 			R := Result(Query);
 			if R /= Command_OK and R /= Tuples_OK then
 --				if Connection.Trace_On then
---					Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Error " & 
+--					Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Error " &
 --						Result_Type'Image(Query.Error_Code) & " : " & Error_Message(Query));
 --				end if;
 				Raise_Exception(SQL_Error'Identity,
@@ -851,7 +1043,7 @@ package body APQ.PostgreSQL.Client is
 			end if;
 		else
 --			if Connection.Trace_On then
---				Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Error " & 
+--				Ada.Text_IO.Put_Line(Connection.Trace_Ada,"-- Error " &
 --					Result_Type'Image(Query.Error_Code) & " : " & Error_Message(Query));
 --			end if;
 			Raise_Exception(SQL_Error'Identity,
@@ -1407,7 +1599,7 @@ package body APQ.PostgreSQL.Client is
 	end Internal_Read;
 
 
-	
+
 	procedure Internal_Blob_Open(Blob : in out Blob_Type; Mode : Mode_Type; Buf_Size : Natural := Buf_Size_Default) is
 		use Ada.Streams;
 	begin
@@ -1428,7 +1620,7 @@ package body APQ.PostgreSQL.Client is
 			Blob.The_Size	:= Stream_Element_Offset(Internal_Size(Blob));
 		else
 			null;		-- unbuffered blob operations will be used
-		end if; 
+		end if;
 	end Internal_Blob_Open;
 
 
@@ -1638,7 +1830,7 @@ package body APQ.PostgreSQL.Client is
 	end Blob_Import;
 
 
-	
+
 	procedure Blob_Export(DB : Connection_Type; Oid : Row_ID_Type; Pathname : String) is
 		P : char_array := To_C(Pathname);
 		Z : int;
@@ -1697,11 +1889,13 @@ package body APQ.PostgreSQL.Client is
 	---------------------
 
 
-	procedure Initialize(C : in out Connection_Type) is
-	begin
-		C.Port_Format := IP_Port;
-		C.Port_Number := 5432;
-	end Initialize;
+   procedure Initialize(C : in out Connection_Type) is
+   begin
+      C.Port_Format := IP_Port;
+      C.Port_Number := 5432;
+      C.keyname_val_cache_uptodate := false;
+
+   end Initialize;
 
 
 
@@ -1745,7 +1939,7 @@ package body APQ.PostgreSQL.Client is
 		Clear(Q);
 	end Finalize;
 
-	
+
 
  	function SQL_Code(Query : Query_Type) return SQL_Code_Type is
 	begin
@@ -1849,7 +2043,7 @@ package body APQ.PostgreSQL.Client is
 					end if;
 				else
 					BX := Stream.Log_Offset - Stream.Buf_Offset + Stream.Buffer.all'First;
-				end if;				
+				end if;
 
 				if Stream.Buf_Empty then					-- if buf was empty or was just made empty then..
 					Stream.Buf_Offset	:= Stream.Log_Offset;		-- Set to our convenient offset
