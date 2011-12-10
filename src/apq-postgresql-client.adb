@@ -551,19 +551,10 @@ package body APQ.PostgreSQL.Client is
 	 val_tmp : root_option_record2 := element(position);
       begin
 	 if val_tmp.is_valid = false then return; end if; --bahiii! :-)
-	 if c.SQL_Case = Preserve_Case then
-	    tmp_ub_cache := tmp_ub_cache & val_tmp.key_u & tmp_eq &
-	      trim(Unbounded_String'(quote_string(string'(To_String(val_tmp.value_u)))),ada.Strings.Both)
-	      & tmp_ap ;
-	 else
-	    if c.SQL_Case = Lower_Case then
-	       tmp_ub_cache := tmp_ub_cache & To_Unbounded_String( To_Lower(string'(to_string(val_tmp.key_u)))) & tmp_eq &
-		 trim(Unbounded_String'(quote_string(To_Lower(string'(To_String(val_tmp.value_u))))),ada.Strings.both) & tmp_ap;
-	    else
-	       tmp_ub_cache := tmp_ub_cache & To_Unbounded_String(To_Upper(string'(to_string(val_tmp.key_u)))) & tmp_eq &
-		 trim(Unbounded_String'(quote_string(To_Upper(string'(To_String(val_tmp.value_u))))),ada.Strings.both) & tmp_ap;
-	    end if;
-	 end if;
+
+	 tmp_ub_cache := tmp_ub_cache & val_tmp.key_u & tmp_eq &
+	   trim(Unbounded_String'(quote_string(string'(To_String(val_tmp.value_u)))),ada.Strings.Both)
+	   & tmp_ap ;
 
       end process;
 
