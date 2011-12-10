@@ -603,7 +603,7 @@ package body APQ.PostgreSQL.Client is
 	    c.key_name_list.clear;
       end if;
       c.keyname_val_cache := ada.Strings.Unbounded.To_Unbounded_String("");
-      c.keyname_val_cache_uptodate := true;
+      c.keyname_val_cache_uptodate := false;
 
    end clear_all_key_nameval;
 
