@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# 
+# Local configuration file for APQ.PostgreSQL
+
+
+
+
+################
+# Project Name #
+################
+
+project="apq-postgresql-examples"
+
+
+
+
+###################
+# Standard Checks #
+###################
+check_project apq
+check_project apq-postgresql
+check_project apq-samples
+
+
+
+
