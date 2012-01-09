@@ -39,8 +39,9 @@
 with ada.Strings.Unbounded;
 
 package APQ.PostgreSQL is
-	pragma linker_options("-lpq");
 
+
+%POSTGRESQL_LIBS%
 
 	type Result_Type is (
 		Empty_Query,

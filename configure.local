@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 
-# Local configuration file for APQ.MySQL
+# Local configuration file for APQ.PostgreSQL
 
 
 
@@ -22,6 +22,8 @@ check_project apq
 
 check_in_path sed
 check_in_path grep
+
+
 
 
 
@@ -49,60 +51,32 @@ fi
 
 
 
-############################
+#################################
 # apq-postgresql.ads Generation #
-############################
+#################################
+
+get_linker_options(){
+	for i in $POSTGRESQL_LIBS
+	do
+		echo "	pragma Linker_Options( \"$i\" );";
+	done;
+}
+
+
+
+
 
 if [[ -f src/apq-postgresql.ads ]]
 then
 	echo "apq-postgresql.ads exists";
 else
-	
-	TMP_ADS="$TMP_PATH/apq-postgresql.ads"
-	mkdir -p "$TMP_PATH";
-	cp "src-in/apq-postgresql.ads.in" "$TMP_ADS"
-
 
 	echo "Generating src/apq-postgresql.ads";
-	source configure-postgresql.sh;
-
-
-	# Field Types
-
-	echo -n "    * Getting type codes                    ... ";
-	field_types=`get_field_type_codes`;
-	test_is_set "${field_types}"
-
-	echo -n "    * Setting type codes                    ... ";
-	set_enum_values "$TMP_ADS" "$field_types" "FIELD_TYPE"
-
-
-	# Error/Return codes
-
-	echo -n "    * Getting error codes                   ... ";
-	error_codes=`get_error_codes`;
-	test_is_set "${error_codes}";
-	echo -n "    * Setting error codes                   ... ";
-	set_enum_values "$TMP_ADS" "$error_codes" "RESULT_TYPE"
-
-
-
-	# Connection options codes
-
-	echo -n "    * Getting MySQL connection option codes ... ";
-	connection_options=`get_connection_options`
-	test_is_set "${connection_options}"
-	echo -n "    * Getting MySQL connection option codes ... ";
-	set_enum_values "$TMP_ADS" "$connection_options" "POSTGRESQL_OPTION_TYPE"
-
+	cp "src-in/apq-postgresql.ads.in" "src/apq-postgresql.ads";
 
 	linker_options=`get_linker_options`
 	echo "$linker_options"
-	replace_in_file "$TMP_ADS" "%POSTGRESQL_LIBS%" "$linker_options"
-
-
-
-	mv "$TMP_ADS" src/ && echo "    => APQ.MySQL specification file seems to be ready now..." 
+	replace_in_file src/apq-postgresql.ads "%POSTGRESQL_LIBS%" "$linker_options"
 fi
 
 
