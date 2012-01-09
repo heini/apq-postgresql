@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# 
+# Local configuration file for APQ.MySQL
+
+
+
+
+################
+# Project Name #
+################
+
+project="apq-posgresql"
+
+
+
+
+###################
+# Standard Checks #
+###################
+check_project apq
+
+
+check_in_path sed
+check_in_path grep
+
+
+
+########################################
+# PostgreSQL Compiler and Linker Flags #
+########################################
+
+
+if [[ "$OS" = "Windows_NT" ]]
+then
+	if [[ "${POSTGRESQL_PATH}" = "" ]]
+	then
+		echo "Please set the POSTGRESQL_PATH environment variable pointing to your MySQL installment";
+		exit -1;
+	fi
+	POSTGRESQL_CFLAGS=-I "${POSTGRESQL_PATH}\include" -I./ -D_WINDOWS -D__LCC__
+	POSTGRESQL_LIBS="-L${POSTGRESQL_PATH}\lib -lpq"
+	POSTGRESQL_INCLUDE_PATH="${POSTGRESQL_PATH}\include"
+else
+	check_in_path pg_config
+	POSTGRESQL_CFLAGS=`pg_config --cflags` 
+	POSTGRESQL_LIBS=`pg_config --libs`
+	POSTGRESQL_INCLUDE_PATH=`pg_config --includedir`
+fi
+
+
+
+############################
+# apq-postgresql.ads Generation #
+############################
+
+if [[ -f src/apq-postgresql.ads ]]
+then
+	echo "apq-postgresql.ads exists";
+else
+	
+	TMP_ADS="$TMP_PATH/apq-postgresql.ads"
+	mkdir -p "$TMP_PATH";
+	cp "src-in/apq-postgresql.ads.in" "$TMP_ADS"
+
+
+	echo "Generating src/apq-postgresql.ads";
+	source configure-postgresql.sh;
+
+
+	# Field Types
+
+	echo -n "    * Getting type codes                    ... ";
+	field_types=`get_field_type_codes`;
+	test_is_set "${field_types}"
+
+	echo -n "    * Setting type codes                    ... ";
+	set_enum_values "$TMP_ADS" "$field_types" "FIELD_TYPE"
+
+
+	# Error/Return codes
+
+	echo -n "    * Getting error codes                   ... ";
+	error_codes=`get_error_codes`;
+	test_is_set "${error_codes}";
+	echo -n "    * Setting error codes                   ... ";
+	set_enum_values "$TMP_ADS" "$error_codes" "RESULT_TYPE"
+
+
+
+	# Connection options codes
+
+	echo -n "    * Getting MySQL connection option codes ... ";
+	connection_options=`get_connection_options`
+	test_is_set "${connection_options}"
+	echo -n "    * Getting MySQL connection option codes ... ";
+	set_enum_values "$TMP_ADS" "$connection_options" "POSTGRESQL_OPTION_TYPE"
+
+
+	linker_options=`get_linker_options`
+	echo "$linker_options"
+	replace_in_file "$TMP_ADS" "%POSTGRESQL_LIBS%" "$linker_options"
+
+
+
+	mv "$TMP_ADS" src/ && echo "    => APQ.MySQL specification file seems to be ready now..." 
+fi
+
+
+mkdir -p gnat
+GPR="gnat/apq-postgresql.gpr.in";
+cp "src-in/apq-postgresql.gpr.in" $GPR
+
+list=`sedfy_gpr_list "$POSTGRESQL_CFLAGS"` 
+replace_in_file "$GPR" "%POSTGRESQL_CFLAGS%" "$list"
+
+
+
+set_configuration APQPOSTGRESQL_EXTERNALLY_BUILT "false"
