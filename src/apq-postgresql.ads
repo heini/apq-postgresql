@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --         Copyright (C) 2002-2007, Warren W. Gay VE3WWG                    --
---         Copyright (C) 2007-2009, Ada Works Project                       --
+--         Copyright (C) 2007-2011, KOW Framework Project                   --
 --                                                                          --
 --                                                                          --
 -- APQ is free software;  you can  redistribute it  and/or modify it under  --
@@ -36,8 +36,11 @@
 -- This is the base package for the PostreSQL driver for APQ.                --
 -------------------------------------------------------------------------------
 
+with ada.Strings.Unbounded;
+
 package APQ.PostgreSQL is
-	
+
+
 %POSTGRESQL_LIBS%
 
 	type Result_Type is (
@@ -50,7 +53,7 @@ package APQ.PostgreSQL is
 		Nonfatal_Error,
 		Fatal_Error
 		);
-	
+
 	for Result_Type use (
 		Empty_Query		=> 0,
 		Command_OK		=> 1,
@@ -59,7 +62,7 @@ package APQ.PostgreSQL is
 		Copy_In			=> 4,
 		Bad_Response	=> 5,
 		Nonfatal_Error	=> 6,
-		Fatal_Error		=> 7 
+		Fatal_Error		=> 7
 		);
 
 
@@ -76,7 +79,7 @@ package APQ.PostgreSQL is
 	subtype PG_Date is APQ_Date;				-- For compatibility only (use APQ_Date instead)
 	subtype PG_Time is APQ_Time;				-- For compatibility only (use APQ_Time instead)
 	subtype PG_Timestamp is APQ_Timestamp;			-- For compatibility only (use APQ_Timestamp instead)
-	subtype PG_Timezone is APQ_Timezone;			-- For compatibility only (use APQ_Timestamp instead)
+	-- subtype PG_Timezone is APQ_Timezone;			-- For compatibility only (use APQ_Timestamp instead)
 	subtype PG_Bitstring is APQ_Bitstring;			-- For compatibility only (use APQ_Timestamp instead)
 
 	type Mode_Type is (
@@ -91,9 +94,19 @@ package APQ.PostgreSQL is
 		);
 	for Mode_Type'Size use 32;
 
+   type root_option_record2 is private;
+
 private
 
-	type PQOid_Type is mod 2 ** 32;			-- Currently PostgreSQL uses unsigned int for Oid
+   type root_option_record2 is tagged
+      record
+	 is_valid : boolean := false;
+	 key_u    : ada.Strings.Unbounded.Unbounded_String := ada.Strings.Unbounded.To_Unbounded_String("");
+	 value_u  : ada.Strings.Unbounded.Unbounded_String := ada.Strings.Unbounded.To_Unbounded_String("");
+      end record;
+
+
+   type PQOid_Type is mod 2 ** 32;			-- Currently PostgreSQL uses unsigned int for Oid
 
 	Null_Row_ID : constant Row_ID_Type := 0;	-- Value representing no OID
 
