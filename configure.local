@@ -45,7 +45,8 @@ then
 else
 	check_in_path pg_config
 	POSTGRESQL_CFLAGS=`pg_config --cflags` 
-	POSTGRESQL_LIBS=`pg_config --libs`
+	POSTGRESQL_LIBDIR=`pg_config --libdir`
+	POSTGRESQL_LIBS="-L${POSTGRESQL_LIBDIR} -lpq"
 	POSTGRESQL_INCLUDE_PATH=`pg_config --includedir`
 fi
 
