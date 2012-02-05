@@ -16,7 +16,6 @@ uninstall:
 	./scripts/uninstall.sh
 clean:
 	./scripts/clean.sh
-	rm -f src/apq-postgresql.ads 
 
 distclean: 
 	@-${MAKE} clean
