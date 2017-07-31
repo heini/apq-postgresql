@@ -78,7 +78,7 @@ package APQ.PostgreSQL.Client is
 	------------------------------
 
 	function Engine_Of(C : Connection_Type) return Database_Type;
-	function New_Query(C : Connection_Type) return Root_Query_Type'Class;
+	-- function New_Query(C : Connection_Type) return Root_Query_Type'Class;
 
 	procedure Notify_on_Standard_Error(C : in out Connection_Type; Message : String);
 
