@@ -8,7 +8,9 @@ contains more useful documentation, but as a simple example:
 
 ```ada
 with APQ;                       use APQ;
-with APQ.PostgreSQL.Client; 	use APQ.PostgreSQL.Client;
+with APQ.PostgreSQL.Client;     use APQ.PostgreSQL.Client;
+with Ada.Text_IO;               use Ada.Text_IO;
+
 
 procedure list_users is
         C: Connection_Type;
@@ -52,7 +54,7 @@ begin
 
 			New_Line;
 		end loop;
-	end Query_Results;
+	end;
 end list_users;
 ```
 
